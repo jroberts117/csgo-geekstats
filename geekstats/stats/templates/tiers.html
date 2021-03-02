@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+
+<div class="page">
+<div class="container rowwrap m5px" align=center>
+	<div class="header master"><span title="Master tier is for players who keep a KDR greater than 1.5">MASTER</span></div>
+	<div class="container rowwrap">
+		<div class="container rowheader">
+			<div class="data focus">Player</div>
+			<div class="data">KDR</div>
+		</div>
+	{% for i in tier0 %}
+		<div class="container row">
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+			<div class="data">{{i.kdr}}</div>
+		</div>
+	{% endfor %}
+	</div>
+	<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+		This tier is restricted from: Buying armor, and using the Negev, autosniper or AWP</div>
+</div>
+<div class="container rowwrap m5px" align=center>
+	<div class="header gold"><span title="Gold tier is for players who keep a KDR greater than 1.0">GOLD</span></div>
+	<div class="container rowwrap">
+		<div class="container rowheader">
+			<div class="data focus">Player</div>
+			<div class="data">KDR</div>
+		</div>
+	{% for i in tier1 %}
+		<div class="container row">
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+			<div class="data">{{i.kdr}}</div>
+		</div>
+	{% endfor %}
+	</div>
+	<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+		This tier is restricted from: Using the Negev, the autosniper and the AWP</div>
+</div>
+<div class="container rowwrap m5px" align=center>
+	<div class="header silver"><span title="Silver tier is for players who keep a KDR greater than .75 but less than 1.25">SILVER</span></div>
+	<div class="container rowwrap">
+		<div class="container rowheader">
+			<div class="data focus">Player</div>
+			<div class="data">KDR</div>
+		</div>
+	{% for i in tier2 %}
+		<div class="container row">
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+		<div class="data">{{i.kdr}}</div>
+		</div>
+ 	{% endfor %}
+	</div>
+	<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+		This tier is restricted from: Using the autosniper, and the AWP</div></div>
+
+<div class="container rowwrap m5px" align=center>
+	<div class="header bronze"><span title="Bronze tier is for players who do not exceed a 1.0 KDR">BRONZE</span></div>
+	<div class="container rowwrap">
+		<div class="container rowheader">
+			<div class="data focus">Player</div>
+			<div class="data">KDR</div>
+		</div>
+	{% for i in tier3 %}
+		<div class="container row">
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+		<div class="data">{{i.kdr}}</div>
+		</div>
+	{% endfor %}
+	</div>
+</div>
+</div>
+<div class="tile500 acenter" style="margin-top:20px;" align="center">
+	<div class="header "><span title="Total Rank of Players In KDR Performance order">RANKED LIST</span></div>
+	<div class="container rowwrap">
+		<div class="container rowheader">
+			<div class="data short">Rank</div>
+			<div class="data medium focus">Player</div>
+			<div class="data short">Kills</div>
+			<div class="data short">Deaths</div>
+			<div class="data short">KDR</div>
+			<div class="data short">v. AVG</div>
+		</div>
+	{% for i in players %}
+		{% if i.tier == 0 %}
+		<div class="master container">
+		{% elif i.tier == 1 %}
+		<div class="container gold">
+		{% elif i.tier == 2 %}
+		<div class="container silver">
+		{% elif i.tier == 3 %}
+		<div class="container bronze">
+		{% else %}
+		<div class="container ">
+		{% endif %}
+		<div class="data acenter short" align=center>{{forloop.counter}}</div>
+		<div class="data medium focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+		<div class="data short">{{i.kills}}</div>
+		<div class="data short">{{i.deaths}}</div>
+		<div class="data short">{{i.kdr}}</div>
+		<div class="data short">{{i.kdr_v_avg}}</div>
+		</div>
+	{% endfor %}
+	</div>
+</div>
+
+<!--
+   {% if user.is_authenticated %}
+     <li>User: {{ user.get_username }}</li>
+     <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
+   {% else %}
+     <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>   
+   {% endif %} 
+  </ul>	
+{% endblock content %}
+->

@@ -1,0 +1,286 @@
+@charset "utf-8";
+
+.page {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: flex-start;
+	margin: auto;
+	box-sizing: border-box;
+	font-family: Verdana, Arial, serif;
+}
+.title {
+	margin: 5px auto;
+	text-align: center;
+	background: darkred;
+	font-size: 28px;
+
+	color: white;
+}
+.cgeek{
+	background: #f1f3f4;
+}
+.cfest{
+	background: lavenderblush;
+}
+
+.container {
+	display: flex;
+	flex: 1 1 auto;
+	width: 100%;
+	justify-content: space-evenly;
+	align-items: flex-start;
+}
+
+.border {
+	border: 1px solid gray;
+}
+.p800 {
+	max-width: 800px;
+	margin: auto;
+	
+}
+.acenter {
+	align-items: center;
+	text-align: center;
+	vertical-align: middle;
+	margin: auto;
+}
+.h100 {
+	height: 100px;
+}
+.m5px {
+	margin: 5px;
+}
+.rowwrap {
+	flex-flow: row wrap;
+}
+.colwrap {
+	flex-flow: column wrap;
+}
+.nowrap {
+	flex-flow: nowrap;
+}
+.tile250 {
+	width:250px;
+	flex: 0 0 auto;
+	border: 1px solid gray;
+}
+.tile500 {
+	width:500px;
+	flex: 0 0 auto;
+	border: 1px solid gray;
+}
+.header{
+	text-align: center;
+	background: lightgray;
+	width:100%;
+	font-size: 16px;
+	margin: 3px;
+
+}
+
+.row {
+	font-size: 12px;
+	width: 100%;
+	box-sizing: border-box;
+}
+.orow {
+	font-size: 12px;
+	width: 100%;
+	box-sizing: border-box;
+}
+.rowheader {
+	font-size: 14px;
+	width: 100%;
+	box-sizing: border-box;
+	background: black;
+	color: white;
+	font-weight: bold
+}
+
+.row:nth-of-type(odd) {
+	background-color:rgb(224,224,224,.5);
+}
+.data{
+	padding: 2px;
+	font-size: 12px;
+	text-align: left;
+}
+img{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.short{
+	width:35px;
+}
+.medium{
+	width:100px;
+}
+.fbig {
+	font-size: 36px;
+}
+.fmed {
+	font-size: 24px;
+}
+.freg {
+	font-size: 16px;
+}
+.fsmall {
+	font-size: 12px;
+}
+.fbold {
+	font-weight: bold;
+}
+.focus{
+	text-align:left;
+	width:75%;
+}
+.long{
+	text-align:left;
+	width:25%;
+}
+
+.noflow{
+	overflow: hidden;
+}
+.master{
+	background-color: rgb(254,225,1);
+}
+.silver {
+	background-color: rgb(215, 215, 215);
+}
+.bronze {
+	background-color: rgb(167, 112, 68);
+}
+.gold {
+	background-color: rgb(214, 175, 54);
+}
+.winner {
+	background: DimGrey;
+	color: White;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+
+	width: 100%;
+}
+
+li {
+	float: left;
+	border-right: 1px solid #bbb;
+}
+
+li a {
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 8px 26px;
+	text-decoration: none;
+}
+
+li a:hover {
+	background-color: #111;
+}
+.active {
+	background-color: #4CAF50;
+}
+a {
+	color:black;
+	opacity: 1;
+}
+
+
+#header {
+    border-style: none;
+	text-align: center;
+    
+    height: auto;
+	margin: auto;
+}
+#footer {
+    text-align: center;
+    font-size: 0.8em;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #FFFFFF;
+    border-top: thin solid #BBBBBB;
+    clear: both;
+    color: #969696;
+}
+/********************************* TAB SELECTOR STYLES ***********************************/
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  border: 1px dotted green;
+  width: 25%;
+  outline: none;
+  cursor: pointer;
+  margin: 2px 0px 2px 0px;
+  padding: 10px 12px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: lightblue;
+  color: black;
+  font-weight: bold;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: darkred;
+  color: white;
+  font-weight: bold;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 2px 0px;
+  border: none;
+  border-top: none;
+}
+/********************************* GFXX:V Styles ***********************************/
+.gfxx_title {
+	background: black; 
+	color:white; 
+	min-width:123px; 
+	max-width:123px; 
+	flex:1; 
+	align-self:stretch;
+	text-align:center; 
+	padding:10px;
+	border:2px solid white;
+}
+.wm_team {
+	padding: 10px; 
+	border:1px dotted gray; 
+	text-shadow: 2px 2px 5px silver; 
+	font-weight:bold; 
+	text-align:center;
+}
+.wm_score {
+	padding: 10px; 
+	width:40%; 
+	border:1px dotted gray; 
+	text-align:center;
+	font-size:28px;
+}
+.awd_header {
+	padding-top:5px; 
+	font-size:12px; 
+}
+
+	

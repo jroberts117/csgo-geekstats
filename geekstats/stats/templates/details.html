@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+
+
+<!- Details box ->
+<div class="container rowwrap ">
+	<table style="">
+	<TR>
+	<TH style="background:grey;" colspan=6>DETAIL STATS</TH>
+	</TR><TR style="background:black;color:white;padding:2px;" >
+	<TH style="padding:5px;">Date</TH>
+	<TH style="padding:5px;">Map</TH>
+	<TH style="padding:5px;">Weapon</TH>
+	<TH style="padding:5px;">HS?</TH>
+	<TH style="padding:5px;">Killer</TH>
+	<TH style="padding:5px;">Victim</TH>
+	</TR>
+	{% for i in details %}
+		{% if i.6|stringformat:"i" == detailinfo.0 %}
+			<TR style= "background:lightgreen;">
+		{% else %}
+			<TR style= "background:pink;">
+		{% endif %}
+		<TD class="acenter">{{i.3}}</td>
+		<TD class="acenter">{{i.0}}</td>
+		<TD class="acenter">{{i.1}}</td>
+		<TD class="acenter">{{i.2}}</td>
+		<TD class="acenter">{{i.4}}</td>
+		<TD class="acenter">{{i.5}}</td>
+	</TR>
+	
+
+	{% endfor %}
+</TABLE>
+</div>
+ 
+{% endblock content %}

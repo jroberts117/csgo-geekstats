@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div class="page rowwrap">
+<div class="container nowrap" style="background:lightgray; padding:10px; margin-top:5px;">
+	<div style="width:50px; font-weight:bold; font-size: 14px;">Legend:</div>
+	<div class=container nowrap" style="max-width:100px;">
+		<div class="data" style="width:15px; height:15px; background:#FFFFFF; ">  </div>
+		<div class="data" style="text-align:left; width:100%;"><a href="Awards?aid=0">All</a></div>
+	</div>
+	{% for i in types %}
+	<div class=container nowrap" style="max-width:100px;">
+		<div class="data" style="width:15px; height:15px; background:{{i.1}}; ">  </div>
+		<div class="data" style="text-align:left; width:100%;"><a href="Awards?aid={{i.0}}">{{i.0}}</a></div>
+	</div>
+	{% endfor %}
+</div>
+	{% for i in awards %}
+		<div style="padding: 5px;">
+		<div class="container tile250 rowwrap" style="height:125px; ">
+			<div class="rowheader" style="height:12px;font-size:10px;">{{i.description|upper}}</div>
+			<div class="container nowrap " style="height:115px;">
+				<div class="" style="background:{{i.color}}; width:100px; height:113px; position:relative;">
+				<div style="  margin: 0;  position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);">
+					<span title="{{i.longdesc}}">
+					<div class=""><img src="{% static i.image %}"></div>
+					<div class="fbold data acenter">{{i.award}}</div>
+					</span>
+				</div>
+				</div>
+				<div class="colwrap container" style="width:150px; ">
+					{% if i.winners.0.0 == null %}
+						<div class="acenter fbold fmed" style="padding-top: 10px; color:gray;">NO WINNERS</div>
+					{% endif %}
+					<div class="fbold freg winner container nowrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.0.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.0.1}} </div>
+					</div>
+					<div class="{% if i.winners.1.1 == i.winners.0.1 %} fbold winner freg {% endif %} container noflow" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.1.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.1.1}} </div>
+					</div>
+					<div class="{% if i.winners.2.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.2.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.2.1}} </div>
+					</div>
+					<div class="{% if i.winners.3.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.3.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.3.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.4.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.4.1}} </div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		</div>
+	{% endfor %}
+</div>
+
+<!-
+				{% for j in i.winners %}
+				<div class="container row">
+					<div class="data focus">{{j.0}} [{{j.1}}] {{j.2}}</div>
+				</div>
+				{% endfor %}
+->
+		
+{% endblock content %}

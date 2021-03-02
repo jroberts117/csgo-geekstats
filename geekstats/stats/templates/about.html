@@ -1,0 +1,15 @@
+{% extends 'stats/base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div class="font1"> TIERS</div>
+	{% for i in geeks %}
+		<div class="tile" align=center>
+		<div class="font8">{{i.handle}}</div>
+  
+		</div>
+	{% endfor %}
+	
+{% endblock content %}

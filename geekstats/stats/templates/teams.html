@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<input type="hidden" id="dateList" name="dateList" value="n/a">
+<div class="headband">
+		<fieldset>
+			Showing Data For: 
+			<select name="seasonList">
+			
+			{% for i in seasons %}
+				<option value="{{i.0}}"
+				{% if i.0 == state.season %}
+					selected
+				{% endif %}
+				>{{i.0}}</option>
+			{% endfor %}
+			</select>
+			<button type="submit">Submit</button>
+		</fieldset>
+</div>
+
+<div class="container cGeek" style="width=100%;">
+	<div class="container rowwrap border noflow" style="width: 20%; height:150px;">
+		<div class="rowheader acenter" style="">SEASON INFO</div>
+		<div class="header fbig" style="height:140px; display:table-cell;vertical-align:center;">{{games.name}} </div>
+	</div>
+	<div class="container rowwrap" style="width: 80%;">
+		<div class="container rowheader" style="width=80%;">
+			<div class=" " style="width:50%; text-align:center; background:darkslategray;" >TEAM 1</div>
+			<div class=" " style="width:50%; text-align:center; background: darkred;" >TEAM 2</div>
+		</div>	
+		<div class="container" style="width=80%;">
+			<div class="data fbig fbold cgeek" style="width:50%; text-align:center;" >{{games.team1}}</div>
+			<div class="data fbig fbold cfest" style="width:50%; text-align:center;">{{games.team2}}</div>
+		</div>
+		<div class="container" style="width=80%;">
+			<div class="data fbig fbold cgeek" style="width:50%; font-size:48px; text-align:center;
+				{% if games.team1wins >= games.team2wins %}
+					color: darkgreen;
+				{% endif %}
+				" >{{games.team1wins}}
+			</div>
+			<div class="data fbig fbold cfest" style="width:50%; font-size:48px; text-align:center;
+				{% if games.team1wins <= games.team2wins %}
+					color: darkgreen;
+				{% endif %}
+				" >{{games.team2wins}}
+			</div>
+		</div>
+		<div class="container" style="width=800%;">
+			<div class="data fbold cgeek" style="width:50%; text-align:center;" >{{games.team1rdwins}} rounds won</div>
+			<div class="data fbold cfest" style="width:50%; text-align:center;" >{{games.team2rdwins}} rounds won</div>
+		</div>
+	</div>
+</div>
+
+
+{% for i in games.rounds %}
+<div class="container rowwrap" style="width=100%;">
+	<div class="container" style="width:100%">
+		<div class="rowheader" style="width:100%; text-align:center;">{{i.date}}</div>
+	</div>
+	{% for j in i.gamedata %}
+	<div class="container" style="">
+		<div style="width: 20%; ">
+			<div class="fbold fmed" style="text-align:right;">{{j.0}}</div>
+		</div>
+		<div class="data cgeek fmed" style="text-align:center; width: 40%;">
+			{% if j.2 == None %}
+				--
+			{% else %}
+				{{j.2}}
+			{% endif %}
+		</div>
+		<div class="data cfest fmed" style="text-align:center; width: 40%;">
+			{% if j.4 == None %}
+				--
+			{% else %}
+				{{j.4}}
+			{% endif %}
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endfor %}
+
+
+	
+<div class="container" style="min-width:100%">
+	<div class="rowheader" style="min-width:100%;">PLAYERS</div>
+</div>	
+
+
+<div class="container" style="width=100%;">
+
+	<div class="container rowwrap noflow" style="width: 20%; height:150px;">
+		<div class="header" style="height:140px; display:table-cell; vertical-align:center;">Player Sidebar: </div>
+	</div>
+	<div class="container" style="width=80%;">
+		<div class="container" style="width:50%;" >
+			<Table style="width:100%; height 100%; align:center;">
+			<TR class="rowheader" style="background: darkslategray;">
+				<TH>Geek</TH>
+				<TH>K</TH>
+				<TH>D</TH>
+				<TH>KDR</TH>
+				<TH>vs AVG</TH>
+			</TR>
+			{% for i in players %}
+				{% if i.team == games.team1 %}
+				<TR>
+					<TD class="acenter">{{i.handle}}</td>
+					<td class="acenter">{{i.kills}}</td>
+					<td class="acenter">{{i.deaths}}</td>
+					<td class="acenter">{{i.kdr}}</td>
+					<td class="acenter">{{i.kdr_v_avg}}</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
+				<tr>
+					<td colspan=4 class="acenter">{{games.team1avg}} KDR Average</td>
+				</tr>
+			</table>
+		</div>
+		<div class="container" style="width:50%;" >
+			<Table style="width:100%; height 100%; align:center;">
+			<TR class="rowheader" style="background: darkred;">
+				<TH>Geek</TH>
+				<TH>K</TH>
+				<TH>D</TH>
+				<TH>KDR</TH>
+				<TH>vs AVG</TH>
+			</TR>
+			{% for i in players %}
+				{% if i.team == games.team2 %}
+				<TR>
+					<TD class="acenter">{{i.handle}}</td>
+					<td class="acenter">{{i.kills}}</td>
+					<td class="acenter">{{i.deaths}}</td>
+					<td class="acenter">{{i.kdr}}</td>
+					<td class="acenter">{{i.kdr_v_avg}}</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
+				<tr>
+					<td colspan=4 class="acenter">{{games.team2avg}} KDR Average</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+	
+{% endblock content %}

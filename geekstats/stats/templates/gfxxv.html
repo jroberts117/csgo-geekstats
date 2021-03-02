@@ -1,0 +1,508 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+
+<div class="tab container" style="width:75%; border: 3px solid #383838; margin-left: auto; margin-right: auto;">
+	<button class="tablinks fjosefin fmed active" onclick="openCity(event, 'Summary')" style="">Summary</button>
+	<button class="tablinks fjosefin fmed" onclick="openCity(event, 'Tiers')" style="">Tiers</button>
+	<button class="tablinks fjosefin fmed" onclick="openCity(event, 'Rank')">Ranked List</button>
+	<button class="tablinks fjosefin fmed" onclick="openCity(event, 'Awards')">Awards</button>
+</div>
+<div class="page">
+	<div id="Summary" class="tabcontent" style="display:block;">
+<!- TIERS ->
+		<div style="display:flex; align-items:flex-start; margin:auto;">
+			<div class="" style="display:flex; width:75%; margin:auto;">
+				<div class="container rowwrap m5px" style="height:125px; border: 2px dotted gray;background: #ffffcc;" align=center>
+					<div class="header master"><span title="Master tier is for players who keep a KDR greater than 1.5">MASTER</span></div>
+					<div class="fbig" style="width:100%;"> {{tier0.0.handle}}</div>
+					<div class="freg" style="width:100%;">{{tier0.0.kdr}}kdr </div>
+					<div class="fsmall"> Runner-up: {{tier1.0.handle}} - {{tier1.0.kdr}} </div>
+				</div>
+				<div class="container rowwrap m5px" style="border: 2px dotted gray;background: #ffe699;"align=center>
+					<div class="header gold"><span title="Master tier is for players who keep a KDR greater than 1.5">GOLD</span></div>
+					<div class="fbig" style="width:100%;"> {{tier1.0.handle}}</div>
+					<div class="freg" style="width:100%;">{{tier1.0.kdr}}kdr </div>
+					<div class="fsmall"> Runner-up: {{tier1.1.handle}} - {{tier1.1.kdr}} </div>
+				</div>
+				<div class="container rowwrap m5px" style="border: 2px dotted gray;background: #f0f0f5;" align=center>
+					<div class="header silver"><span title="Master tier is for players who keep a KDR greater than 1.5">SILVER</span></div>
+					<div class="fbig" style="width:100%;"> {{tier2.0.handle}}</div>
+					<div class="freg" style="width:100%;">{{tier2.0.kdr}} </div>
+					<div class="fsmall"> Runner-up: {{tier2.1.handle}} - {{tier2.1.kdr}} </div>
+				</div>
+				<div class="container rowwrap m5px" style="border: 2px dotted gray;background: #ecd9c6;" align=center>
+					<div class="header bronze"><span title="Master tier is for players who keep a KDR greater than 1.5">BRONZE</span></div>
+					<div class="fbig" style="width:100%;"> {{tier3.0.handle}}</div>
+					<div class="freg" style="width:100%;">{{tier3.0.kdr}} </div>
+					<div class="fsmall"> Runner-up: {{tier3.1.handle}} - {{tier3.1.kdr}} </div>
+				</div>
+			</div>
+		</div>
+<!- WINGMAN ->
+		<div style="display:flex; align-items:flex-start; margin:auto;width:75%;height:100px; ">
+				<div class="gfxx_title" style="padding-top:25px;">WINGMAN CHALLENGE</div>
+				<div style="flex:25; align:center; align-items: flex-start; padding:5px; height:90%;">
+					<div style="margin:auto; text-align:center; background:#404040; color:white;">MASTER TIER</div>
+					<div style="display:flex; margin:auto; height:80%;">
+						<div style="width:50%; display:flex;">
+							<div class="wm_team" style="">CLONER / YAKOBAY</div>
+							<div class="wm_score" style="">0</div>
+						</div>
+						<div style="width:50%; display:flex;">
+							<div class="wm_team" style="padding-top:15px;">DREAM / KURA</div>
+							<div class="wm_score" style="">0</div>
+						</div>					
+					</div>
+				</div>
+				<div style="flex:25; align:center;  align-items: flex-start; padding:5px; height:90%;">
+					<div style="margin:auto; text-align:center; background:#404040; color:white;">GEEKFEST FINALS</div>
+					<div style="display:flex; margin:auto; height:80%">
+						<div style="width:50%; display:flex;">
+							<div class="wm_team" style=";">YAKOBAY / WILLBOMB</div>
+							<div class="wm_score" style="">0</div>
+						</div>
+						<div style="width:50%; display:flex;">
+							<div class="wm_team" style="width:60%; border:1px dotted gray;">MACPOODLE / CALDWELL</div>
+							<div class="wm_score" style="width:40%; border:1px dotted gray; text-align:center;font-size:24px;">0</div>
+						</div>					</div>
+				</div>
+		</div>
+<!- TEAM AWARDS ->
+		<div style="display:flex; align-items:flex-start; margin:auto; ">
+			<div class="" style="display:flex; width:75%; margin:auto; background:#fdffcc;">
+			<div class="gfxx_title" style="padding-top:40px;">TEAM AWARDS</div>
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.10.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.10.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div style="padding-top:5px;">{{awards.10.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap fbig" style=""> {{awards.10.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.10.winners.0.1}} Game Saving Moments</div>
+						</div>
+					</div>
+				</div>
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.2.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.2.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%;">
+					<div style="padding-top:5px;">{{awards.2.award}}</div>
+					<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+						{% if awards.2.winners.0.0 != "Dream" and  awards.2.winners.0.0 != "Cloner" %}
+						<div class="noflow nowrap fbig" style="font-size:10px;"> {{awards.2.winners.0.0}}</div>
+						<div class="noflow nowrap acenter" style=""> {{awards.2.winners.0.1}}X Celebrated </div>
+						{% elif awards.2.winners.1.0 != "Dream" and  awards.2.winners.1.0 != "Cloner" %}
+						<div class="noflow nowrap fbig" style=""> {{awards.2.winners.1.0}}</div>
+						<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.2.winners.1.1}}X Celebrated </div>
+						{% else %}
+						<div class="noflow nowrap fbig" style=""> {{awards.2.winners.2.0}}</div>
+						<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.2.winners.2.1}}X Celebrated </div>
+						{% endif %}
+					</div>
+					</div>
+				</div>	
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">Highest POSITIVE differential to average</div>
+					<div class="" style="width:20%;"><img src="{% static awards.10.image %}"></div>
+					<div class="fbold data freg acenter" style="width:70%;">
+					<div style="padding-top:5px; text-align:center;">Rise To The Occassion</div>
+					<div class="fbold freg acenter " style="white-space: nowrap;">
+						<div class="noflow nowrap fbig" style=""> {{v_avg.0.handle}}</div>
+						<div class="noflow nowrap acenter" style="font-size:10px;">+{{v_avg.0.kdr_v_avg}} over average KDR </div>
+					</div>
+					</div>
+				</div>				
+			</div>
+		</div>
+<!- SEASON RECOGNITION ->
+		<div style="display:flex; align-items:flex-start; margin:auto; ">
+			<div class="" style="display:flex; width:75%; margin:auto; background:#cbf7cb;">
+				<div style="background: black; color:white; width:125px; text-align:center; padding:35px;border:2px solid white;">2020 GF AWARDS</div>
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">Showing up for EVERY Wednesday Fest since March</div>
+					<div class="" style="width:20%;"><img src="/static/images/ribbons/4_round_mvp.png"></div>
+					<div class="fbold data freg acenter" style="width:25%;">Perfect Attendance</div>
+					<div class="fbold freg  acenter " style="white-space: nowrap; width:50%">
+						<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px silver; ">TBA</div>
+						<div class="noflow nowrap acenter" style="font-size:10px;">  Attending X weeks without fail </div>
+					</div>
+				</div>				
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">Highest Attendance with Lowest KDR</div>
+					<div class="" style="width:20%;"><img src="/static/images/ribbons/4_arms_dealer.png"></div>
+					<div class="fbold data freg acenter" style="width:20%;">Dedicated To Fun</div>
+					<div class="fbold freg  acenter " style="white-space: nowrap; width:50%">
+						<div class="noflow nowrap" style="text-shadow: 2px 2px 5px silver; "> TBA</div>
+						<div class="noflow nowrap acenter" style="font-size:10px;">  X Days </div>
+					</div>
+				</div>	
+			</div>
+		</div>
+
+<!- WEAPON AWARDS ->
+		<div style="display:flex; align-items:flex-start; margin:auto; width:75%; background:mint;">
+		
+			<div class="gfxx_title" style="padding-top:55px;">SPECIALTLY AWARDS</div>
+			<div style="background:#f5f5f5;">
+			
+
+			<div class="" style="display:flex;  margin:auto;">
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.0.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.0.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.0.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="	text-shadow: 2px 2px 5px ff7070; "> {{awards.0.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.0.winners.0.1}} Stabs In The Back</div>
+						</div>
+					</div>
+				</div>			
+			
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.9.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.9.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.9.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="	text-shadow: 2px 2px 5px lightblue; "> {{awards.9.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.9.winners.0.1}} On The Spot Electricutions</div>
+						</div>
+					</div>
+				</div>	
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.8.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.8.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.8.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px orange;"> {{awards.8.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.8.winners.0.1}} In The Field BBQs</div>
+						</div>
+					</div>
+				</div>	
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.6.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.6.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.6.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px yellow;"> {{awards.6.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.6.winners.0.1}} Explosive Introductions</div>
+						</div>
+					</div>
+				</div>	
+				</div>
+				<div style="float:left; ">
+				<div class="" style="display:flex; margin:auto;">
+
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.1.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.1.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.1.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px gray;"> {{awards.1.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.1.winners.0.1}} Snipes </div>
+						</div>
+					</div>
+				</div>	
+
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.5.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.5.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.5.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px gray;"> {{awards.5.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.5.winners.0.1}} Bullet Spray Kills</div>
+						</div>
+					</div>
+				</div>	
+
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.7.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.7.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.7.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px gray;"> {{awards.7.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.7.winners.0.1}}X "Hasta La Vista, Baby!"</div>
+						</div>
+					</div>
+				</div>	
+				</div>
+				</div>
+				</div>
+				</div>
+			
+<!- n00b AWARDS ->
+		<div style="display:flex; align-items:flex-start; margin:auto; ">
+			<div class="" style="display:flex; width:75%; margin:auto;background:#ffdeff;">
+			<div class="gfxx_title" style="padding-top:35px;">n00b AWARDS</div>
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.3.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.3.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.3.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px yellow;"> {{awards.3.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.3.winners.0.1}} Cases of mistaken identity</div>
+						</div>
+					</div>
+				</div>	
+
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">{{awards.4.description|upper}}</div>
+					<div class="" style="width:20%;"><img src="{% static awards.4.image %}"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">{{awards.4.award}}</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px yellow;"> {{awards.4.winners.0.0}}</div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{awards.4.winners.0.1}}X Caught in the wrong place</div>
+						</div>
+					</div>
+				</div>	
+
+				<div class="container rowwrap m5px" style="border: 1px dotted gray;" align=center>
+					<div class="rowheader" style="height:12px;font-size:10px;">Highest NEGATIVE differential to average</div>
+					<div class="" style="width:20%;"><img src="/static/images/ribbons/6_latency.png"></div>
+					<div class="fbold freg acenter" style="width:70%; height:90%;">
+						<div class="awd_header" style="">Drunk</div>
+						<div class="fbold freg nowrap acenter" style="white-space: nowrap;" >
+							<div class="noflow nowrap freg" style="text-shadow: 2px 2px 5px yellow;"> {{v_avg.1.handle}} </div>
+							<div class="noflow nowrap acenter" style="font-size:10px;"> {{v_avg.1.kdr_v_avg}} under average KDR </div>
+						</div>
+					</div>
+				</div>	
+
+				
+			</div>
+		</div>		
+	</div>
+
+	
+	<div id="Tiers" class="tabcontent" style="">
+	<div style="display:flex; align-items:flex-start;">
+		<div class="" style="display:flex; width:250px;">
+		<div class="container rowwrap m5px" align=center>
+			<div class="header master"><span title="Master tier is for players who keep a KDR greater than 1.5">MASTER</span></div>
+			<div class="container rowwrap">
+				<div class="container rowheader">
+					<div class="data focus">Player</div>
+					<div class="data">KDR</div>
+				</div>
+			{% for i in tier0 %}
+				<div class="container row">
+					<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+					<div class="data">{{i.kdr}}</div>
+				</div>
+			{% endfor %}
+			</div>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from: Buying armor, and using the Negev, autosniper or AWP</div>
+		</div>
+		</div>
+		<div class="" style="display:flex; width:250px;">
+		<div class="container rowwrap m5px" align=center>
+			<div class="header gold"><span title="Gold tier is for players who keep a KDR greater than 1.0">GOLD</span></div>
+			<div class="container rowwrap">
+				<div class="container rowheader">
+					<div class="data focus">Player</div>
+					<div class="data">KDR</div>
+				</div>
+			{% for i in tier1 %}
+				<div class="container row">
+					<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+					<div class="data">{{i.kdr}}</div>
+				</div>
+			{% endfor %}
+			</div>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from: Using the Negev, the autosniper and the AWP</div>
+		</div>
+		</div>
+		<div class="" style="display:flex; width:250px;">		
+		<div class="container rowwrap m5px" align=center>
+			<div class="header silver"><span title="Silver tier is for players who keep a KDR greater than .75 but less than 1.25">SILVER</span></div>
+			<div class="container rowwrap">
+				<div class="container rowheader">
+					<div class="data focus">Player</div>
+					<div class="data">KDR</div>
+				</div>
+			{% for i in tier2 %}
+				<div class="container row">
+					<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+				<div class="data">{{i.kdr}}</div>
+				</div>
+			{% endfor %}
+			</div>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from: Using the autosniper, and the AWP</div>
+		</div>
+		</div>
+		<div class="" style="display:flex; width:250px;">
+		<div class="container rowwrap m5px" align=center>
+			<div class="header bronze"><span title="Bronze tier is for players who do not exceed a 1.0 KDR">BRONZE</span></div>
+			<div class="container rowwrap">
+				<div class="container rowheader">
+					<div class="data focus">Player</div>
+					<div class="data">KDR</div>
+				</div>
+			{% for i in tier3 %}
+				<div class="container row">
+					<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+				<div class="data">{{i.kdr}}</div>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+		</div>
+		</div>
+		</div>
+	<div id="Rank" class="tabcontent container" style="">
+		<div class="tile500 acenter" style="margin-top:20px;" align="center">
+			<div class="header "><span title="Total Rank of Players In KDR Performance order">RANKED LIST</span></div>
+			<div class="container rowwrap">
+				<div class="container rowheader">
+					<div class="data short">Rank</div>
+					<div class="data medium focus">Player</div>
+					<div class="data short">Kills</div>
+					<div class="data short">Deaths</div>
+					<div class="data short">KDR</div>
+					<div class="data short">v. AVG</div>
+				</div>
+			{% for i in players %}
+				<div 
+				{% if i.tier == 0 %}
+				class="master container">
+				{% elif i.tier == 1 %}
+				class="container gold">
+				{% elif i.tier == 2 %}
+				class="container silver">
+				{% elif i.tier == 3 %}
+				class="container bronze">
+				{% else %}
+				class="container ">
+				{% endif %}
+				<div class="data acenter short" align=center>{{forloop.counter}}</div>
+				<div class="data medium focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+				<div class="data short">{{i.kills}}</div>
+				<div class="data short">{{i.deaths}}</div>
+				<div class="data short">{{i.kdr}}</div>
+				<div class="data short">{{i.kdr_v_avg}}</div>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+	</div>
+	
+	<div id="Awards" class="tabcontent container" style="">
+	<div class="rowwrap" style="display:flex; align-items:flex-start; width:75%; margin:auto;">
+
+	{% for i in awards %}
+		<div style="padding: 5px;">
+		<div class="container tile250 rowwrap" style="height:250px; ">
+			<div class="rowheader" style="height:12px;font-size:10px;">{{i.description|upper}}</div>
+			<div class="container nowrap " style="height:240px;">
+				<div class="" style="background:{{i.color}}; width:100px; height:250px; position:relative;">
+				<div style="  margin: 0;  position: absolute;  top: 50%;  left: 50%;  transform: translate(-50%, -50%);">
+					<span title="{{i.longdesc}}">
+					<div class=""><img src="{% static i.image %}"></div>
+					<div class="fbold data acenter">{{i.award}}</div>
+					</span>
+				</div>
+				</div>
+				<div class="colwrap container" style="width:150px; ">
+					{% if i.winners.0.0 == null %}
+						<div class="acenter fbold fmed" style="padding-top: 10px; color:gray;">NO WINNERS</div>
+					{% endif %}
+					<div class="fbold freg winner container nowrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.0.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.0.1}} </div>
+					</div>
+					<div class="{% if i.winners.1.1 == i.winners.0.1 %} fbold winner freg {% endif %} container noflow" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.1.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.1.1}} </div>
+					</div>
+					<div class="{% if i.winners.2.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.2.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.2.1}} </div>
+					</div>
+					<div class="{% if i.winners.3.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.3.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.3.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.4.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.4.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.5.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.5.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.6.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.6.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.7.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.7.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.8.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.8.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.9.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.9.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.10.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.10.1}} </div>
+					</div>
+					<div class="{% if i.winners.4.1 == i.winners.0.1 %} fbold winner freg {% endif %} container rowwrap" style="white-space: nowrap;" >
+						<div class="noflow nowrap" style="width:115px;"> {{i.winners.11.0}}</div>
+						<div class="noflow nowrap acenter" style="width:35px;"> {{i.winners.11.1}} </div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		</div>
+	{% endfor %}
+		</div>
+	</div>
+</div>	
+	
+	
+</div>
+<script>
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+</script>	
+<!--
+   {% if user.is_authenticated %}
+     <li>User: {{ user.get_username }}</li>
+     <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
+   {% else %}
+     <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>   
+   {% endif %} 
+  </ul>	
+{% endblock content %}
+->

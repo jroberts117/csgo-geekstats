@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div class="page rowwrap">
+	<div class="container rowwrap">
+	<div class="container" style="background:black;">
+		<div class="rowheader data long">Handle</div>
+		<div class="rowheader data short">Kills</div>
+		<div class="rowheader data short">Deaths</div>
+		<div class="rowheader data short">KDR</div>
+		<div class="rowheader data short">Avg KDR</div>
+		<div class="rowheader data short">KDR v. Avg</div>
+		<div class="rowheader data short">Tier</div>
+		<div class="rowheader data short">Maps Played</div>
+		<div class="rowheader data short">Gen</div>
+		<div class="rowheader data short">Location</div>
+		<div class="rowheader data long">Tenure</div>
+	</div>
+	{% for i in geeks %}
+	<div class="container row ">
+		<div class="data long"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+		<div class="data short">{{i.kills}}</div>
+		<div class="data short">{{i.deaths}}</div>
+		<div class="data short">{{i.kdr}}</div>
+		<div class="data short">{{i.kdr_avg}}</div>
+		<div class="data short">{{i.kdr_v_avg}}</div>
+		<div class="data short">{{i.tier}}</div>
+		<div class="data short">{{i.maps_played}}</div>
+		<div class="data short">{{i.gen}}</div>
+		<div class="data short">{{i.location}}</div>
+		<div class="data long">{{i.years}} years</div>
+	
+	</div>
+	{% endfor %}
+	</div>
+</div>
+
+<div style="margin-top:20px;">
+<div class="fmed fbold"> OVERALL PERFORMANCE GRID </DIV>
+<!-- <div class="fbold"> To be released soon...</div> -->
+<table width=100%>
+{% for i in perf %}
+	<tr>
+		{% for j in i %}
+			{{j|safe}}
+		{% endfor %}
+	</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock content %}

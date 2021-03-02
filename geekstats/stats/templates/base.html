@@ -1,0 +1,63 @@
+{% load static %}
+
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>
+			{% block title %}
+			{{ page_title|default:"Untitled Page" }}
+			{% endblock title %}
+		</title>
+		<link href='https://fonts.googleapis.com/css?family=Monoton' rel='stylesheet'>
+		<link href='https://fonts.googleapis.com/css?family=Geostar Fill' rel='stylesheet'>
+		<link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
+	</head>
+	
+	<BODY style="background-color:white;">
+		<header id="header">
+			<div style="text-align: center;"><img src="{% static 'images/gfxxv_header.png' %}"
+                alt="GeekFest Stats" title="Geekfest Stats" style="height: 75px"><br>
+			</div>    
+			<ul>
+			{% for i,j in stateinfo %}
+			<li><a class="{{j}}" href="{{ i }}">{{ i }}</a></li>
+			{% endfor %}
+			</ul>
+			<div class="title"> {{state.page}}</div>
+			<form method=post action="{{state.page}}">
+				{% csrf_token %}
+				{% if state.page != "Teams" and state.page != "Event" %}
+				<fieldset>
+					Showing Data For: 
+					<select name="dateList">
+					<p>{{eventdates}}</p>
+					{% for i in eventdates %}
+						<option value="{{i}}"
+						{% if i == state.selector %}
+							selected
+						{% endif %}
+						>{{i}}</option>
+					{% endfor %}
+					</select>
+					<button type="submit">Submit</button>
+				</fieldset>
+				{% endif %}
+
+					
+		</header>
+		</form>	
+
+		<section id="main">
+			{% block content %}
+			<p>Placeholder text in base template.   Replace with page content.</p>
+			{% endblock content %}
+		</section>
+		<footer id="footer">Copyright &copy;
+			<script type="text/JavaScript">
+				document.write(new Date().getFullYear());                    
+			</script> GeekFest
+		</footer>
+	</body>
+	
+</html>

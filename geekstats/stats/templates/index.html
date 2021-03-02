@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div class="font1"> GEEKS</div>
+	{% for i in geeks %}
+		<div class="tile" align=center>
+		<div class="font8">{{i.handle}}</div>
+		Page with no data
+		</div>
+	{% endfor %}
+	
+{% endblock content %}

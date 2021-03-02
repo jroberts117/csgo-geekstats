@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+
+<!- Player summary stats box ->
+<div class="container rowwrap p800">
+	<div class="rowheader">PLAYER STATS FOR: </div>
+	<div class = "container tile250 rowwrap h100 acenter">
+		<div class="fbig fbold">{{player.handle}}</div>
+	</div>
+	<div class = "container acenter tile250 colwrap h100">
+		<div class="data fmed">KDR</div>
+		<div class="data fbig fbold">{{player.kdr}}</div>
+		<div class="data">
+			{% if player.kdr_v_avg >= 0 %}
+				<span style="color:green;">{{player.kdr_v_avg}} vs avg</span></div>
+			{% else %}
+				<font style="color:red;">{{player.kdr_v_avg}} vs avg</font></div>
+			{% endif %}
+	</div>
+	<div class = "container tile250 rowwrap h100">
+		<div class = "container row">
+			<div class="data fbold focus">Top Victim</div>
+			<div class="data">{{player.opponents.0.item}}</div>
+		</div>
+		<div class = "container row">
+			<div class="data fbold focus">Nemisis:</div>
+			<div class="data">TBD</div>
+		</div>
+		<div class = "container row">
+			<div class="data fbold focus">Best Weapon:</div>
+			<div class="data">{{player.weapons.0.item}}</div>
+		</div>
+		<div class = "container row">
+			<div class="data fbold focus">Favorite Map:</div>
+			<div class="data">{{player.maps.0.item}}</div>
+		</div>
+	</div>
+</div>
+
+
+{% load chart_tags %}
+{% chart %}
+    http://chart.apis.google.com/chart
+       ?chxt=x,y
+	   &chxl=0:|{{graph.date|join:'|'}}|1:|0.0|1.0|2.0|3.0
+       &chbh=a
+       &chs=800x75
+       &cht=bvg
+       &chco=FF0000
+       &chds=0,3
+	   &chm=N*,000000,0,-1,11,,e
+       &chd=t:{{graph.kdr|join:','}}
+       &chtt=Historical+KDR+Performance
+{% endchart %}
+
+
+<!- Weapon stats box ->
+<div class="page p800 rowwrap">
+	<div class="container rowwrap m5px tile250">
+	<div class="header">Weapon Stats</div>
+	<div class="container rowwrap">
+		<div class="container border">
+			<div class="rowheader focus data">Weapon</div>
+			<div class="rowheader data short">K</div>
+			<div class="rowheader data short">D</div>
+		</div>
+	</div>
+	{% for i in player.weapons %}
+	<div class="container rowwrap">
+		<div class="container">
+			<div class="data focus"><a href="Details?pid={{player.id}}&wid={{i.item}}">{{i.item}}</a></div>
+			<div class="data short">{{i.kills}}</div>	
+			<div class="data short">{{i.deaths}}</div>
+		</div>
+	</div>
+	{% endfor %}
+	</div>
+
+ <!- Opponents stats box ->
+ 	<div class="container rowwrap m5px tile250">
+	<div class="header">Opponent Stats</div>
+	<div class="container rowwrap">
+		<div class="container border">
+			<div class="rowheader focus data">Opponent</div>
+			<div class="rowheader data short">K</div>
+			<div class="rowheader data short">D</div>
+			<div class="rowheader data short">KDR</div>
+		</div>
+	</div>
+	{% for i in player.opponents %}
+	<div class="container rowwrap">
+		<div class="container">
+			<div class="data focus"><a href="Details?pid={{player.id}}&oid={{i.item}}">{{i.item}}</a></div>
+			<div class="data short">{{i.kills}}</div>	
+			<div class="data short">{{i.deaths}}</div>
+			<div class="data short">{{i.kdr}}</div>
+		</div>
+	</div>
+	{% endfor %}
+	</div>
+ 
+  <!- Maps stats box ->
+ 	<div class="container rowwrap m5px tile250">
+	<div class="header">Map Stats</div>
+	<div class="container rowwrap">
+		<div class="container border">
+			<div class="rowheader data focus">Map</div>
+			<div class="rowheader data short">K</div>
+			<div class="rowheader data short">D</div>
+			<div class="rowheader data short">KDR</div>
+		</div>
+	</div>
+	{% for i in player.maps %}
+	<div class="container rowwrap">
+		<div class="container">
+			<div class="data focus"><a href="Details?pid={{player.id}}&mid={{i.item}}">{{i.item}}</a></div>
+			<div class="data short">{{i.kills}}</div>	
+			<div class="data short">{{i.deaths}}</div>
+			<div class="data short">{{i.kdr}}</div>
+		</div>
+	</div>
+	{% endfor %}
+	</div>
+ 
+
+	</div>
+ 
+ 
+{% endblock content %}

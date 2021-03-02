@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div class="page rowwrap">
+	{% for i in maps %}
+		<div class="container rowwrap m5px tile250 border">
+		<div class="header">{{i.detail|upper}}</div>
+<!--		<div class="container rowwrap" style="background-image:url('/static/images/{{i.detail}}.jpg'); background-size:auto 100%; ">
+-->
+		<div class="container rowwrap" style="background: linear-gradient(rgba(191,191,191,0.5),rgba(191,191,191,0.5)),url('/static/images/{{i.detail}}.jpg');
+														background-repeat: no-repeat;background-size: cover;">
+			<div class="container rowheader" >
+				<div class="" style="text-align:left; width:175px;">Player</div>
+				<div class="" style="text-align:left;">KDR</div>
+			</div>
+			{% for j in i.playerscores %}
+				{% if j.kills > 0 %}
+				<div class="container border" >
+					<div class="data focus">
+						<a href="PlayerDetails?pid={{j.id}}">{{j.handle}}</a></div>
+					<div class="data"><a href="Details?pid={{j.id}}&mid={{i.detail}}">{{j.kdr}}</a> </div>
+				</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+		</div>
+	{% endfor %}
+</div>
+{% endblock content %}
