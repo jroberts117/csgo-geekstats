@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 ##from .models import Geeks, Teams, TeamGames, TeamGeeks
-from .geekmodels import Buy, TiersData, Frag, MatchRound
+from .geekmodels import Buy, TiersData, Frag, MatchRound, Death
 import stats.functions as func
 import operator, sys
 from django.db.models import Count
@@ -199,6 +199,8 @@ def weapons(request):
     rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
 
     killData = Frag.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_frags=Count('frag_id')).order_by('item__decscription', '-num_frags')
+    deathData = Death.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('item__decscription')
+    buyData = Buy.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_buys=Count('buy_id')).order_by('item__decscription')
 
     itemGroupedData = {}
 
@@ -207,13 +209,43 @@ def weapons(request):
             itemGroupedData[k['item__decscription']] = {
                 'item_name' : k['item__name'],
                 'item_description' : k['item__decscription'],
-                'player_info' : []
+                'player_info' : {}
             }
-        itemGroupedData[k['item__decscription']]['player_info'].append({
+        itemGroupedData[k['item__decscription']]['player_info'][k['geek_id']] = {
             'player': k['geek__handle'],
             'id': k['geek_id'],
-            'kills': k['num_frags']
-        })
+            'kills': k['num_frags'],
+            'deaths': 0,
+            'buys': 0
+        }
+
+    for d in deathData:
+        if (not d['item__decscription'] in itemGroupedData):
+            continue
+        if (not d['geek_id'] in itemGroupedData[d['item__decscription']]['player_info']):
+            itemGroupedData[d['item__decscription']]['player_info'][d['geek_id']] = {
+                'player': d['geek__handle'],
+                'id': d['geek_id'],
+                'kills': 0,
+                'deaths': 0,
+                'buys': 0
+            }
+        itemGroupedData[d['item__decscription']]['player_info'][d['geek_id']]['deaths'] = d['num_deaths']
+
+    for b in buyData:
+        if (not b['item__decscription'] in itemGroupedData):
+            continue
+        if (not b['geek_id'] in itemGroupedData[b['item__decscription']]['player_info']):
+            #itemGroupedData[b['item__decscription']]['player_info'][b['geek_id']] = {
+            #    'player': b['geek__handle'],
+            #    'id': b['geek_id'],
+            #    'kills': 0,
+            #    'deaths': 0,
+            #    'buys': 0
+            #}
+            #for now, only show if geek was killed by or killed with a weapon, maybe show buys later
+            continue
+        itemGroupedData[b['item__decscription']]['player_info'][b['geek_id']]['buys'] = b['num_buys']
 
     newstate.compare = 'weapon'
     context = {'weapons': itemGroupedData.values,

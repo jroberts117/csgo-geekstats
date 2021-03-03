@@ -11,22 +11,46 @@
 				{{i.item_description}}
 				<img src="{% static 'images/'%}{{ i.item_name}}.png" align="center">
 			</div>
-			<div class="container rowwrap">
-				<div class="container" >
-					<div class="rowheader data focus">Player</div>
-					<div class="rowheader data">Kills</div>
-				</div>
-			{% for j in i.player_info %}
-				{% if j.kills > 0 %}
-				<div class="container row">
-					<div class="data focus"><a href="PlayerDetails?pid={{j.id}}">{{j.player}}</a></div>
-					<div class="data"><a href="Details?pid={{j.id}}&wid={{i.item_name}}">{{j.kills}}</a> </div>
-				</div>
-				{% endif %}
+			<table class="table table-striped table-data data">
+				<thead>
+					<tr class="rowheader">
+						<th>Player</th>
+						<th class="text-right">Kills</th>
+						<th class="text-right">Deaths</th>
+						<th class="text-right">Buys</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for j in i.player_info.values %}
+
+					<tr>
+						<td><a href="PlayerDetails?pid={{j.id}}">{{j.player}}</a></td>
+						<td class="text-right"><a href="Details?pid={{j.id}}&wid={{i.item_name}}">{{j.kills}}</a></td>
+						<td class="text-right"><a href="Details?pid={{j.id}}&wid={{i.item_name}}">{{j.deaths}}</a></td>
+						<td class="text-right">{{j.buys}}</td>
+					</tr>
 			{% endfor %}
-			</div>
+				</tbody>
+			</table>
 		</div>
 	{% endfor %}
 </div>
+
+<style>
+	.table.table-data td, .table.table-data th {
+		padding-right: 0.2rem;
+		margin: 0;
+	}
+
+	.table.table-data {
+		border-collapse: collapse; 
+		border-spacing: 0;
+		width: 100%;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+</style>
 	
 {% endblock content %}
