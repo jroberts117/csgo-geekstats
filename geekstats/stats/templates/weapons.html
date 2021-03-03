@@ -8,19 +8,19 @@
 	{% for i in weapons %}
 		<div class="container rowwrap m5px tile250">
 			<div class="header">
-				{{i.detail}}
-				<img src="{% static 'images/'%}{{ i.detail}}.png" align="center">
+				{{i.item_description}}
+				<img src="{% static 'images/'%}{{ i.item_name}}.png" align="center">
 			</div>
 			<div class="container rowwrap">
 				<div class="container" >
 					<div class="rowheader data focus">Player</div>
 					<div class="rowheader data">Kills</div>
 				</div>
-			{% for j in i.playerscores %}
+			{% for j in i.player_info %}
 				{% if j.kills > 0 %}
 				<div class="container row">
-					<div class="data focus"><a href="PlayerDetails?pid={{j.id}}">{{j.handle}}</a></div>
-					<div class="data"><a href="Details?pid={{j.id}}&wid={{i.detail}}">{{j.kills}}</a> </div>
+					<div class="data focus"><a href="PlayerDetails?pid={{j.id}}">{{j.player}}</a></div>
+					<div class="data"><a href="Details?pid={{j.id}}&wid={{i.item_name}}">{{j.kills}}</a> </div>
 				</div>
 				{% endif %}
 			{% endfor %}

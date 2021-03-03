@@ -2,10 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 ##from .models import Geeks, Teams, TeamGames, TeamGeeks
-from .geekmodels import Buy, TiersData
+from .geekmodels import Buy, TiersData, Frag, MatchRound
 import stats.functions as func
 import operator, sys
 from django.db.models import Count
+import datetime
 
 ###############################################################
 ## Views
@@ -187,14 +188,35 @@ def maps(request):
                }
     return HttpResponse(template.render(context, request))
 
+import time
+
 def weapons(request):
     mainmenu.set('Weapons')
     template = loader.get_template('weapons.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Weapons', request.session['selector'])
 
+    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+    rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+
+    killData = Frag.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_frags=Count('frag_id')).order_by('item__decscription', '-num_frags')
+
+    itemGroupedData = {}
+
+    for k in killData:
+        if (not k['item__decscription'] in itemGroupedData):
+            itemGroupedData[k['item__decscription']] = {
+                'item_name' : k['item__name'],
+                'item_description' : k['item__decscription'],
+                'player_info' : []
+            }
+        itemGroupedData[k['item__decscription']]['player_info'].append({
+            'player': k['geek__handle'],
+            'id': k['geek_id'],
+            'kills': k['num_frags']
+        })
+
     newstate.compare = 'weapon'
-    weaponstats = func.get_details(newstate)
-    context = {'weapons': weaponstats,
+    context = {'weapons': itemGroupedData.values,
                'title': 'GeekFest Weapons',
                'eventdates':request.session['eventdates'],
                'state':newstate,
@@ -261,7 +283,7 @@ def about(request):
 
 
 def buys(request):
-    buycount = Buy.objects.all().prefetch_related('geek').values('item', 'geek__handle').annotate(num_buys=Count('buy_id')).order_by('-num_buys')
+    buycount = Buy.objects.all().prefetch_related('geek').values('item__name', 'geek__handle').annotate(num_buys=Count('buy_id')).order_by('-num_buys')
     template = loader.get_template('buys.html')
     mainmenu = StateInfo()
     mainmenu.set('About')
