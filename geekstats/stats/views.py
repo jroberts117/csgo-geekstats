@@ -118,10 +118,10 @@ def tiers(request):
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
     context['eventdates'] = request.session['eventdates']
     context['state'] = newstate
-    context['tier0'] = TiersData.objects.filter(tier="Master")
-    context['tier1'] = TiersData.objects.filter(tier="Gold")
-    context['tier2'] = TiersData.objects.filter(tier="Silver")
-    context['tier3'] = TiersData.objects.filter(tier="Bronze")
+    context['tier0'] = TiersData.objects.filter(tier="Master").order_by('-kdr')
+    context['tier1'] = TiersData.objects.filter(tier="Gold").order_by('-kdr')
+    context['tier2'] = TiersData.objects.filter(tier="Silver").order_by('-kdr')
+    context['tier3'] = TiersData.objects.filter(tier="Bronze").order_by('-kdr')
     context['players'] = TiersData.objects.order_by('-kdr')
 
 ##    players = func.get_stats_data(newstate)
