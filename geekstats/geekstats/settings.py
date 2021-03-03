@@ -90,8 +90,23 @@ DATABASES = {
 #           "host_is_server": True,
         },
     },
+	"geek": {
+        "ENGINE": "django.db.backends.mysql",
+        "HOST": "cs.geekfestclan.com",
+        "PORT": "3306",
+        "NAME": "geekfest",
+        "USER": "geekfest",
+        "PASSWORD": "g33k",
+        "AUTOCOMMIT": True,
+        "OPTIONS": {
+#            "driver": "MySQL ODBC 5.3 ANSI Driver",
+#            "unicode_results": True,
+#           "host_is_server": True,
+        }
+    }
 }
 
+DATABASE_ROUTERS = ["geekstats.routers.GeekRouter"]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
