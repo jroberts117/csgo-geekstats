@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 ##from .models import Geeks, Teams, TeamGames, TeamGeeks
+from .geekmodels import Buy
 import stats.functions as func
 import operator, sys
+from django.db.models import Count
 
 ###############################################################
 ## Views
@@ -246,6 +248,14 @@ def about(request):
     context = {'title': 'About GeekFest', 'stateinfo': zip(mainmenu.menu,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
+
+def buys(request):
+    buycount = Buy.objects.all().prefetch_related('geek').values('item', 'geek__handle').annotate(num_buys=Count('buy_id')).order_by('-num_buys')
+    template = loader.get_template('buys.html')
+    mainmenu = StateInfo()
+    mainmenu.set('About')
+    context = {'buys': buycount, 'title': 'Buys', 'stateinfo': zip(mainmenu.menu,mainmenu.state), }
+    return HttpResponse(template.render(context, request))
 
 
 

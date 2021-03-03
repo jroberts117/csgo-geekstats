@@ -94,7 +94,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "HOST": "cs.geekfestclan.com",
         "PORT": "3306",
-        "NAME": "geekfest",
+        "NAME": "geek",
         "USER": "geekfest",
         "PASSWORD": "g33k",
         "AUTOCOMMIT": True,

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div class="font1"> BUYS</div>
+
+		<div class="tile" align=center>
+
+            <table>
+                <thead>
+                    <tr style="font-weight: bold;">
+                        <td style="padding: 0.25rem">Handle</td>
+                        <td style="padding: 0.25rem">Item Name</td>
+                        <td style="text-align: right;padding: 0.25rem">Number Purchased</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in buys %}
+                    <tr>
+                        <td style="padding: 0.25rem">{{i.geek__handle}}</td>
+                        <td style="padding: 0.25rem">{{i.item}}</td>
+                        <td style="text-align: right;padding: 0.25rem">{{i.num_buys}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+  
+		</div>
+	
+	
+{% endblock content %}
