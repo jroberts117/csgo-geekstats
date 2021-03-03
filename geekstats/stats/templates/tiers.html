@@ -15,7 +15,7 @@
 		</div>
 	{% for i in tier0 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
 			<div class="data">{{i.kdr}}</div>
 		</div>
 	{% endfor %}
@@ -32,7 +32,7 @@
 		</div>
 	{% for i in tier1 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
 			<div class="data">{{i.kdr}}</div>
 		</div>
 	{% endfor %}
@@ -49,7 +49,7 @@
 		</div>
 	{% for i in tier2 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
 		<div class="data">{{i.kdr}}</div>
 		</div>
  	{% endfor %}
@@ -66,7 +66,7 @@
 		</div>
 	{% for i in tier3 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
 		<div class="data">{{i.kdr}}</div>
 		</div>
 	{% endfor %}
@@ -81,30 +81,25 @@
 			<div class="data medium focus">Player</div>
 			<div class="data short">Kills</div>
 			<div class="data short">Deaths</div>
+			<div class="data short">Assists</div>
 			<div class="data short">KDR</div>
+			<div class="data short">aKDR</div>
 			<div class="data short">v. AVG</div>
 		</div>
 	{% for i in players %}
-		{% if i.tier == 0 %}
-		<div class="master container">
-		{% elif i.tier == 1 %}
-		<div class="container gold">
-		{% elif i.tier == 2 %}
-		<div class="container silver">
-		{% elif i.tier == 3 %}
-		<div class="container bronze">
-		{% else %}
-		<div class="container ">
-		{% endif %}
+		<div class="{{ i.tier|lower }} container">
 		<div class="data acenter short" align=center>{{forloop.counter}}</div>
-		<div class="data medium focus"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+		<div class="data medium focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
 		<div class="data short">{{i.kills}}</div>
 		<div class="data short">{{i.deaths}}</div>
+		<div class="data short">{{i.assists}}</div>
 		<div class="data short">{{i.kdr}}</div>
+		<div class="data short">{{i.akdr}}</div>
 		<div class="data short">{{i.kdr_v_avg}}</div>
 		</div>
 	{% endfor %}
 	</div>
+
 </div>
 
 <!--

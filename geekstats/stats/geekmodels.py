@@ -279,3 +279,20 @@ class Tier(models.Model):
         managed = False
         db_table = 'tier'
         app_label = 'geek'
+
+class TiersData(models.Model):
+    player = models.CharField(max_length=250)
+    tier = models.CharField(max_length=250)
+#    matchdate = models.DateTimeField(blank=True, null=True)
+    kills = models.IntegerField()
+    deaths = models.IntegerField()
+    assists = models.IntegerField()
+    kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    akdr = models.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        managed = False
+        db_table = 'tiers_data'
+        app_label = 'geek'
+    
+    

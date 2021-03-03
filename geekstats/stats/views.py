@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 ##from .models import Geeks, Teams, TeamGames, TeamGeeks
-from .geekmodels import Buy
+from .geekmodels import Buy, TiersData
 import stats.functions as func
 import operator, sys
 from django.db.models import Count
@@ -109,24 +109,35 @@ def teams(request):
 
 def tiers(request):
     mainmenu.set('Tiers')
-    template = loader.get_template('tiers.html')
+    context={}
+##    template = loader.get_template('tiers.html')
+    template = 'tiers.html'
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'])
+    context['title'] = 'GeekFest Tiers'
+    context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
+    context['eventdates'] = request.session['eventdates']
+    context['state'] = newstate
+    context['tier0'] = TiersData.objects.filter(tier="Master")
+    context['tier1'] = TiersData.objects.filter(tier="Gold")
+    context['tier2'] = TiersData.objects.filter(tier="Silver")
+    context['tier3'] = TiersData.objects.filter(tier="Bronze")
+    context['players'] = TiersData.objects.order_by('-kdr')
 
-    players = func.get_stats_data(newstate)
-    players.sort(key=lambda players: players.kdr, reverse=True)
-     
-    tier0 = [x for x in players if x.tier == 0]
-    tier1 = [x for x in players if x.tier == 1]
-    tier2 = [x for x in players if x.tier == 2]
-    tier3 = [x for x in players if x.tier == 3]
-
-    context = {'tier0':tier0, 'tier1': tier1, 'tier2': tier2, 'tier3':tier3, 'players':players,
-               'title': 'GeekFest Tiers',
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
-               'eventdates':request.session['eventdates'],
-               'state':newstate,
-               }
-    return HttpResponse(template.render(context, request))
+##    players = func.get_stats_data(newstate)
+##    players.sort(key=lambda players: players.kdr, reverse=True)
+##     
+##    tier0 = [x for x in players if x.tier == 0]
+##    tier1 = [x for x in players if x.tier == 1]
+##    tier2 = [x for x in players if x.tier == 2]
+##    tier3 = [x for x in players if x.tier == 3]
+##
+##    context = {'tier0':tier0, 'tier1': tier1, 'tier2': tier2, 'tier3':tier3, 'players':players, 'newtier':gtier0,
+##               'title': 'GeekFest Tiers',
+##               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+##               'eventdates':request.session['eventdates'],
+##               'state':newstate,
+##               }
+    return render(request, template, context)
 
 ##### GEEKFEST XX: VIRTUAL CODE ######
 def gfxx(request):
