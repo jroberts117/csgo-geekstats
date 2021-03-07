@@ -2,7 +2,9 @@ from django.http import HttpResponse
 import stats.query as qry
 import sys
 import datetime
+from .geekmodels import TiersData, Season
 
+## State is used in the middleware as a way to track default values 
 class state:
     def __init__(self):
         self.start_date = '2019-01-01'
@@ -13,79 +15,73 @@ class state:
         self.clause = ''
         self.page = ''
         self.season = ''
-        
+
+## EventData object is called on each request by Django        
 class EventData(object):
     def __init__(self, get_response):
         self.get_response = get_response
         return(None)
         
     def __call__(self, request):
-#        print("hello middleware", file=sys.stderr)
-        newstate = state()
-        eventdates = []
-        #Get Date picklist info
+
+######################### SETUP THE DATE AND SEASON PICKLIST FOR EVERY PAGE ##########################################################
+        
+        eventdates = []                                                         # eventdates is the pick list of dates and seasons
         eventdates.append('Overall')
         eventdates.append('------ Seasons')
-        data = qry.get_query('seasons',state)
+        data = list(Season.objects.values().order_by('-start_date'))            # Gets all the season date ranges
         for i in data:
-            eventdates.append(str(i[0]))
+            eventdates.append(i['name'])                                        # Adds the season names to the picklist
         eventdates.append('------ Individual Dates')
-        dates = qry.get_query('values',newstate)
-        dates.sort(reverse=True)
+        dates = list(TiersData.objects.values('matchdate').order_by('-matchdate').distinct())
         for i in dates:
-            eventdates.append(str(i[0]))
-        if request.method == 'POST':
+            eventdates.append(str(i['matchdate']))                              # Adds the individual dates to the picklist
+        request.session['eventdates'] = eventdates                              # Set the session to have all the dates for the ddlb
+
+######################### PROCESS REQUEST IF A DATE OR SEASON WAS SELECTED AND SET SESSION INFO ##########################################
+        
+        if request.method == 'POST':                                            # If a date or season was picked
             try:
-                request.session['selector'] = request.POST['dateList']
-                try:
-                    print('POST and the selector is a date')
-                    temp = datetime.datetime.strptime(request.POST['dateList'], '%Y-%m-%d')
-                    request.session['start_date'] = request.POST['dateList']
+                request.session['selector'] = request.POST['dateList']          # Set a session object for the item selected
+                try:                                                            # Use try and except to catch if it is a date or not
+                    temp = datetime.datetime.strptime(request.POST['dateList'], '%Y-%m-%d')  # Test to see if it is a date
+                    request.session['start_date'] = request.POST['dateList']    # Set the session date ranges to the same thing
                     request.session['end_date'] = request.POST['dateList']
-                except:
-                    print('POST and the selector is NOT a date')
-                    data = []
-                    data = qry.get_query('seasons',state)
-                    if request.POST['dateList'] == 'Overall':
+                except:                                                         # If it fails, they picked text
+                    if request.POST['dateList'] == 'Overall':                   # If they want everything get the max range from the db
                         request.session['start_date'] = eventdates[-1]
                         request.session['end_date'] = '2100-01-01'
-                    else:
-                        for i in data:
-                            if i[0] == request.POST['dateList']:
-                                print('we are processing')
-                                request.session['start_date'] = str(i[1])
-                                request.session['end_date'] = str(i[2])
-                                request.session['season'] = i[0]
+                    else:                                                       # If it's a season, then work with that
+                        data = list(Season.objects.values().filter(name=requet.POST['dateList']))
+                        request.session['start_date'] = str(data['start_date'])   # Set the dates
+                        request.session['end_date'] = str(data['end_date'])
+                        request.session['season'] = data['name']
             except:
-                print('we are not in the stats so skip this stuff')
+                print('we are not in the stats so skip this stuff')     # If that fails, it's a page not working with data range data
+
+################ PROCESS THE PAGE IF NO DATE OR SEASON WAS SELECTED CAPTURE OTHER SESSION DATA  #######################################
         else:
-            try:
-                print('NOT a POST and the start date is already set')
+            try:                                                        # Test to see if we have a start date set
                 test = request.session['start_date']
-
-            except:
+            except:                                                     # If we don't, this is the first load so default to the last play date
                 print('NOT a POST and the start date is NOT already set')
-                request.session['start_date'] = str(dates[0][0])
-                request.session['end_date'] = str(dates[0][0])
-                request.session['selector'] = str(dates[0][0])
+                request.session['start_date'] = str(dates[0]['matchdate'])
+                request.session['end_date'] = str(dates[0]['matchdate'])
+                request.session['selector'] = str(dates[0]['matchdate'])
 
-                
-        request.session['eventdates'] = eventdates
-
-        if request.method == 'GET':
             if request.GET.get('pid') != None:
-                request.session['playerid'] = request.GET.get('pid')
+                request.session['playerid'] = request.GET.get('pid')    #  Capture the playerid
             else:
                 request.session['playerid'] = ''
             if request.GET.get('wid') != None:
-                request.session['weaponid'] = request.GET.get('wid')
+                request.session['weaponid'] = request.GET.get('wid')    # Capture the weaponid
             else:
                 request.session['weaponid'] = ''
             if request.GET.get('mid') != None:
-                request.session['mapid'] = request.GET.get('mid')
+                request.session['mapid'] = request.GET.get('mid')       # Capture the mapid
             else:
                 request.session['mapid'] = ''
-            if request.GET.get('oid') != None:
+            if request.GET.get('oid') != None:                          # Capture the opponentid
                 request.session['opponentid'] = request.GET.get('oid')
             else:
                 request.session['opponentid'] = ''

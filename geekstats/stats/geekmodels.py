@@ -283,9 +283,9 @@ class Tier(models.Model):
 class TiersData(models.Model):
     player = models.CharField(max_length=250)
     tier = models.CharField(max_length=250)
-#    matchdate = models.DateTimeField(blank=True, null=True)
+    matchdate = models.DateField()
     kills = models.IntegerField()
-    deaths = models.IntegerField()
+    deaths = models.IntegerField() 
     assists = models.IntegerField()
     kdr = models.DecimalField(max_digits=8, decimal_places=2)
     akdr = models.DecimalField(max_digits=8, decimal_places=2)

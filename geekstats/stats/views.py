@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
+##from django.forms.models import model_to_dict
 ##from .models import Geeks, Teams, TeamGames, TeamGeeks
 from .geekmodels import Buy, TiersData, Frag, MatchRound, Death
 import stats.functions as func
 import operator, sys
-from django.db.models import Count
+from django.db.models import Count, Sum, Avg
 import datetime
+from datetime import date, timedelta
 
 ###############################################################
 ## Views
@@ -43,6 +45,9 @@ class state:
     def __init__(self):
         self.start_date = '2019-02-09'
         self.end_date = '2019-02-09'
+        self.today = date.today().isoformat()
+        self.days90ago = date.today() - timedelta(days=90)
+        self.days180ago = date.today() - timedelta(days=180)
         self.compare = ''
         self.value = 0
         self.clause = ''
@@ -111,33 +116,31 @@ def teams(request):
 def tiers(request):
     mainmenu.set('Tiers')
     context={}
-##    template = loader.get_template('tiers.html')
     template = 'tiers.html'
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'])
     context['title'] = 'GeekFest Tiers'
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
     context['eventdates'] = request.session['eventdates']
     context['state'] = newstate
-    context['tier0'] = TiersData.objects.filter(tier="Master").order_by('-kdr')
-    context['tier1'] = TiersData.objects.filter(tier="Gold").order_by('-kdr')
-    context['tier2'] = TiersData.objects.filter(tier="Silver").order_by('-kdr')
-    context['tier3'] = TiersData.objects.filter(tier="Bronze").order_by('-kdr')
-    context['players'] = TiersData.objects.order_by('-kdr')
+    context['tier0'] = TiersData.objects.values('player')\
+                       .filter(tier="Master", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])\
+                       .order_by('-kdr__avg').annotate(Avg('kdr'))
+    context['tier1'] = TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
+    context['tier2'] = TiersData.objects.values('player').filter(tier="Silver", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
+    context['tier3'] = TiersData.objects.values('player').filter(tier="Bronze", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
+    context['players'] = TiersData.objects.values('player','tier').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+    avgkdr = TiersData.objects.values('player').filter(matchdate__gte=newstate.days180ago, matchdate__lte=newstate.today).annotate(Avg('kdr'))
+    players = list(context['players'])
+    print(players)
+    for geek in players:
+        for item in avgkdr:
+            if geek['player'] == item['player']:
+                geek['avgkdr'] = item['kdr__avg']
+                geek['diffkdr'] = geek['kdr__avg'] - item['kdr__avg']
+    context['players'] = players
 
-##    players = func.get_stats_data(newstate)
-##    players.sort(key=lambda players: players.kdr, reverse=True)
-##     
-##    tier0 = [x for x in players if x.tier == 0]
-##    tier1 = [x for x in players if x.tier == 1]
-##    tier2 = [x for x in players if x.tier == 2]
-##    tier3 = [x for x in players if x.tier == 3]
-##
-##    context = {'tier0':tier0, 'tier1': tier1, 'tier2': tier2, 'tier3':tier3, 'players':players, 'newtier':gtier0,
-##               'title': 'GeekFest Tiers',
-##               'stateinfo': zip(mainmenu.menu,mainmenu.state),
-##               'eventdates':request.session['eventdates'],
-##               'state':newstate,
-##               }
+##    context['players'][0].new = 'hello?'
+
     return render(request, template, context)
 
 ##### GEEKFEST XX: VIRTUAL CODE ######
