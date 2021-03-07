@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-##from django.forms.models import model_to_dict
-##from .models import Geeks, Teams, TeamGames, TeamGeeks
 from .geekmodels import Buy, TiersData, Frag, MatchRound, Death
 import stats.functions as func
 import operator, sys
@@ -131,15 +129,12 @@ def tiers(request):
     context['players'] = TiersData.objects.values('player','tier').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
     avgkdr = TiersData.objects.values('player').filter(matchdate__gte=newstate.days180ago, matchdate__lte=newstate.today).annotate(Avg('kdr'))
     players = list(context['players'])
-    print(players)
     for geek in players:
         for item in avgkdr:
             if geek['player'] == item['player']:
                 geek['avgkdr'] = item['kdr__avg']
                 geek['diffkdr'] = geek['kdr__avg'] - item['kdr__avg']
     context['players'] = players
-
-##    context['players'][0].new = 'hello?'
 
     return render(request, template, context)
 
