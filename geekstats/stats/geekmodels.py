@@ -24,7 +24,7 @@ class Action(models.Model):
 
 class Assist(models.Model):
     assist_id = models.AutoField(primary_key=True)
-    round = models.ForeignKey('MatchRound', models.DO_NOTHING)
+    round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='assists')
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
     killing_player = models.ForeignKey('Geek', models.DO_NOTHING, blank=True, null=True)
     is_tk_assist = models.IntegerField()
@@ -51,7 +51,7 @@ class Blind(models.Model):
 
 class Buy(models.Model):
     buy_id = models.AutoField(primary_key=True)
-    round = models.ForeignKey('MatchRound', models.DO_NOTHING)
+    round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='buys')
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
     item = models.ForeignKey('Item', models.DO_NOTHING)
 
@@ -64,7 +64,7 @@ class Buy(models.Model):
 class Death(models.Model):
     death_id = models.AutoField(primary_key=True)
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
-    round = models.ForeignKey('MatchRound', models.DO_NOTHING)
+    round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='deaths')
     killer = models.ForeignKey('Geek', models.DO_NOTHING, blank=True, null=True)
     pos_x = models.DecimalField(max_digits=12, decimal_places=4)
     pos_y = models.DecimalField(max_digits=12, decimal_places=4)
@@ -87,7 +87,7 @@ class Death(models.Model):
 class Frag(models.Model):
     frag_id = models.AutoField(primary_key=True)
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
-    round = models.ForeignKey('MatchRound', models.DO_NOTHING)
+    round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='frags')
     victim = models.ForeignKey('Geek', models.DO_NOTHING)
     pos_x = models.DecimalField(max_digits=12, decimal_places=4)
     pos_y = models.DecimalField(max_digits=12, decimal_places=4)
@@ -183,7 +183,7 @@ class MatchAward(models.Model):
 
 class MatchRound(models.Model):
     round_id = models.AutoField(primary_key=True)
-    match = models.ForeignKey('SeasonMatch', models.DO_NOTHING)
+    match = models.ForeignKey('SeasonMatch', models.DO_NOTHING, related_name='rounds')
     ct_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True)
     t_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True)
     win_side = models.CharField(max_length=100, blank=True, null=True)

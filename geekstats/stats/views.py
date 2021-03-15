@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-from .geekmodels import Buy, TiersData, Frag, MatchRound, Death
+from .geekmodels import Buy, TiersData, Frag, MatchRound, Death, SeasonMatch
 import stats.functions as func
 import operator, sys
 from django.db.models import Count, Sum, Avg
@@ -174,19 +174,55 @@ def maps(request):
     template = loader.get_template('maps.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'])
     newstate.compare = 'map'
-    mapstats = func.get_details(newstate)
-    for i in mapstats:
-        i.playerscores.sort(key=lambda playerscores: playerscores.kdr, reverse=True)
-    
-    context = {'maps': mapstats,
-               'title': 'GeekFest Maps', 
+    #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
+    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+    rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+
+    killData = Frag.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id').annotate(num_frags=Count('frag_id')).order_by('round__match__map', '-num_frags')
+    deathData = Death.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('round__match__map')
+
+    mapGroupData = {}
+
+    for k in killData:
+        if (not k['round__match__map'] in mapGroupData):
+            mapGroupData[k['round__match__map']] = {
+                'map' : k['round__match__map'],
+                'player_info' : {}
+            }
+        mapGroupData[k['round__match__map']]['player_info'][k['geek_id']] = {
+            'player': k['geek__handle'],
+            'id': k['geek_id'],
+            'kills': k['num_frags'],
+            'deaths': 0,
+            'kdr': k['num_frags']
+            }
+
+    for d in deathData:
+        if (not d['round__match__map'] in mapGroupData):
+            continue
+        if (not d['geek_id'] in mapGroupData[d['round__match__map']]['player_info']):
+            mapGroupData[d['round__match__map']]['player_info'][d['geek_id']] = {
+                'player': d['geek__handle'],
+                'id': d['geek_id'],
+                'kills': 0,
+                'deaths': 0,
+                'buys': 0
+            }
+        curPlayer = mapGroupData[d['round__match__map']]['player_info'][d['geek_id']]
+        curPlayer['deaths'] = d['num_deaths']
+        if (d['num_deaths'] > 0):
+            curPlayer['kdr'] = curPlayer['kills']/curPlayer['deaths']
+        curPlayer['kdr'] = round(curPlayer['kdr'], 2)
+
+
+    context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                'eventdates':request.session['eventdates'],
                'state':newstate,
+               'mapstats':mapGroupData.values
                }
     return HttpResponse(template.render(context, request))
 
-import time
 
 def weapons(request):
     mainmenu.set('Weapons')
@@ -196,8 +232,8 @@ def weapons(request):
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
     rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
 
-    killData = Frag.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds, is_teamkill=False).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_frags=Count('frag_id')).order_by('item__decscription', '-num_frags')
-    deathData = Death.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds, is_teamkill=False).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('item__decscription')
+    killData = Frag.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_frags=Count('frag_id')).order_by('item__decscription', '-num_frags')
+    deathData = Death.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds, is_teamkill=False,  geek__is_member=True).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('item__decscription')
     buyData = Buy.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_buys=Count('buy_id')).order_by('item__decscription')
 
     itemGroupedData = {}
