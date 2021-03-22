@@ -33,53 +33,58 @@
 			<div class=" " style="width:50%; text-align:center; background: darkred;" >TEAM 2</div>
 		</div>	
 		<div class="container" style="width=80%;">
-			<div class="data fbig fbold cgeek" style="width:50%; text-align:center;" >{{games.team1}}</div>
-			<div class="data fbig fbold cfest" style="width:50%; text-align:center;">{{games.team2}}</div>
+			<div class="data fbig fbold cgeek" style="width:50%; text-align:center;" >{{gfgames.team1}}</div>
+			<div class="data fbig fbold cfest" style="width:50%; text-align:center;">{{gfgames.team2}}</div>
 		</div>
 		<div class="container" style="width=80%;">
 			<div class="data fbig fbold cgeek" style="width:50%; font-size:48px; text-align:center;
 				{% if games.team1wins >= games.team2wins %}
 					color: darkgreen;
 				{% endif %}
-				" >{{games.team1wins}}
+				" >{{gfgames.team1wins}}
 			</div>
 			<div class="data fbig fbold cfest" style="width:50%; font-size:48px; text-align:center;
 				{% if games.team1wins <= games.team2wins %}
 					color: darkgreen;
 				{% endif %}
-				" >{{games.team2wins}}
+				" >{{gfgames.team2wins}}
 			</div>
 		</div>
 		<div class="container" style="width=800%;">
-			<div class="data fbold cgeek" style="width:50%; text-align:center;" >{{games.team1rdwins}} rounds won</div>
-			<div class="data fbold cfest" style="width:50%; text-align:center;" >{{games.team2rdwins}} rounds won</div>
+			<div class="data fbold freg cgeek" style="width:50%; text-align:center;" >{{gfgames.team1matchwins}} matches won</div>
+			<div class="data fbold freg cfest" style="width:50%; text-align:center;" >{{gfgames.team2matchwins}} matches won</div>
 		</div>
+		<div class="container" style="width=800%;">
+			<div class="data fbold cgeek" style="width:50%; text-align:center;" >{{gfgames.team1rdwins}} rounds won</div>
+			<div class="data fbold cfest" style="width:50%; text-align:center;" >{{gfgames.team2rdwins}} rounds won</div>
+		</div>
+		
 	</div>
 </div>
 
 
-{% for i in games.rounds %}
+{% for i in gfgames.match %}
 <div class="container rowwrap" style="width=100%;">
 	<div class="container" style="width:100%">
 		<div class="rowheader" style="width:100%; text-align:center;">{{i.date}}</div>
 	</div>
-	{% for j in i.gamedata %}
+	{% for j in i.round %}
 	<div class="container" style="">
 		<div style="width: 20%; ">
-			<div class="fbold fmed" style="text-align:right;">{{j.0}}</div>
+			<div class="fbold fmed" style="text-align:right;">{{j.map}}</div>
 		</div>
 		<div class="data cgeek fmed" style="text-align:center; width: 40%;">
-			{% if j.2 == None %}
+			{% if j.score.0 == None %}
 				--
 			{% else %}
-				{{j.2}}
+				{{j.score.0}}
 			{% endif %}
 		</div>
 		<div class="data cfest fmed" style="text-align:center; width: 40%;">
-			{% if j.4 == None %}
+			{% if j.score.1 == None %}
 				--
 			{% else %}
-				{{j.4}}
+				{{j.score.1}}
 			{% endif %}
 		</div>
 	</div>

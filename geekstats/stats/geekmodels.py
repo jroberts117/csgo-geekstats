@@ -295,4 +295,14 @@ class TiersData(models.Model):
         db_table = 'tiers_data'
         app_label = 'geek'
     
+class TeamWins(models.Model):
+    match_date = models.DateField()
+    map = models.CharField(max_length=250)
+    team_name = models.CharField(max_length=250)
+    wins = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'team_wins'
+        app_label = 'geek'
 

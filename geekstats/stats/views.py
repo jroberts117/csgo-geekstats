@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-from .geekmodels import Buy, TiersData, Frag, MatchRound, Death, SeasonMatch
+from .geekmodels import Buy, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch
+from .geekclasses import season
 import stats.functions as func
 import operator, sys
 from django.db.models import Count, Sum, Avg
@@ -95,13 +96,26 @@ def awards(request):
     return HttpResponse(template.render(context, request))
 
 def teams(request):
+    ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Teams')
     template = loader.get_template('teams.html')
     seasons = func.get_team_seasons(newstate,request)
     newstate.season = request.session['season']
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'])
+
+    ### BUILD THE TEAMS DATA
+    seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
+    teamInfo = season(newstate.season)
+    teamInfo.setTeams(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct())
+    dates = TeamWins.objects.values('match_date').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct()
+    for date in dates:
+        teamInfo.addMatches(TeamWins.objects.values().filter(match_date=date['match_date']).order_by('map'))
+
+    teamInfo.calcWins()
+    
     games,players = func.get_team_data(newstate)
     context = {'seasons': seasons,
+               'gfgames':teamInfo,
                'players': players,
                'games': games,
                'title': 'GeekFest Teams',
