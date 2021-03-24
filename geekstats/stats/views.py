@@ -25,7 +25,7 @@ from datetime import date, timedelta
 
 class StateInfo:
     def __init__(self):
-        self.menu = ['Event','Awards','Tiers','Teams','Maps','Weapons','Geeks']
+        self.menu = ['Awards','Tiers','Teams','Maps','Weapons','Geeks']
         self.state = ['','','','','','','']
 
     def set(self, value):
@@ -113,11 +113,11 @@ def teams(request):
 
     teamInfo.calcWins()
     
-    games,players = func.get_team_data(newstate)
+#    games,players = func.get_team_data(newstate)
     context = {'seasons': seasons,
                'gfgames':teamInfo,
-               'players': players,
-               'games': games,
+#               'players': players,
+#               'games': games,
                'title': 'GeekFest Teams',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                'eventdates':request.session['eventdates'],
