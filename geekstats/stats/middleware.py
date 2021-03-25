@@ -52,10 +52,11 @@ class EventData(object):
                         request.session['start_date'] = eventdates[-1]
                         request.session['end_date'] = '2100-01-01'
                     else:                                                       # If it's a season, then work with that
-                        data = list(Season.objects.values().filter(name=requet.POST['dateList']))
-                        request.session['start_date'] = str(data['start_date'])   # Set the dates
-                        request.session['end_date'] = str(data['end_date'])
-                        request.session['season'] = data['name']
+##                        print('we received '+request.POST['dateList']+' and will try and look it up')
+                        data = list(Season.objects.values().filter(name=request.POST['dateList']))
+                        request.session['start_date'] = data[0]['start_date'].strftime('%Y-%m-%d')   # Set the dates
+                        request.session['end_date'] = data[0]['end_date'].strftime('%Y-%m-%d')
+                        request.session['season'] = data[0]['name']
             except:
                 print('we are not in the stats so skip this stuff')     # If that fails, it's a page not working with data range data
 
@@ -64,7 +65,7 @@ class EventData(object):
             try:                                                        # Test to see if we have a start date set
                 test = request.session['start_date']
             except:                                                     # If we don't, this is the first load so default to the last play date
-                print('NOT a POST and the start date is NOT already set')
+##                print('NOT a POST and the start date is NOT already set')
                 request.session['start_date'] = str(dates[0]['matchdate'])
                 request.session['end_date'] = str(dates[0]['matchdate'])
                 request.session['selector'] = str(dates[0]['matchdate'])
