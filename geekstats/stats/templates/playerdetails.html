@@ -4,16 +4,15 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
-<DIV style="height:30px; text-align:center; margin-bottom: 5px; padding-top: 5px; font-size:20px; background-color:red; color:yellow;">OLD STATS DATABASE</DIV>
 <!- Player summary stats box ->
 <div class="container rowwrap p800">
 	<div class="rowheader">PLAYER STATS FOR: </div>
 	<div class = "container tile250 rowwrap h100 acenter">
-		<div class="fbig fbold">{{player.handle}}</div>
+		<div class="fbig fbold">{{player.name}}</div>
 	</div>
 	<div class = "container acenter tile250 colwrap h100">
 		<div class="data fmed">KDR</div>
-		<div class="data fbig fbold">{{player.kdr}}</div>
+		<div class="data fbig fbold">{{player.KDR}}</div>
 		<div class="data">
 			{% if player.kdr_v_avg >= 0 %}
 				<span style="color:green;">{{player.kdr_v_avg}} vs avg</span></div>
@@ -28,7 +27,7 @@
 		</div>
 		<div class = "container row">
 			<div class="data fbold focus">Nemisis:</div>
-			<div class="data">TBD</div>
+			<div class="data">{% with player.opponents|last as last%}{{last.item}}{% endwith %}</div>
 		</div>
 		<div class = "container row">
 			<div class="data fbold focus">Best Weapon:</div>
@@ -97,6 +96,7 @@
 			<div class="rowheader data focus">Map</div>
 			<div class="rowheader data short">K</div>
 			<div class="rowheader data short">D</div>
+			<div class="rowheader data short">A</div>
 			<div class="rowheader data short">KDR</div>
 		</div>
 	</div>
@@ -106,6 +106,7 @@
 			<div class="data focus"><a href="Details?pid={{player.id}}&mid={{i.item}}">{{i.item}}</a></div>
 			<div class="data short">{{i.kills}}</div>	
 			<div class="data short">{{i.deaths}}</div>
+			<div class="data short">{{i.assists}}</div>
 			<div class="data short">{{i.kdr}}</div>
 		</div>
 	</div>

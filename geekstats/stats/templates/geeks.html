@@ -4,7 +4,6 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
-<DIV style="height:30px; text-align:center; margin-bottom: 5px; padding-top: 5px; font-size:20px; background-color:red; color:yellow;">OLD STATS DATABASE</DIV>
 <div class="page rowwrap">
 	<div class="container rowwrap">
 	<div class="container" style="background:black;">
@@ -12,27 +11,25 @@
 		<div class="rowheader data short">Kills</div>
 		<div class="rowheader data short">Deaths</div>
 		<div class="rowheader data short">KDR</div>
-		<div class="rowheader data short">Avg KDR</div>
-		<div class="rowheader data short">KDR v. Avg</div>
+		<div class="rowheader data short">aKDR</div>
 		<div class="rowheader data short">Tier</div>
-		<div class="rowheader data short">Maps Played</div>
+		<div class="rowheader data short">Matches</div>
 		<div class="rowheader data short">Gen</div>
 		<div class="rowheader data short">Location</div>
 		<div class="rowheader data long">Tenure</div>
 	</div>
 	{% for i in geeks %}
 	<div class="container row ">
-		<div class="data long"><a href="PlayerDetails?pid={{i.id}}">{{i.handle}}</a></div>
+		<div class="data long"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
 		<div class="data short">{{i.kills}}</div>
 		<div class="data short">{{i.deaths}}</div>
 		<div class="data short">{{i.kdr}}</div>
-		<div class="data short">{{i.kdr_avg}}</div>
-		<div class="data short">{{i.kdr_v_avg}}</div>
+		<div class="data short">{{i.akdr}}</div>
 		<div class="data short">{{i.tier}}</div>
-		<div class="data short">{{i.maps_played}}</div>
-		<div class="data short">{{i.gen}}</div>
+		<div class="data short">{{i.matches}}</div>
+		<div class="data short">{{i.generation}}</div>
 		<div class="data short">{{i.location}}</div>
-		<div class="data long">{{i.years}} years</div>
+		<div class="data long">{{i.tenure}} years</div>
 	
 	</div>
 	{% endfor %}

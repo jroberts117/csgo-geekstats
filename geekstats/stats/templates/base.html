@@ -27,7 +27,7 @@
 			<div class="title"> {{state.page}}</div>
 			<form method=post action="{{state.page}}">
 				{% csrf_token %}
-				{% if state.page != "Teams" and state.page != "Event" %}
+				{% if state.page != "Teams" and state.page != "Event" and state.page != "Geeks" %}
 				<fieldset>
 					Showing Data For: 
 					<select name="dateList">

@@ -281,6 +281,7 @@ class Tier(models.Model):
         app_label = 'geek'
 
 class TiersData(models.Model):
+    geekid = models.IntegerField()
     player = models.CharField(max_length=250)
     tier = models.CharField(max_length=250)
     matchdate = models.DateField()
@@ -305,4 +306,40 @@ class TeamWins(models.Model):
         managed = False
         db_table = 'team_wins'
         app_label = 'geek'
+
+class GeekInfo(models.Model):
+    player = models.CharField(max_length=250)
+    tier = models.CharField(max_length=250)
+    generation = models.CharField(max_length=250)
+    location = models.CharField(max_length=250)
+    member_since = models.DateField()
+    matches = models.IntegerField()
+    kills = models.IntegerField()
+    deaths = models.IntegerField()
+    assists = models.IntegerField()
+    kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    akdr = models.DecimalField(max_digits=8, decimal_places=2)
+    tenure = models.DecimalField(max_digits=8, decimal_places=2)
+    
+    class Meta:
+        managed = False
+        db_table = 'geek_info'
+        app_label = 'geek'
+
+class FragDetails(models.Model):
+    match_date = models.DateField()
+    match_datetime = models.DateField()
+    killer = models.CharField(max_length=250)
+    victim = models.CharField(max_length=250)
+    victim_id = models.IntegerField()
+    map = models.CharField(max_length=250)
+    weapon = models.CharField(max_length=250)
+    partner = models.CharField(max_length=250)
+    type = models.CharField(max_length=250)
+    
+    class Meta:
+        managed = False
+        db_table = 'frag_details'
+        app_label = 'geek'
+
 

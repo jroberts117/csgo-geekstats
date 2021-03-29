@@ -109,3 +109,138 @@ class season:
 
     def __str__(self):
         return self.name
+
+########################################################################
+### ITEM
+###     This class contains the data for a weapon, maps or opponents
+###     This class is normally associated with the player object
+########################################################################
+class item:
+    def __init__(self, data, mType, field):
+        try:
+            self.item = data[field]
+            if mType == 'killer':
+                self.kills = data['id__count']
+                self.deaths = 0
+                self.assists = 0
+            elif mType == 'victim':
+                self.kills = 0
+                self.deaths = data['id__count']
+                self.assists = 0
+            elif mType == 'assist':
+                self.kills = 0
+                self.deaths = 0
+                self.assists = data['id__count']
+        except:
+            self.item = 'No data'
+        self.buys = 0
+        self.kdr = 0.00
+        self.kpb = 0.00
+
+    def calcTotals(self):
+        if self.deaths > 0:
+            self.akdr = round((self.kills + (self.assists*.25)) / self.deaths,2)
+            self.kdr = round(self.kills / self.deaths,2)
+        else:
+            self.akdr = 9.99
+            self.kdr = 9.99
+        
+########################################################################
+### PLAYER
+###     This class contains the high level data for a player
+###     It contains subclasses for opponent, map and weapon data
+########################################################################
+class player:
+    def __init__(self, data):
+        try:
+            self.name = data[0]['player']
+            self.kills = data[0]['kills__sum']
+            self.deaths = data[0]['deaths__sum']
+            self.assists = data[0]['assists__sum']
+            self.KDR = round(data[0]['kdr__avg'],2)
+            self.aKDR = round(data[0]['akdr__avg'],2)
+        except:
+            self.name = 'No data'
+        self.avgKDR = 0.0
+        self.diffAvg = 0.0
+        self.topVictim = ''
+        self.Nemisis = ''
+        self.topWeapon = ''
+        self.lowWeapon = ''
+        self.topMap = ''
+        self.lowMap = ''
+        self.topOpponent = ''
+        self.lowOpponent = ''
+        self.weapons = []
+        self.opponents = []
+        self.maps = []
+
+    def addWeapons(self,mType,field,data):
+        if mType == 'killer':
+            for row in data:
+                self.weapons.append(item(row,mType,field))
+        elif mType == 'victim':
+            for row in data:
+                exists = False
+                for line in self.weapons:
+                    if line.item == row[field]:
+                        line.deaths = row['id__count']
+                        exists = True
+                if not exists:   
+                    self.weapons.append(item(row,mType,field))
+
+    def addMaps(self,mType,field,data):
+        if mType == 'killer':
+            for row in data:
+                self.maps.append(item(row,mType,field))
+        elif mType == 'victim':
+            for row in data:
+                exists = False
+                for line in self.maps:
+                    if line.item == row[field]:
+                        line.deaths = row['id__count']
+                        exists = True
+                if not exists:   
+                    self.maps.append(item(row,mType,field))
+        elif mType == 'assist':
+            for row in data:
+                print(row[field])
+                exists = False
+                for line in self.maps:
+                    if line.item == row[field]:
+                        line.assists = row['id__count']
+                        exists = True
+                if not exists:   
+                    self.maps.append(item(row,mType,field))
+                    
+    def addOpps(self,mType,field,data):
+        if mType == 'killer':
+            for row in data:
+                self.opponents.append(item(row,mType,field))
+        elif mType == 'victim':
+            for row in data:
+                exists = False
+                for line in self.opponents:
+                    if line.item == row[field]:
+                        line.deaths = row['id__count']
+                        exists = True
+                if not exists:   
+                    self.opponents.append(item(row,mType,field))
+
+    def calcStats(self):
+        for row in self.maps:
+            row.calcTotals()
+        for row in self.weapons:
+            row.calcTotals()
+        for row in self.opponents:
+            row.calcTotals()
+##        self.opponents.sort(key=lambda x:x.kdr, reverse=True)
+        self.maps.sort(key=lambda x:x.kdr, reverse=True)
+            
+        mapTotKill = sum(row.kills for row in self.maps)
+        mapTotDeath = sum(row.deaths for row in self.maps)
+        
+            
+   
+        
+        
