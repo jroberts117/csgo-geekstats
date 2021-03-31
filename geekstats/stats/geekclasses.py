@@ -153,6 +153,7 @@ class item:
 class player:
     def __init__(self, data):
         try:
+            self.id = data[0]['geekid']
             self.name = data[0]['player']
             self.kills = data[0]['kills__sum']
             self.deaths = data[0]['deaths__sum']

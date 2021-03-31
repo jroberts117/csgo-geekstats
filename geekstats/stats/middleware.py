@@ -50,9 +50,6 @@ class EventData(object):
         if request.method == 'POST':                                            # If a date or season was picked
             if request.session.get('selector',False) and request.POST.get('dateList',False):
                 request.session['selector'] = request.POST['dateList']          # Set a session object for the item selected
-                print(request.POST['dateList'])
-                print(type(request.POST['dateList']))
-                print(validate(request.POST['dateList']))
                 if validate(request.POST['dateList']):                          # catch if it is a date or not
 ##                    temp = datetime.datetime.strptime(request.POST['dateList'], '%Y-%m-%d')  # Test to see if it is a date
                     request.session['start_date'] = request.POST['dateList']    # Set the session date ranges to the same thing

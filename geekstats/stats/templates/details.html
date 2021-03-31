@@ -7,6 +7,7 @@
 
 
 <!- Details box ->
+<DIV style="height:30px; text-align:center; margin-bottom: 5px; padding-top: 5px; font-size:20px; background-color:red; color:yellow;">ONLY KILLS DATA BEING DISPLAYED IN BETA</DIV>
 <div class="container rowwrap ">
 	<table style="">
 	<TR>
@@ -25,12 +26,12 @@
 		{% else %}
 			<TR style= "background:pink;">
 		{% endif %}
-		<TD class="acenter">{{i.3}}</td>
-		<TD class="acenter">{{i.0}}</td>
-		<TD class="acenter">{{i.1}}</td>
-		<TD class="acenter">{{i.2}}</td>
-		<TD class="acenter">{{i.4}}</td>
-		<TD class="acenter">{{i.5}}</td>
+		<TD class="acenter">{{i.match_datetime}}</td>
+		<TD class="acenter">{{i.map}}</td>
+		<TD class="acenter">{{i.weapon}}</td>
+		<TD class="acenter">N/A</td>
+		<TD class="acenter">{{i.killer}}</td>
+		<TD class="acenter">{{i.victim}}</td>
 	</TR>
 	
 

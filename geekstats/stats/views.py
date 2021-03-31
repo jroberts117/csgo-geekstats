@@ -135,13 +135,13 @@ def tiers(request):
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
     context['eventdates'] = request.session['eventdates']
     context['state'] = newstate
-    context['tier0'] = TiersData.objects.values('player')\
+    context['tier0'] = TiersData.objects.values('geekid','player')\
                        .filter(tier="Master", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])\
                        .order_by('-kdr__avg').annotate(Avg('kdr'))
-    context['tier1'] = TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
-    context['tier2'] = TiersData.objects.values('player').filter(tier="Silver", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
-    context['tier3'] = TiersData.objects.values('player').filter(tier="Bronze", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
-    context['players'] = TiersData.objects.values('player','tier').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+    context['tier1'] = TiersData.objects.values('geekid','player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
+    context['tier2'] = TiersData.objects.values('geekid','player').filter(tier="Silver", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
+    context['tier3'] = TiersData.objects.values('geekid','player').filter(tier="Bronze", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
+    context['players'] = TiersData.objects.values('geekid','player','tier').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
     avgkdr = TiersData.objects.values('player').filter(matchdate__gte=newstate.days180ago, matchdate__lte=newstate.today).annotate(Avg('kdr'))
     players = list(context['players'])
     for geek in players:
@@ -330,7 +330,7 @@ def playerdetails(request):
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'])
 
     ### BUILD THE PLAYER DETAIL DATA
-    playerData = player(TiersData.objects.values('player','tier').filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
+    playerData = player(TiersData.objects.values('geekid','player','tier').filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
     playerData.addWeapons('killer','weapon',FragDetails.objects.values('weapon').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
     playerData.addWeapons('victim','weapon',FragDetails.objects.values('weapon').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
     playerData.addMaps('killer','map',FragDetails.objects.values('map').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
@@ -356,14 +356,25 @@ def playerdetails(request):
     return HttpResponse(template.render(context, request))
 
 def details(request):
+    ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
     template = loader.get_template('details.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'])
-    detailinfo = [request.session['playerid'],request.session['opponentid'],request.session['mapid'],request.session['weaponid']]
+    pid = request.session['playerid']
+    xOpp = request.session['opponentid']
+    xMap = request.session['mapid']
+    xWeapon = request.session['weaponid']
 
-    details = func.get_pdetails(newstate, request)
+    ### GET THE DETAILS REQUESTED FROM THE FRAGDETAILS VIEW
+    if request.session['opponentid'] != '':
+        details = FragDetails.objects.values().filter(id=pid,victim=xOpp,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+    elif xMap != '':
+        details = FragDetails.objects.values().filter(id=pid,map=xMap,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+    elif xWeapon != '':
+        details = FragDetails.objects.values().filter(id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+##    details = func.get_pdetails(newstate, request)
     context = {'details' : details,
-               'detailinfo' : detailinfo,
+##               'detailinfo' : detailinfo,
                'title': 'GeekFest Geeks',
                'eventdates':request.session['eventdates'],
                'state':newstate,

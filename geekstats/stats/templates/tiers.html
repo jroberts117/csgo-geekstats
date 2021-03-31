@@ -15,7 +15,7 @@
 		</div>
 	{% for i in tier0 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
 			<div class="data">{{i.kdr__avg|floatformat:2}}</div>
 		</div>
 	{% endfor %}
@@ -32,7 +32,7 @@
 		</div>
 	{% for i in tier1 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
 			<div class="data">{{i.kdr__avg|floatformat:2}}</div>
 		</div>
 	{% endfor %}
@@ -49,7 +49,7 @@
 		</div>
 	{% for i in tier2 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
 		<div class="data">{{i.kdr__avg|floatformat:2}}</div>
 		</div>
  	{% endfor %}
@@ -66,7 +66,7 @@
 		</div>
 	{% for i in tier3 %}
 		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
+			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
 		<div class="data">{{i.kdr__avg|floatformat:2}}</div>
 		</div>
 	{% endfor %}
@@ -89,7 +89,7 @@
 	{% for i in players %}
 		<div class="{{ i.tier|lower }} container">
 		<div class="data acenter short" align=center>{{forloop.counter}}</div>
-		<div class="data medium focus"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
+		<div class="data medium focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
 		<div class="data short">{{i.kills__sum}}</div>
 		<div class="data short">{{i.deaths__sum}}</div>
 		<div class="data short">{{i.assists__sum}}</div>
