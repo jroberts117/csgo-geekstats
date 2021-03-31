@@ -16,6 +16,13 @@ class state:
         self.page = ''
         self.season = ''
 
+def validate(date_text):
+    try:
+        temp = datetime.datetime.strptime(date_text, '%Y-%m-%d')
+        return True
+    except:
+        return False
+
 ## EventData object is called on each request by Django        
 class EventData(object):
     def __init__(self, get_response):
@@ -41,13 +48,16 @@ class EventData(object):
 ######################### PROCESS REQUEST IF A DATE OR SEASON WAS SELECTED AND SET SESSION INFO ##########################################
         
         if request.method == 'POST':                                            # If a date or season was picked
-            try:
+            if request.session.get('selector',False) and request.POST.get('dateList',False):
                 request.session['selector'] = request.POST['dateList']          # Set a session object for the item selected
-                try:                                                            # Use try and except to catch if it is a date or not
-                    temp = datetime.datetime.strptime(request.POST['dateList'], '%Y-%m-%d')  # Test to see if it is a date
+                print(request.POST['dateList'])
+                print(type(request.POST['dateList']))
+                print(validate(request.POST['dateList']))
+                if validate(request.POST['dateList']):                          # catch if it is a date or not
+##                    temp = datetime.datetime.strptime(request.POST['dateList'], '%Y-%m-%d')  # Test to see if it is a date
                     request.session['start_date'] = request.POST['dateList']    # Set the session date ranges to the same thing
                     request.session['end_date'] = request.POST['dateList']
-                except:                                                         # If it fails, they picked text
+                else:                                                           # If they picked text
                     if request.POST['dateList'] == 'Overall':                   # If they want everything get the max range from the db
                         request.session['start_date'] = eventdates[-1]
                         request.session['end_date'] = '2100-01-01'
@@ -57,14 +67,12 @@ class EventData(object):
                         request.session['start_date'] = data[0]['start_date'].strftime('%Y-%m-%d')   # Set the dates
                         request.session['end_date'] = data[0]['end_date'].strftime('%Y-%m-%d')
                         request.session['season'] = data[0]['name']
-            except:
-                print('we are not in the stats so skip this stuff')     # If that fails, it's a page not working with data range data
+##            except:
+##                print('we are not in the stats so skip this stuff')     # If that fails, it's a page not working with data range data
 
 ################ PROCESS THE PAGE IF NO DATE OR SEASON WAS SELECTED CAPTURE OTHER SESSION DATA  #######################################
         else:
-            try:                                                        # Test to see if we have a start date set
-                test = request.session['start_date']
-            except:                                                     # If we don't, this is the first load so default to the last play date
+            if not request.session.get('start_date',False):                     # If we don'thave a start date, this is the first load so default to the last play date
 ##                print('NOT a POST and the start date is NOT already set')
                 request.session['start_date'] = str(dates[0]['matchdate'])
                 request.session['end_date'] = str(dates[0]['matchdate'])
