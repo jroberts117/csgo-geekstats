@@ -34,6 +34,17 @@ class Assist(models.Model):
         db_table = 'assist'
         app_label = 'geek'
 
+class AwardCategory(models.Model):
+    award_category_id = models.AutoField(primary_key=True)
+    category_name = models.CharField(max_length=1000)
+    category_description = models.CharField(max_length=1000)
+    category_color = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'award_category'
+        app_label = 'geek'
+
 
 class Blind(models.Model):
     blind_id = models.AutoField(primary_key=True)
@@ -123,6 +134,36 @@ class Geek(models.Model):
     class Meta:
         managed = False
         db_table = 'geek'
+        app_label = 'geek'
+
+class GeekfestAward(models.Model):
+    geekfest_award_id = models.AutoField(primary_key=True)
+    award_name = models.CharField(max_length=1000)
+    award_title = models.CharField(max_length=1000)
+    award_description = models.CharField(max_length=1000, blank=True, null=True)
+    award_image_path = models.CharField(max_length=1000, blank=True, null=True)
+    award_category = models.ForeignKey(AwardCategory, models.DO_NOTHING)
+    award_query = models.CharField(max_length=10000)
+    award_query_type = models.CharField(max_length=100)
+    award_value_type = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'geekfest_award'
+        app_label = 'geek'
+
+
+class GeekfestMatchAward(models.Model):
+    geekfest_match_award_id = models.AutoField(primary_key=True)
+    match = models.ForeignKey('SeasonMatch', models.DO_NOTHING)
+    geekfest_award = models.ForeignKey(GeekfestAward, models.DO_NOTHING)
+    geek = models.ForeignKey(Geek, models.DO_NOTHING)
+    award_rank = models.IntegerField()
+    award_value = models.DecimalField(max_digits=12, decimal_places=4)
+
+    class Meta:
+        managed = False
+        db_table = 'geekfest_match_award'
         app_label = 'geek'
 
 

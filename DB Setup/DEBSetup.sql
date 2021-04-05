@@ -263,6 +263,7 @@ CREATE TABLE geek.award_category(
 	award_category_id	INT				NOT NULL auto_increment
     , category_name		VARCHAR(1000)	NOT NULL
     , category_description VARCHAR(1000) NOT NULL
+    , category_color VARCHAR(100)		NOT NULL DEFAULT 'rgba(192,192,192,0.2)'
     , PRIMARY KEY (award_category_id)
 );
 
@@ -275,6 +276,7 @@ CREATE TABLE geek.geekfest_award(
     , award_category_id	INT				NOT NULL
     , award_query		VARCHAR(20000)	NOT NULL
     , award_query_type	VARCHAR(100)	NOT NULL
+    , award_value_type 	VARCHAR(100)	NOT NULL
     , PRIMARY KEY (geekfest_award_id)
     , FOREIGN KEY (award_category_id) REFERENCES geek.award_category(award_category_id)
 );
@@ -284,7 +286,6 @@ CREATE TABLE geek.geekfest_match_award(
     , match_id			INT				NOT NULL
     , geekfest_award_id	INT				NOT NULL
     , geek_id			INT				NOT NULL
-    , award_rank		INT				NOT NULL
     , award_value		DECIMAL(12,4)	NOT NULL
     , PRIMARY KEY (geekfest_match_award_id)
     , FOREIGN KEY (match_id) REFERENCES geek.season_match(match_id) ON DELETE CASCADE

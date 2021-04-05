@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-from .geekmodels import Buy, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails
+from .geekmodels import Buy, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory
 from .geekclasses import season, player
 import stats.functions as func
 import operator, sys
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Min, Max
 import datetime
 from datetime import date, timedelta
+from collections import defaultdict
 
 ###############################################################
 ## Views
@@ -25,8 +26,8 @@ from datetime import date, timedelta
 
 class StateInfo:
     def __init__(self):
-##        self.menu = ['Awards','Tiers','Teams','Maps','Weapons','Geeks']
-        self.menu = ['Tiers','Teams','Maps','Weapons','Geeks']
+        self.menu = ['Awards','Tiers','Teams','Maps','Weapons','Geeks']
+##        self.menu = ['Tiers','Teams','Maps','Weapons','Geeks']
         self.state = ['','','','','','','']
 
     def set(self, value):
@@ -85,9 +86,54 @@ def awards(request):
             newstate.value = request.session['aid']
         except:
             newstate.value = 0
+
+    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+    raw_award_data = GeekfestMatchAward.objects.select_related('match', 'geefest_award', 'geekfest_award__award_category', 'geek').filter(
+        match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S')).values(
+            'geek__handle', 'geekfest_award__award_name', 'geekfest_award__award_title', 'geekfest_award__award_category__category_name',
+            'geekfest_award__award_image_path', 'geekfest_award__award_description', 'geekfest_award__award_value_type',
+            'geekfest_award__award_category__category_color').annotate(
+                max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value'))
+
+    award_data_by_award = defaultdict(list)
+    for award_data in raw_award_data:
+        award_data_by_award[award_data['geekfest_award__award_name']].append(award_data)
+
+
+    awards_new = []
+
+    for award_name in award_data_by_award:
+        if (award_data_by_award[award_name] is None and len(award_data_by_award[award_name]) > 0):
+            continue
+        sample = award_data_by_award[award_name][0]
+        award_value_type = sample['geekfest_award__award_value_type']
+        data_key = 'sum_points'
+        if award_value_type == 'max':
+            data_key = 'max_points'
+        elif award_value_type == 'min':
+            data_key = 'min_points'
+        #print(award_data_by_award[award_name])
+        ad = award_data_by_award[award_name]
+        ad.sort(key=lambda aw: aw[data_key], reverse=True)
+        winner_award_data = []
+        for aw in ad[:5]:
+            aw_value = aw[data_key]
+            if aw_value == aw_value.to_integral_value():
+                aw_value = int(aw_value)
+            winner_award_data.append([aw['geek__handle'], aw_value])
+        #winner_award_data = map(lambda ad: {ad['geek__handle'], ad['sum_points']}, ad[:5])
+        actual_award = func.awards(sample['geekfest_award__award_title'], winner_award_data, award_name, sample['geekfest_award__award_category__category_name'],
+            sample['geekfest_award__award_image_path'], sample['geekfest_award__award_description'], sample['geekfest_award__award_category__category_color'])
+        print(actual_award)
+        awards_new.append(actual_award)
+
+    award_types = []
+    for category in AwardCategory.objects.all():
+        award_types.append([category.category_name, category.category_color])
+
             
-    award_types, awards = func.get_awards(newstate)
-    context = {'awards': awards,
+    #award_types, awards = func.get_awards(newstate)
+    context = {'awards': awards_new,
                'types' : award_types,
                'title': 'GeekFest Awards',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
