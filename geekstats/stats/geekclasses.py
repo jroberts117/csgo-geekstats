@@ -59,10 +59,9 @@ class season:
     def setTeams(self, data):
         self.team1 = data[0]['team_name']
         self.team2 = data[1]['team_name']
-        print(self.team1, self.team2)
+##        print(self.team1, self.team2)
         
     def addMatches(self, data):
-        print('loading: '+str(data[0]['match_date']))
         curr_match = gfMatch(data[0]['match_date'])
         curr_map = 'none'
         for row in data:
@@ -80,9 +79,8 @@ class season:
 
     def calcWins(self):
         for match in self.match:
-            print(match.date)
+##            print(match.date)
             for round in match.round:
-                print('the map is '+round.map+' score 1: '+str(round.score[0])+' score 2: '+str(round.score[1]))
                 self.team1rdwins += round.score[0]
                 match.team1rdwins += round.score[0]
                 self.team2rdwins += round.score[1]
@@ -102,10 +100,10 @@ class season:
                     self.team1wins += 1
                 elif match.team1rdwins < match.team2rdwins:
                     self.team2wins += 1
-            print('At the end of match '+str(match.date))
-            print('Team 1 has '+str(match.team1rdwins)+' and Team 2 has '+str(match.team2rdwins))
-            print('Team 1 has '+str(self.team1wins)+' total wins, '+str(self.team1matchwins)+' match wins and '+str(self.team1rdwins)+' round wins')
-            print('Team 2 has '+str(self.team2wins)+' total wins, '+str(self.team2matchwins)+' match wins and '+str(self.team2rdwins)+' round wins')
+##            print('At the end of match '+str(match.date))
+##            print('Team 1 has '+str(match.team1rdwins)+' and Team 2 has '+str(match.team2rdwins))
+##            print('Team 1 has '+str(self.team1wins)+' total wins, '+str(self.team1matchwins)+' match wins and '+str(self.team1rdwins)+' round wins')
+##            print('Team 2 has '+str(self.team2wins)+' total wins, '+str(self.team2matchwins)+' match wins and '+str(self.team2rdwins)+' round wins')
 
     def __str__(self):
         return self.name
@@ -205,7 +203,6 @@ class player:
                     self.maps.append(item(row,mType,field))
         elif mType == 'assist':
             for row in data:
-                print(row[field])
                 exists = False
                 for line in self.maps:
                     if line.item == row[field]:

@@ -11,15 +11,16 @@
 			<select name="seasonList">
 			
 			{% for i in seasons %}
-				<option value="{{i.0}}"
-				{% if i.0 == state.season %}
+				<option value="{{i.name}}"
+				{% if i.name == state.season %}
 					selected
 				{% endif %}
-				>{{i.0}}</option>
+				>{{i.name}}</option>
 			{% endfor %}
 			</select>
 			<button type="submit">Submit</button>
 		</fieldset>
+		</form>
 </div>
 
 <div class="container cGeek" style="width=100%;">

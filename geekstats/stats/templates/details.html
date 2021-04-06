@@ -7,7 +7,7 @@
 
 
 <!- Details box ->
-<DIV style="height:30px; text-align:center; margin-bottom: 5px; padding-top: 5px; font-size:20px; background-color:red; color:yellow;">ONLY KILLS DATA BEING DISPLAYED IN BETA</DIV>
+
 <div class="container rowwrap ">
 	<table style="">
 	<TR>
@@ -21,17 +21,26 @@
 	<TH style="padding:5px;">Victim</TH>
 	</TR>
 	{% for i in details %}
-		{% if i.6|stringformat:"i" == detailinfo.0 %}
+		{% if i.weapon == 'n/a' %}
+			<TR style= "background:yellow;">
+		{% elif i.id|stringformat:"i" == state.value %}
 			<TR style= "background:lightgreen;">
 		{% else %}
 			<TR style= "background:pink;">
 		{% endif %}
 		<TD class="acenter">{{i.match_datetime}}</td>
 		<TD class="acenter">{{i.map}}</td>
-		<TD class="acenter">{{i.weapon}}</td>
-		<TD class="acenter">N/A</td>
-		<TD class="acenter">{{i.killer}}</td>
-		<TD class="acenter">{{i.victim}}</td>
+		{% if i.weapon == 'n/a' %}
+			<TD class="acenter">ASSIST</td>
+			<TD class="acenter">N/A</td>
+			<TD class="acenter">{{i.partner}}</td>
+			<TD class="acenter">{{i.victim}}</td>
+		{% else %}
+			<TD class="acenter">{{i.weapon}}</td>
+			<TD class="acenter">N/A</td>
+			<TD class="acenter">{{i.killer}}</td>
+			<TD class="acenter">{{i.victim}}</td>
+		{% endif %}
 	</TR>
 	
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-from .geekmodels import Buy, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory
+from .geekmodels import Buy, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season
 from .geekclasses import season, player
 import stats.functions as func
 import operator, sys
@@ -143,22 +143,35 @@ def awards(request):
     return HttpResponse(template.render(context, request))
 
 def teams(request):
-    ### INITIALIZE THE PAGE AND SESSION DATA
+    ### INITIALIZE THE PAGE
     mainmenu.set('Teams')
     template = loader.get_template('teams.html')
-    seasons = func.get_team_seasons(newstate,request)
+
+    ### BUILD THE SEASON PICKLIST AND LOAD THE SESSION DATA BASED ON INPUT
+    seasons = Season.objects.values().order_by('-start_date')
+    if request.POST.get('seasonList',False):
+        curr_season = Season.objects.values().filter(name=request.POST['seasonList'])
+        request.session['start_date'] = curr_season[0]['start_date'].strftime('%Y-%m-%d')
+        request.session['end_date'] = curr_season[0]['end_date'].strftime('%Y-%m-%d')
+        request.session['season'] = curr_season[0]['name']
+    else:
+        request.session['start_date'] = seasons[0]['start_date'].strftime('%Y-%m-%d')
+        request.session['end_date'] = seasons[0]['end_date'].strftime('%Y-%m-%d')
+        request.session['season'] = seasons[0]['name']
+##    seasons = func.get_team_seasons(newstate,request)
     newstate.season = request.session['season']
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'])
 
     ### BUILD THE TEAMS DATA
     seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
     teamInfo = season(newstate.season)
-    teamInfo.setTeams(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct())
-    dates = TeamWins.objects.values('match_date').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct()
-    for date in dates:
-        teamInfo.addMatches(TeamWins.objects.values().filter(match_date=date['match_date']).order_by('map'))
+    if seasonData:
+        teamInfo.setTeams(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct())
+        dates = TeamWins.objects.values('match_date').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct()
+        for date in dates:
+            teamInfo.addMatches(TeamWins.objects.values().filter(match_date=date['match_date']).order_by('map'))
 
-    teamInfo.calcWins()
+        teamInfo.calcWins()
     
 #    games,players = func.get_team_data(newstate)
     context = {'seasons': seasons,
@@ -413,11 +426,14 @@ def details(request):
 
     ### GET THE DETAILS REQUESTED FROM THE FRAGDETAILS VIEW
     if request.session['opponentid'] != '':
-        details = FragDetails.objects.values().filter(id=pid,victim=xOpp,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+        pdetails = FragDetails.objects.values().filter(id=pid,victim=xOpp,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+        details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,killer=xOpp,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime'),all=True).order_by('match_datetime')
     elif xMap != '':
-        details = FragDetails.objects.values().filter(id=pid,map=xMap,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+        pdetails = FragDetails.objects.values().filter(id=pid,map=xMap,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+        details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,map=xMap,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']),all=True).order_by('match_datetime')
     elif xWeapon != '':
-        details = FragDetails.objects.values().filter(id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+        pdetails = FragDetails.objects.values().filter(id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
+        details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']),all=True).order_by('match_datetime')
 ##    details = func.get_pdetails(newstate, request)
     context = {'details' : details,
 ##               'detailinfo' : detailinfo,

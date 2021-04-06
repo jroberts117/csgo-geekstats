@@ -59,14 +59,15 @@ class EventData(object):
                         request.session['start_date'] = eventdates[-1]
                         request.session['end_date'] = '2100-01-01'
                     else:                                                       # If it's a season, then work with that
-##                        print('we received '+request.POST['dateList']+' and will try and look it up')
-                        data = list(Season.objects.values().filter(name=request.POST['dateList']))
-                        request.session['start_date'] = data[0]['start_date'].strftime('%Y-%m-%d')   # Set the dates
-                        request.session['end_date'] = data[0]['end_date'].strftime('%Y-%m-%d')
-                        request.session['season'] = data[0]['name']
-##            except:
-##                print('we are not in the stats so skip this stuff')     # If that fails, it's a page not working with data range data
-
+                        try:
+##                          print('we received '+request.POST['dateList']+' and will try and look it up')
+                            data = list(Season.objects.values().filter(name=request.POST['dateList']))
+                            request.session['start_date'] = data[0]['start_date'].strftime('%Y-%m-%d')   # Set the dates
+                            request.session['end_date'] = data[0]['end_date'].strftime('%Y-%m-%d')
+                            request.session['season'] = data[0]['name']
+                        except:                                                 # Catches if a separator was selected
+                            pass
+                
 ################ PROCESS THE PAGE IF NO DATE OR SEASON WAS SELECTED CAPTURE OTHER SESSION DATA  #######################################
         else:
             if not request.session.get('start_date',False):                     # If we don'thave a start date, this is the first load so default to the last play date
