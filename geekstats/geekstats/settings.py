@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os, sys
+import pymysql
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'u_dltse0*#unyk7noswy$7meqac)1#qz%fznva3!l+q_$*nl9j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['73.89.143.101', 'localhost', '127.0.0.1','geekfest.duckdns.org']
+ALLOWED_HOSTS = ['73.89.143.101', 'localhost', '127.0.0.1','geekfest.duckdns.org','test.geekfestclan.com','stats.geekfestclan.com']
 
 
 # Application definition
@@ -107,6 +108,8 @@ DATABASES = {
 }
 
 DATABASE_ROUTERS = ["geekstats.routers.GeekRouter"]
+pymysql.version_info = (1, 4, 2, "final", 0)
+pymysql.install_as_MySQLdb()
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

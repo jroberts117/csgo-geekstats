@@ -23,7 +23,7 @@ VIEW `team_wins` AS
         JOIN `geek`.`team` `t1` ON ((`mr`.`ct_team_id` = `t1`.`team_id`)))
         WHERE
             (`mr`.`win_side` = 'CT')
-        GROUP BY `ma`.`match_id` , `ma`.`match_date` , `ma`.`map` , `team_name` UNION SELECT 
+        GROUP BY `ma`.`match_id` , `ma`.`match_date` , `ma`.`map` , `team_name` UNION ALL SELECT 
             `ma`.`match_id` AS `match_id`,
                 `ma`.`match_date` AS `match_date`,
                 `ma`.`map` AS `map`,
