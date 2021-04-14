@@ -92,8 +92,9 @@ def awards(request):
         match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S')).values(
             'geek__handle', 'geekfest_award__award_name', 'geekfest_award__award_title', 'geekfest_award__award_category__category_name',
             'geekfest_award__award_image_path', 'geekfest_award__award_description', 'geekfest_award__award_value_type',
-            'geekfest_award__award_category__category_color').annotate(
-                max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value'))
+            'geekfest_award__award_category__category_color','geekfest_award__award_category__award_category_id').annotate(
+                max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value')).order_by(
+                    "geekfest_award__award_category__award_category_id", "geekfest_award__award_name")
 
     award_data_by_award = defaultdict(list)
     for award_data in raw_award_data:
@@ -108,13 +109,15 @@ def awards(request):
         sample = award_data_by_award[award_name][0]
         award_value_type = sample['geekfest_award__award_value_type']
         data_key = 'sum_points'
+        reverse = True
         if award_value_type == 'max':
             data_key = 'max_points'
         elif award_value_type == 'min':
             data_key = 'min_points'
+            reverse = False
         #print(award_data_by_award[award_name])
         ad = award_data_by_award[award_name]
-        ad.sort(key=lambda aw: aw[data_key], reverse=True)
+        ad.sort(key=lambda aw: aw[data_key], reverse=reverse)
         winner_award_data = []
         for aw in ad[:5]:
             aw_value = aw[data_key]
