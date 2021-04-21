@@ -193,7 +193,7 @@ class playerGraph:
 ##        self.season = ''
 
 class awards:
-    def __init__(self, award, players, desc, group, image, description, color, groupid):
+    def __init__(self, award, players, desc, group, image, description, color):
         self.award = award
         self.winners = players
         self.description = desc
@@ -201,7 +201,6 @@ class awards:
         self.image = image
         self.color = color
         self.longdesc = description
-        self.groupid = groupid
 
 ## Sets colors for values on KDR
 def set_color(score):

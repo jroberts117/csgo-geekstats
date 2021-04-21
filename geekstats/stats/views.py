@@ -9,7 +9,6 @@ from django.db.models import Count, Sum, Avg, Min, Max
 import datetime
 from datetime import date, timedelta
 from collections import defaultdict
-from itertools import groupby
 
 ###############################################################
 ## Views
@@ -127,28 +126,17 @@ def awards(request):
             winner_award_data.append([aw['geek__handle'], aw_value])
         #winner_award_data = map(lambda ad: {ad['geek__handle'], ad['sum_points']}, ad[:5])
         actual_award = func.awards(sample['geekfest_award__award_title'], winner_award_data, award_name, sample['geekfest_award__award_category__category_name'],
-            sample['geekfest_award__award_image_path'], sample['geekfest_award__award_description'], sample['geekfest_award__award_category__category_color'],
-            sample['geekfest_award__award_category__award_category_id'])
+            sample['geekfest_award__award_image_path'], sample['geekfest_award__award_description'], sample['geekfest_award__award_category__category_color'])
         print(actual_award)
         awards_new.append(actual_award)
 
-    def award_type_key_func(aw):
-        return aw.groupid
-
-    awards_new = sorted(awards_new, key=award_type_key_func)
-
-    awards_by_type = {}
-    for key, awards in groupby(awards_new, award_type_key_func):
-        awards_by_type[key] = list(awards)
-
     award_types = []
     for category in AwardCategory.objects.all():
-        award_types.append([category.category_name, category.category_color, category.award_category_id, (awards_by_type.get(category.award_category_id) or [])])
+        award_types.append([category.category_name, category.category_color])
 
             
     #award_types, awards = func.get_awards(newstate)
     context = {'awards': awards_new,
-               'abt': awards_by_type, 
                'types' : award_types,
                'title': 'GeekFest Awards',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
