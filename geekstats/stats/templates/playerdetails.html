@@ -23,11 +23,11 @@
 	<div class = "container tile250 rowwrap h100">
 		<div class = "container row">
 			<div class="data fbold focus">Top Victim</div>
-			<div class="data">{{player.opponents.0.item}}</div>
+			<div class="data">{{player.topVictim}}</div>
 		</div>
 		<div class = "container row">
-			<div class="data fbold focus">Nemisis:</div>
-			<div class="data">{% with player.opponents|last as last%}{{last.item}}{% endwith %}</div>
+			<div class="data fbold focus">Nemesis:</div>
+			<div class="data">{{player.nemesis}}</div>
 		</div>
 		<div class = "container row">
 			<div class="data fbold focus">Best Weapon:</div>

@@ -163,7 +163,7 @@ class player:
         self.avgKDR = 0.0
         self.diffAvg = 0.0
         self.topVictim = ''
-        self.Nemisis = ''
+        self.nemesis = ''
         self.topWeapon = ''
         self.lowWeapon = ''
         self.topMap = ''
@@ -213,9 +213,11 @@ class player:
                     
     def addOpps(self,mType,field,data):
         if mType == 'killer':
+            self.topVictim = data[0][field]
             for row in data:
                 self.opponents.append(item(row,mType,field))
         elif mType == 'victim':
+            self.nemesis = data[0][field]
             for row in data:
                 exists = False
                 for line in self.opponents:

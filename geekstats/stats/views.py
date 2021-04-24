@@ -396,7 +396,7 @@ def playerdetails(request):
     playerData.addMaps('victim','map',FragDetails.objects.values('map').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
     playerData.addMaps('assist','map',FragDetails.objects.values('map').filter(id=pid,type='assist',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
     playerData.addOpps('killer','victim',FragDetails.objects.values('victim').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-    playerData.addOpps('victim','killer',FragDetails.objects.values('killer').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
+    playerData.addOpps('victim','killer',FragDetails.objects.values('killer').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
     playerData.calcStats()
 ##    print('for player '+playerData.name+' the top weapon is: '+playerData.topWeapon+' and the worst is: '+playerData.lowWeapon)
 ##    for row in playerData.weapons:
