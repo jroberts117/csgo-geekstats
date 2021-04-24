@@ -9,6 +9,7 @@ from django.db.models import Count, Sum, Avg, Min, Max
 import datetime
 from datetime import date, timedelta
 from collections import defaultdict
+from itertools import groupby
 
 ###############################################################
 ## Views
@@ -92,8 +93,9 @@ def awards(request):
         match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S')).values(
             'geek__handle', 'geekfest_award__award_name', 'geekfest_award__award_title', 'geekfest_award__award_category__category_name',
             'geekfest_award__award_image_path', 'geekfest_award__award_description', 'geekfest_award__award_value_type',
-            'geekfest_award__award_category__category_color').annotate(
-                max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value'))
+            'geekfest_award__award_category__category_color','geekfest_award__award_category__award_category_id').annotate(
+                max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value')).order_by(
+                    "geekfest_award__award_category__award_category_id", "geekfest_award__award_name")
 
     award_data_by_award = defaultdict(list)
     for award_data in raw_award_data:
@@ -108,13 +110,15 @@ def awards(request):
         sample = award_data_by_award[award_name][0]
         award_value_type = sample['geekfest_award__award_value_type']
         data_key = 'sum_points'
+        reverse = True
         if award_value_type == 'max':
             data_key = 'max_points'
         elif award_value_type == 'min':
             data_key = 'min_points'
+            reverse = False
         #print(award_data_by_award[award_name])
         ad = award_data_by_award[award_name]
-        ad.sort(key=lambda aw: aw[data_key], reverse=True)
+        ad.sort(key=lambda aw: aw[data_key], reverse=reverse)
         winner_award_data = []
         for aw in ad[:5]:
             aw_value = aw[data_key]
@@ -123,17 +127,28 @@ def awards(request):
             winner_award_data.append([aw['geek__handle'], aw_value])
         #winner_award_data = map(lambda ad: {ad['geek__handle'], ad['sum_points']}, ad[:5])
         actual_award = func.awards(sample['geekfest_award__award_title'], winner_award_data, award_name, sample['geekfest_award__award_category__category_name'],
-            sample['geekfest_award__award_image_path'], sample['geekfest_award__award_description'], sample['geekfest_award__award_category__category_color'])
+            sample['geekfest_award__award_image_path'], sample['geekfest_award__award_description'], sample['geekfest_award__award_category__category_color'],
+            sample['geekfest_award__award_category__award_category_id'])
         print(actual_award)
         awards_new.append(actual_award)
 
+    def award_type_key_func(aw):
+        return aw.groupid
+
+    awards_new = sorted(awards_new, key=award_type_key_func)
+
+    awards_by_type = {}
+    for key, awards in groupby(awards_new, award_type_key_func):
+        awards_by_type[key] = list(awards)
+
     award_types = []
     for category in AwardCategory.objects.all():
-        award_types.append([category.category_name, category.category_color])
+        award_types.append([category.category_name, category.category_color, category.award_category_id, (awards_by_type.get(category.award_category_id) or [])])
 
             
     #award_types, awards = func.get_awards(newstate)
     context = {'awards': awards_new,
+               'abt': awards_by_type, 
                'types' : award_types,
                'title': 'GeekFest Awards',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
