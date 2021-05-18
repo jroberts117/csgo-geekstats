@@ -308,6 +308,63 @@ WHERE d.is_teamkill=0 AND mr.match_id={match} AND
 GROUP BY geek_id', 'sql', 'sum');
 
 
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Failed Bomb Carries', 'Failed To Deliver', 'The number of times a player had the bomb but failed to plant', '/images/ribbons/3_planted_the_bomb.png', 6, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.player_event_action pea
+	JOIN geek.match_round mr ON pea.round_id=mr.round_id
+    JOIN geek.action a ON pea.action_id=a.action_id
+WHERE a.code=\'Got_The_Bomb\' AND mr.match_id={match} AND 
+	NOT EXISTS (SELECT 1 FROM geek.player_event_action ipea
+				JOIN geek.action ia ON ipea.action_id=ia.action_id
+				WHERE ipea.round_id=pea.round_id AND ipea.geek_id=pea.geek_id AND ia.code=\'Planted_The_Bomb\')
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Bomb Plants', 'Saboteur', 'The number of times a player planted the bomb', '/images/ribbons/3_planted_the_bomb.png', 6, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.player_event_action pea
+	JOIN geek.match_round mr ON pea.round_id=mr.round_id
+    JOIN geek.action a ON pea.action_id=a.action_id
+WHERE a.code=\'Planted_The_Bomb\' AND mr.match_id={match} 
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Hostages Rescued', 'Rescue Hero', 'The number of times a player rescued a hostage', '/images/ribbons/3_rescued_a_hostage.png', 6, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.player_event_action pea
+	JOIN geek.match_round mr ON pea.round_id=mr.round_id
+    JOIN geek.action a ON pea.action_id=a.action_id
+WHERE a.code=\'Rescued_A_Hostage\' AND mr.match_id={match} 
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Bombs Defused', 'MacGyver', 'The number of times a player defused the bomb', '/images/ribbons/3_defused_the_bomb.png', 6, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.player_event_action pea
+	JOIN geek.match_round mr ON pea.round_id=mr.round_id
+    JOIN geek.action a ON pea.action_id=a.action_id
+WHERE a.code=\'Defused_The_Bomb\' AND mr.match_id={match} 
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Attempts To Rescue', 'Hero Wannabe', 'The number of times a player attempted to rescue a hostage (includes both failed and successful attempts)', '/images/ribbons/3_rescued_a_hostage.png', 6, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.player_event_action pea
+	JOIN geek.match_round mr ON pea.round_id=mr.round_id
+    JOIN geek.action a ON pea.action_id=a.action_id
+WHERE a.code=\'Touched_A_Hostage\' AND mr.match_id={match} 
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('No Kit Defusal Attempts', 'Not A Boyscout', 'The number of times a player attempted to defuse the bomb without a kit', '/images/ribbons/3_rescued_a_hostage.png', 6, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.player_event_action pea
+	JOIN geek.match_round mr ON pea.round_id=mr.round_id
+    JOIN geek.action a ON pea.action_id=a.action_id
+WHERE a.code=\'Begin_Bomb_Defuse_Without_Kit\' AND mr.match_id={match} 
+GROUP BY geek_id', 'sql', 'sum');
+
 
 
 INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
@@ -335,6 +392,48 @@ FROM geek.blind b
 	JOIN geek.match_round mr ON b.round_id=mr.round_id
 WHERE b.is_team_blind=0 AND mr.match_id={match}
 GROUP BY blinding_player_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Total Time Allies Flashed', 'The Flasher', 'The total time player blinded allies with a flashbang', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, blinding_player_id, SUM(duration) AS value
+FROM geek.blind b
+	JOIN geek.match_round mr ON b.round_id=mr.round_id
+WHERE b.is_team_blind=1 AND mr.match_id={match}
+GROUP BY blinding_player_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Total Time Flashed', 'Ray Charles', 'The total time player was blinded by a flashbang (from either enemies or allies)', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, blinded_player_id, SUM(duration) AS value
+FROM geek.blind b
+	JOIN geek.match_round mr ON b.round_id=mr.round_id
+WHERE mr.match_id={match}
+GROUP BY blinded_player_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Dream Killer', 'Freddy Krueger', 'The total times a player has killed Dream', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.frag f
+	JOIN geek.match_round mr ON f.round_id=mr.round_id
+WHERE mr.match_id={match} AND victim_id=13 AND f.is_teamkill=0
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Dream\'s Bitch', 'Master Baiter', 'The total times a player has been killed by Dream', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.death d
+	JOIN geek.match_round mr ON d.round_id=mr.round_id
+WHERE mr.match_id={match} AND killer_id=13 AND d.is_teamkill=0
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Stabs, Nades, and Tazes', 'Ninja', 'The number of times player killed with flame, taser, grenade, or knife', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+FROM geek.frag f
+	JOIN geek.match_round mr ON f.round_id=mr.round_id
+    JOIN geek.item i on f.item_id=i.item_id
+WHERE f.is_teamkill=0 AND mr.match_id={match} AND 
+	(i.name=\'taser\' OR i.sub_category=\'Grenades\' OR i.category=\'Knives\' OR i.name=\'inferno\')
+GROUP BY geek_id', 'sql', 'sum');
 
 
 
