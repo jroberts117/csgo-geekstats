@@ -3,13 +3,13 @@ class GeekRouter:
     A router to control all database operations on models in the
     auth and contenttypes applications.
     """
-    route_app_labels = {'geek'}
+    route_db_tablespaces = {'geek'}
 
     def db_for_read(self, model, **hints):
         """
         Attempts to read geek data.
         """
-        if model._meta.app_label in self.route_app_labels:
+        if model._meta.db_tablespace in self.route_db_tablespaces:
             return 'geek'
         return None
 
@@ -17,7 +17,7 @@ class GeekRouter:
         """
         Attempts to write geek data.
         """
-        if model._meta.app_label in self.route_app_labels:
+        if model._meta.db_tablespace in self.route_db_tablespaces:
             return 'geek'
         return None
 
@@ -27,17 +27,17 @@ class GeekRouter:
         involved.
         """
         if (
-            obj1._meta.app_label in self.route_app_labels or
-            obj2._meta.app_label in self.route_app_labels
+            obj1._meta.db_tablespace in self.route_db_tablespaces or
+            obj2._meta.db_tablespace in self.route_db_tablespaces
         ):
            return True
         return None
 
-    def allow_migrate(self, db, app_label, model_name=None, **hints):
+    def allow_migrate(self, db, db_tablespace, model_name=None, **hints):
         """
         Make sure the geek apps only appear in the
         'auth_db' database.
         """
-        if app_label in self.route_app_labels:
+        if db_tablespace in self.route_db_tablespaces:
             return db == 'geek'
         return None

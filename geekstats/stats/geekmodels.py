@@ -19,20 +19,20 @@ class Action(models.Model):
     class Meta:
         managed = False
         db_table = 'action'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Assist(models.Model):
     assist_id = models.AutoField(primary_key=True)
     round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='assists')
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
-    killing_player = models.ForeignKey('Geek', models.DO_NOTHING, blank=True, null=True)
+    killing_player = models.ForeignKey('Geek', models.DO_NOTHING, blank=True, null=True, related_name="assist_kill")
     is_tk_assist = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'assist'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 class AwardCategory(models.Model):
     award_category_id = models.AutoField(primary_key=True)
@@ -43,21 +43,21 @@ class AwardCategory(models.Model):
     class Meta:
         managed = False
         db_table = 'award_category'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Blind(models.Model):
     blind_id = models.AutoField(primary_key=True)
     round = models.ForeignKey('MatchRound', models.DO_NOTHING)
     blinding_player = models.ForeignKey('Geek', models.DO_NOTHING)
-    blinded_player = models.ForeignKey('Geek', models.DO_NOTHING)
+    blinded_player = models.ForeignKey('Geek', models.DO_NOTHING, related_name="blindee")
     is_team_blind = models.IntegerField()
     duration = models.DecimalField(max_digits=12, decimal_places=4)
 
     class Meta:
         managed = False
         db_table = 'blind'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Buy(models.Model):
@@ -69,14 +69,14 @@ class Buy(models.Model):
     class Meta:
         managed = False
         db_table = 'buy'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Death(models.Model):
     death_id = models.AutoField(primary_key=True)
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
     round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='deaths')
-    killer = models.ForeignKey('Geek', models.DO_NOTHING, blank=True, null=True)
+    killer = models.ForeignKey('Geek', models.DO_NOTHING, blank=True, null=True, related_name="killer")
     pos_x = models.DecimalField(max_digits=12, decimal_places=4)
     pos_y = models.DecimalField(max_digits=12, decimal_places=4)
     pos_z = models.DecimalField(max_digits=12, decimal_places=4)
@@ -92,14 +92,14 @@ class Death(models.Model):
     class Meta:
         managed = False
         db_table = 'death'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Frag(models.Model):
     frag_id = models.AutoField(primary_key=True)
     geek = models.ForeignKey('Geek', models.DO_NOTHING)
     round = models.ForeignKey('MatchRound', models.DO_NOTHING, related_name='frags')
-    victim = models.ForeignKey('Geek', models.DO_NOTHING)
+    victim = models.ForeignKey('Geek', models.DO_NOTHING, related_name="victim")
     pos_x = models.DecimalField(max_digits=12, decimal_places=4)
     pos_y = models.DecimalField(max_digits=12, decimal_places=4)
     pos_z = models.DecimalField(max_digits=12, decimal_places=4)
@@ -115,7 +115,7 @@ class Frag(models.Model):
     class Meta:
         managed = False
         db_table = 'frag'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Geek(models.Model):
@@ -134,7 +134,7 @@ class Geek(models.Model):
     class Meta:
         managed = False
         db_table = 'geek'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 class GeekfestAward(models.Model):
     geekfest_award_id = models.AutoField(primary_key=True)
@@ -150,7 +150,7 @@ class GeekfestAward(models.Model):
     class Meta:
         managed = False
         db_table = 'geekfest_award'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class GeekfestMatchAward(models.Model):
@@ -164,7 +164,7 @@ class GeekfestMatchAward(models.Model):
     class Meta:
         managed = False
         db_table = 'geekfest_match_award'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Generation(models.Model):
@@ -175,7 +175,7 @@ class Generation(models.Model):
     class Meta:
         managed = False
         db_table = 'generation'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class GrenadeToss(models.Model):
@@ -190,7 +190,7 @@ class GrenadeToss(models.Model):
     class Meta:
         managed = False
         db_table = 'grenade_toss'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Item(models.Model):
@@ -204,7 +204,7 @@ class Item(models.Model):
     class Meta:
         managed = False
         db_table = 'item'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class MatchAward(models.Model):
@@ -219,20 +219,20 @@ class MatchAward(models.Model):
     class Meta:
         managed = False
         db_table = 'match_award'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class MatchRound(models.Model):
     round_id = models.AutoField(primary_key=True)
     match = models.ForeignKey('SeasonMatch', models.DO_NOTHING, related_name='rounds')
-    ct_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True)
-    t_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True)
+    ct_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True, related_name="ct_teams")
+    t_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True, related_name="t_teams")
     win_side = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'match_round'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class PlayerEventAction(models.Model):
@@ -245,7 +245,7 @@ class PlayerEventAction(models.Model):
     class Meta:
         managed = False
         db_table = 'player_event_action'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Season(models.Model):
@@ -257,7 +257,7 @@ class Season(models.Model):
     class Meta:
         managed = False
         db_table = 'season'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class SeasonMatch(models.Model):
@@ -270,7 +270,7 @@ class SeasonMatch(models.Model):
     class Meta:
         managed = False
         db_table = 'season_match'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Team(models.Model):
@@ -278,13 +278,13 @@ class Team(models.Model):
     season = models.ForeignKey(Season, models.DO_NOTHING)
     name = models.CharField(max_length=250)
     description = models.CharField(max_length=5000, blank=True, null=True)
-    captain = models.ForeignKey(Geek, models.DO_NOTHING)
+    captain = models.ForeignKey(Geek, models.DO_NOTHING, related_name="captain")
     co_captain = models.ForeignKey(Geek, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'team'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class TeamEventAction(models.Model):
@@ -297,7 +297,7 @@ class TeamEventAction(models.Model):
     class Meta:
         managed = False
         db_table = 'team_event_action'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class TeamGeek(models.Model):
@@ -308,7 +308,7 @@ class TeamGeek(models.Model):
         managed = False
         db_table = 'team_geek'
         unique_together = (('geek', 'team'),)
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
 class Tier(models.Model):
@@ -319,7 +319,7 @@ class Tier(models.Model):
     class Meta:
         managed = False
         db_table = 'tier'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 class TiersData(models.Model):
     geekid = models.IntegerField()
@@ -335,7 +335,7 @@ class TiersData(models.Model):
     class Meta:
         managed = False
         db_table = 'tiers_data'
-        app_label = 'geek'
+        db_tablespace = 'geek'
     
 class TeamWins(models.Model):
     match_date = models.DateField()
@@ -346,7 +346,7 @@ class TeamWins(models.Model):
     class Meta:
         managed = False
         db_table = 'team_wins'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 class GeekInfo(models.Model):
     player = models.CharField(max_length=250)
@@ -365,7 +365,7 @@ class GeekInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'geek_info'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 class FragDetails(models.Model):
     match_date = models.DateField()
@@ -381,6 +381,6 @@ class FragDetails(models.Model):
     class Meta:
         managed = False
         db_table = 'frag_details'
-        app_label = 'geek'
+        db_tablespace = 'geek'
 
 
