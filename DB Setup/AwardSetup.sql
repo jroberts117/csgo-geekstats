@@ -418,7 +418,7 @@ WHERE mr.match_id={match} AND victim_id=13 AND f.is_teamkill=0
 GROUP BY geek_id', 'sql', 'sum');
 
 INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
-VALUES ('Dream\'s Bitch', 'Master Baiter', 'The total times a player has been killed by Dream', '/images/ribbons/1_standaard.png', 7, 
+VALUES ('Dream\'s Top Victim', 'Master Baiter', 'The total times a player has been killed by Dream', '/images/ribbons/1_standaard.png', 7, 
 'SELECT {match}, {award}, geek_id, COUNT(*) AS value
 FROM geek.death d
 	JOIN geek.match_round mr ON d.round_id=mr.round_id
