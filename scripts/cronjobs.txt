@@ -1,0 +1,10 @@
+#
+# Add the 2 lines below to the geekfest crontab -e
+#
+# START GeekSTATS - Wednesday 8pm US EST
+# STOP  GeekSTATS - Thursday 3am US EST
+#
+#
+# m h  dom mon dow   command
+30 20 * * Wed /home/geekfest/geekstats/scripts/start_geekstats.sh
+00 03 * * Thu /home/geekfest/geekstats/scripts/stop_geekstats.sh
