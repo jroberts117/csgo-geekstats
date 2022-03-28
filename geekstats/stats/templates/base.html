@@ -9,25 +9,37 @@
 			{{ page_title|default:"Untitled Page" }}
 			{% endblock title %}
 		</title>
-		<link href='https://fonts.googleapis.com/css?family=Monoton' rel='stylesheet'>
-		<link href='https://fonts.googleapis.com/css?family=Geostar Fill' rel='stylesheet'>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Changa:wght@300;500&family=Electrolize&family=Heebo:wght@300;400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 		<link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
 	</head>
 	
 	<BODY style="background-color:white;">
-		<header id="header">
-			<div style="text-align: center;"><img src="{% static 'images/gfkamiv2b.png' %}"
-                alt="GeekFest Stats" title="Geekfest Stats" style="height: 75px"><br>
+		<header>
+			<div style="text-align: center;"><a href="/" class=""><img src="{% static 'images/gf_header.gif' %}"
+                alt="GeekFest Stats" title="Geekfest Stats" style="height: 75px"><br></a>
 			</div>    
-			<ul>
+			<div><ul>
 			{% for i,j in stateinfo %}
 			<li><a class="{{j}}" href="{{ i }}">{{ i }}</a></li>
 			{% endfor %}
 			</ul>
+			{% if state.page %}
+				{% if user.is_authenticated %}
+				<div class="login"><span title="Click to logout"><a href="{% url 'logout' %}">
+					<div class="login-img"><img src = "{%static 'images/loggedin.png' %}" style="height: 25px;"></div>
+					<div class="login-text"> {{ user.get_username }} </div></a></span></div>
+				{% else %}
+				<div class="login"><span title="click to login"><a href="/accounts/login">
+					<div class="login-img"><img src = "{%static 'images/login.png' %}" style="height: 25px;"></div>
+					<div class="login-text"> LOGIN </div></a></span></div>
+				{% endif %}
+			</div>
 			<div class="title"> {{state.page}}</div>
 			<form method=post action="{{state.page}}">
 				{% csrf_token %}
-				{% if state.page != "Teams" and state.page != "Event" and state.page != "Geeks" %}
+				{% if state.page and state.page != "Teams" and state.page != "Event" and state.page != "Geeks" %}
 				<fieldset>
 					Showing Data For: 
 					<select name="dateList">
@@ -44,17 +56,18 @@
 				</fieldset>
 			</form>	
 				{% endif %}
+			{% endif %}
 		</header>
 
 					
 
 
-		<section id="main">
+		<article id="main">
 			{% block content %}
 			<p>Placeholder text in base template.   Replace with page content.</p>
 			{% endblock content %}
-		</section>
-		<footer id="footer">Copyright &copy;
+		</article>
+		<footer>Copyright &copy;
 			<script type="text/JavaScript">
 				document.write(new Date().getFullYear());                    
 			</script> GeekFest

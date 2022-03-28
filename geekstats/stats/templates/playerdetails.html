@@ -5,116 +5,140 @@
 
 {% block content %}
 <!- Player summary stats box ->
-<div class="container rowwrap p800">
-	<div class="rowheader">PLAYER STATS FOR: </div>
-	<div class = "container tile250 rowwrap h100 acenter">
-		<div class="fbig fbold">{{player.name}}</div>
+<section>
+	<div class="summary">
+		<span class="rowheader">PLAYER STATS FOR: </span>
+		<div class= "container" style="min-width: 50%; padding:5px;">
+			<div class="highlightbox"> 
+				<div class="fbig">
+	{% if player.name == 'No data' %} 
+					{{geek.0.handle}} </div>
+					<div class="fmed">{{player.nemesis}} </div></div>
+	{% else %}
+						{{player.name}}
+				{% if geek.0.validated < 1 %} 
+					{% if geek.0.email|length > 5 %} 
+						{% if geek.0.valid_sent_date %} 
+							<span title="This player has been claimed but not responded.  click to resend email.">
+								<a href="PlayerDetails?pid={{player.id}}&claim=resend"><img src="/static/images/details_resend.png" class="imgicon"></a>
+							</span>
+						{% else %} 
+							<span title="This player can be claimed.  Click to send validation email to address on file.">
+								<a href="PlayerDetails?pid={{player.id}}&claim=claim"><img src="/static/images/details_claim.png" class="imgicon"></a>
+							</span>
+						{% endif %}
+					{% else %}  
+						<span title="This player has no email on file.  Contact your administrator to claim."><img src="static/images/details_noemail.png" class="imgicon"></span>
+					{% endif %} 
+				{% else %}
+					{% if user.is_authenticated and user.get_username|upper == player.name|upper %}
+						<span title="Your account is fully validated.  Click here to reset your password."><a href="{% url 'password_reset' %}"><img src="/static/images/details_reset.png" class="imgicon"></a></span>
+					{% else %}
+						<span title="This player has been validated and is an active clan member"><img src="/static/images/details_validated.png" class="imgicon"></span>
+					{% endif %}
+				{% endif %} 
+			  
+				</div>
+				<div class="">
+					<span class="fbig">{{player.KDR}}</span>
+					KDR 
+<!-- 					{% if player.kdr_v_avg >= 0 %}
+						<span style="color:green;">{{player.kdr_v_avg}} vs avg</span>
+					{% else %}
+						<span style="color:red;">{{player.kdr_v_avg}} vs avg</font></span>
+					{% endif %}
+ -->
+				</div>
+			</div>
+			<table>
+				<tr class="header">
+					<td class="">Top Victim</td>
+					<td class="">Nemesis:</td>
+					<td class="">Best Weapon:</td>
+					<td class="">Favorite Map:</td>
+				</tr>
+				<tr class="fmed acenter">
+					<td class="floral">{{player.topVictim}}</td>
+					<td class="floral">{{player.nemesis}}</td>
+					<td class="floral">{{player.weapons.0.item}}</td>
+					<td class="floral">{{player.maps.0.item}}</td>
+				</tr>
+
+			</table>
+	{% endif %}
+		</div>
 	</div>
-	<div class = "container acenter tile250 colwrap h100">
-		<div class="data fmed">KDR</div>
-		<div class="data fbig fbold">{{player.KDR}}</div>
-		<div class="data">
-			{% if player.kdr_v_avg >= 0 %}
-				<span style="color:green;">{{player.kdr_v_avg}} vs avg</span></div>
-			{% else %}
-				<font style="color:red;">{{player.kdr_v_avg}} vs avg</font></div>
-			{% endif %}
-	</div>
-	<div class = "container tile250 rowwrap h100">
-		<div class = "container row">
-			<div class="data fbold focus">Top Victim</div>
-			<div class="data">{{player.topVictim}}</div>
-		</div>
-		<div class = "container row">
-			<div class="data fbold focus">Nemesis:</div>
-			<div class="data">{{player.nemesis}}</div>
-		</div>
-		<div class = "container row">
-			<div class="data fbold focus">Best Weapon:</div>
-			<div class="data">{{player.weapons.0.item}}</div>
-		</div>
-		<div class = "container row">
-			<div class="data fbold focus">Favorite Map:</div>
-			<div class="data">{{player.maps.0.item}}</div>
-		</div>
-	</div>
-</div>
+</section> 
 
 
+<section class="text_center">
 
-
-<!- Weapon stats box ->
-<div class="page p800 rowwrap">
-	<div class="container rowwrap m5px tile250">
-	<div class="header">Weapon Stats</div>
-	<div class="container rowwrap">
-		<div class="container border">
-			<div class="rowheader focus data">Weapon</div>
-			<div class="rowheader data short">K</div>
-			<div class="rowheader data short">D</div>
+	<!- Weapon stats box ->
+	<div class="highlightbox">
+		<div class="header">Weapon Stats</div>
+			<table class="zebra">
+				<tr class="black">
+					<td>Weapon</td>
+					<td>K</td>
+					<td>D</td>
+				</tr>
+				{% for i in player.weapons %}
+				<tr>
+					<td><a href="Details?pid={{player.id}}&wid={{i.item}}">{{i.item}}</a></td>
+					<td>{{i.kills}}</td>	
+					<td>{{i.deaths}}</div>
+				</tr>
+				{% endfor %}
+			</table>
 		</div>
 	</div>
-	{% for i in player.weapons %}
-	<div class="container rowwrap">
-		<div class="container">
-			<div class="data focus"><a href="Details?pid={{player.id}}&wid={{i.item}}">{{i.item}}</a></div>
-			<div class="data short">{{i.kills}}</div>	
-			<div class="data short">{{i.deaths}}</div>
-		</div>
-	</div>
-	{% endfor %}
-	</div>
-
- <!- Opponents stats box ->
- 	<div class="container rowwrap m5px tile250">
+	
+	 <!- Opponents stats box ->
+	<div class="highlightbox">
 	<div class="header">Opponent Stats</div>
-	<div class="container rowwrap">
-		<div class="container border">
-			<div class="rowheader focus data">Opponent</div>
-			<div class="rowheader data short">K</div>
-			<div class="rowheader data short">D</div>
-			<div class="rowheader data short">KDR</div>
+		<table class="zebra">
+			<tr class="black">
+	
+				<td>Opponent</td>
+				<td>K</td>
+				<td>D</td>
+				<td>KDR</td>
+			</tr>
+			{% for i in player.opponents %}
+			<tr>
+	
+				<td><a href="Details?pid={{player.id}}&oid={{i.item}}">{{i.item}}</a></td>
+				<td>{{i.kills}}</td>	
+				<td>{{i.deaths}}</td>
+				<td>{{i.kdr}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	 
+	  <!- Maps stats box ->
+	  <div class="highlightbox">
+		<div class="header">Opponent Stats</div>
+			<table class="zebra">
+				<tr class="black">
+					<td>Map</td>
+					<td>K</td>
+					<td>D</td>
+					<td>A</td>
+					<td>KDR</td>
+				</tr>
+				{% for i in player.maps %}
+				<tr>
+					<td><a href="Details?pid={{player.id}}&mid={{i.item}}">{{i.item}}</a></td>
+					<td>{{i.kills}}</td>	
+					<td>{{i.deaths}}</td>
+					<td>{{i.assists}}</td>
+					<td>{{i.kdr}}</td>
+				</tr>
+				{% endfor %}
+			</table>
 		</div>
-	</div>
-	{% for i in player.opponents %}
-	<div class="container rowwrap">
-		<div class="container">
-			<div class="data focus"><a href="Details?pid={{player.id}}&oid={{i.item}}">{{i.item}}</a></div>
-			<div class="data short">{{i.kills}}</div>	
-			<div class="data short">{{i.deaths}}</div>
-			<div class="data short">{{i.kdr}}</div>
-		</div>
-	</div>
-	{% endfor %}
-	</div>
- 
-  <!- Maps stats box ->
- 	<div class="container rowwrap m5px tile250">
-	<div class="header">Map Stats</div>
-	<div class="container rowwrap">
-		<div class="container border">
-			<div class="rowheader data focus">Map</div>
-			<div class="rowheader data short">K</div>
-			<div class="rowheader data short">D</div>
-			<div class="rowheader data short">A</div>
-			<div class="rowheader data short">KDR</div>
-		</div>
-	</div>
-	{% for i in player.maps %}
-	<div class="container rowwrap">
-		<div class="container">
-			<div class="data focus"><a href="Details?pid={{player.id}}&mid={{i.item}}">{{i.item}}</a></div>
-			<div class="data short">{{i.kills}}</div>	
-			<div class="data short">{{i.deaths}}</div>
-			<div class="data short">{{i.assists}}</div>
-			<div class="data short">{{i.kdr}}</div>
-		</div>
-	</div>
-	{% endfor %}
-	</div>
- 
+</section>
 
-	</div>
- 
  
 {% endblock content %}

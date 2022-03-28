@@ -1,21 +1,169 @@
 @charset "utf-8";
 
+html {
+	scroll-padding-top: 150px;
+}
+body {
+	/* font-family: 'Heebo', sans-serif;
+	font-family: 'Electrolize', sans-serif;
+	font-family: 'Heebo', sans-serif;
+	font-family: 'Press Start 2P', cursive; */
+	font-family: 'Electrolize', Verdana, Arial, serif;
+	max-width: 1440px;
+	margin:auto;
+}
+
+#main {
+	margin-top: 205px;
+}
+
+header {
+    background-color: #fff;
+    box-shadow: 0 1px 6px 0 rgb(0,0,0,0.15);
+    height: 180px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+}
+.container {
+	margin:auto;
+	height:100%;
+	padding:0 16px;
+	flex: 1 1 auto;
+	align-items: center;
+	max-width: 1440px;
+}
+
+.summary {
+	max-width: 1440px;
+	margin: auto;
+}
+
+.summary .container{
+	display: flex;
+	justify-content: space-evenly;
+	align-items: flex-start;
+}
+
+.highlightbox {
+	min-width: 30%;
+	text-align: center;
+	display: inline-block;
+	margin: 4px;
+}
+
+.hbx4 {
+	min-width: 22%;
+}
+
+div {
+	display: block;
+}
+header {
+    border-style: none;
+	text-align: center;
+    
+    height: auto;
+	margin: auto;
+}
+footer {
+    text-align: center;
+    font-size: 0.8em;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #FFFFFF;
+    border-top: thin solid #BBBBBB;
+    clear: both;
+    color: #969696;
+}
+
+table {
+	width: 100%;
+	margin: 0 4px;
+	border-spacing: 0px;
+}
+
+td {
+	padding: 2px;
+}
+
+.text_right
+	{text-align: right;
+}
+
+.text_center {
+	text-align: center;
+}
+
+.section_center{
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.title {
+    margin: 5px auto;
+    text-align: center;
+    background: darkred;
+    font-size: 28px;
+    color: white;
+    margin: revert;
+    display: block;
+    min-width: 100%;
+}
+
+.curr_user_box {
+	font-weight: bold;
+}
+.curr_user_box td {
+	border-top: 4px solid #1628cf;
+	border-bottom: 4px solid #1628cf;
+}
+
+.curr_user_box td:first-child {
+	border-left: 4px solid #1628cf;
+}
+
+.curr_user_box td:last-child {
+	border-right: 4px solid #1628cf;
+}
+
+.curr_user {
+	background: linear-gradient(rgb(211 210 12 / 50%),rgba(191,191,191,0.5));
+	font-weight: bold;
+}
+
+.border {
+	border: 1px solid gray;
+}
+
+.rowheader {
+	font-size: 14px;
+	margin:auto;
+	background: black;
+	color: white;
+	font-weight: bold;
+	display: block;
+}
+
 .page {
 	display: flex;
 	justify-content: space-evenly;
 	align-items: flex-start;
 	margin: auto;
 	box-sizing: border-box;
-	font-family: Verdana, Arial, serif;
 }
-.title {
-	margin: 5px auto;
-	text-align: center;
-	background: darkred;
-	font-size: 28px;
+.imgicon {
+	height:25px;
+	margin-top: 5px;
+	display: inline;
+	vertical-align: top;
+}
+.fbig {
+	font-size: 36px;
+	font-weight: bold;
+}
 
-	color: white;
-}
 .cgeek{
 	background: #f1f3f4;
 }
@@ -23,17 +171,9 @@
 	background: lavenderblush;
 }
 
-.container {
-	display: flex;
-	flex: 1 1 auto;
-	width: 100%;
-	justify-content: space-evenly;
-	align-items: flex-start;
-}
 
-.border {
-	border: 1px solid gray;
-}
+
+
 .p800 {
 	max-width: 800px;
 	margin: auto;
@@ -76,27 +216,24 @@
 	width:100%;
 	font-size: 16px;
 	margin: 3px;
+	font-weight: bold;
 
 }
+
+
 
 .row {
 	font-size: 12px;
 	width: 100%;
 	box-sizing: border-box;
 }
+
 .orow {
 	font-size: 12px;
 	width: 100%;
 	box-sizing: border-box;
 }
-.rowheader {
-	font-size: 14px;
-	width: 100%;
-	box-sizing: border-box;
-	background: black;
-	color: white;
-	font-weight: bold
-}
+
 
 .row:nth-of-type(odd) {
 	background-color:rgb(224,224,224,.5);
@@ -105,6 +242,7 @@
 	padding: 2px;
 	font-size: 12px;
 	text-align: left;
+	display: inline-block;
 }
 img{
 	display: block;
@@ -117,9 +255,7 @@ img{
 .medium{
 	width:100px;
 }
-.fbig {
-	font-size: 36px;
-}
+
 .fmed {
 	font-size: 24px;
 }
@@ -128,9 +264,6 @@ img{
 }
 .fsmall {
 	font-size: 12px;
-}
-.fbold {
-	font-weight: bold;
 }
 .focus{
 	text-align:left;
@@ -156,11 +289,23 @@ img{
 .gold {
 	background-color: rgb(214, 175, 54);
 }
+
+.black {
+	background-color: #111;
+	color:white;
+	padding-left: 2px;
+}
+
+.floral {
+	background-color: floralwhite;
+	border: 2px solid white;
+}
+
 .winner {
 	background: DimGrey;
 	color: White;
 }
-tr:nth-child(even) {
+.zebra tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 ul {
@@ -198,23 +343,7 @@ a {
 }
 
 
-#header {
-    border-style: none;
-	text-align: center;
-    
-    height: auto;
-	margin: auto;
-}
-#footer {
-    text-align: center;
-    font-size: 0.8em;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #FFFFFF;
-    border-top: thin solid #BBBBBB;
-    clear: both;
-    color: #969696;
-}
+
 /********************************* TAB SELECTOR STYLES ***********************************/
 /* Style the buttons inside the tab */
 .tab button {
@@ -282,5 +411,25 @@ a {
 	padding-top:5px; 
 	font-size:12px; 
 }
+/********************************* Fixed and New GF Styles  ***********************************/
+.login {
+	position: fixed;
+    height: 25px;
+    top: 100px;
+	right: 50px;;
+    display: inline-block;
+}
 
+.login-text {
+	display: inline-block;
+    vertical-align: top;
+    color: lightgray;
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+.login-img {
+	display: inline-block;
+    vertical-align: top;
+}
 	

@@ -1,0 +1,11 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<meta http-equiv="REFRESH" content="0;url=/Geeks">
+  <p>Logged out!</p>  
+  <a href="{% url 'login'%}">Click here to login again.</a>
+{% endblock %}

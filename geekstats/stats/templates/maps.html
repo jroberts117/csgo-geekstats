@@ -4,27 +4,32 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
+
+
 <div class="page rowwrap">
 	{% for i in mapstats %}
-		<div class="container rowwrap m5px tile250 border">
+	<div class="highlightbox">
 		<div class="header">{{i.map|upper}}</div>
-<!--		<div class="container rowwrap" style="background-image:url('/static/images/{{i.detail}}.jpg'); background-size:auto 100%; ">
--->
-		<div class="container rowwrap" style="background: linear-gradient(rgba(191,191,191,0.5),rgba(191,191,191,0.5)),url('/static/images/{{i.map}}.jpg');
-														background-repeat: no-repeat;background-size: cover;">
-			<div class="container rowheader" >
-				<div class="" style="text-align:left; width:175px;">Player</div>
-				<div class="" style="text-align:left;">KDR</div>
-			</div>
-			{% for j in i.player_info.values|dictsortreversed:'kdr' %}
-				<div class="container border" >
-					<div class="data focus">
-						<a href="PlayerDetails?pid={{j.id}}">{{j.player}}</a></div>
-					<div class="data"><a href="Details?pid={{j.id}}&mid={{i.map}}">{{j.kdr|floatformat:2}}</a></div>
-				</div>
-			{% endfor %}
+			<table class="" style="background: linear-gradient(rgba(191,191,191,0.5),rgba(191,191,191,0.5)),url('/static/images/{{i.map}}.jpg');
+										background-repeat: no-repeat;background-size: cover;">
+				<tr class="black">
+					<td>Player</td>
+					<td>KDR</td>
+				</tr>
+				{% for j in i.player_info.values|dictsortreversed:'kdr' %}				
+				{% if user.get_username|upper == j.player|upper %}
+					<tr class="curr_user">
+				{% else %}
+					<tr>
+				{% endif %}
+						<td><a href="PlayerDetails?pid={{j.id}}">{{j.player}}</a></td>
+						<td><a href="Details?pid={{j.id}}&mid={{i.map}}">{{j.kdr|floatformat:2}}</a></td>	
+					</tr>
+				{% endfor %}
+			</table>
 		</div>
-		</div>
+
 	{% endfor %}
+
 </div>
 {% endblock content %}

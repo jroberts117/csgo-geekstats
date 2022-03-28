@@ -17,4 +17,5 @@ urlpatterns = [
     path('Event', views.gfxx, name='gfxx'),
     path('Buys', views.buys, name='buys'),
     path('GFMMXXII', views.event, name='event'),
+    path('Join', views.join, name='join'),
 ]

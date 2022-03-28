@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'stats',
 ]
 
@@ -112,6 +113,13 @@ DATABASE_ROUTERS = ["geekstats.routers.GeekRouter"]
 pymysql.version_info = (1, 4, 2, "final", 0)
 pymysql.install_as_MySQLdb()
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'bot.geekfestclan@gmail.com'
+EMAIL_HOST_PASSWORD = 'smtwexgufmodlurj'
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -153,5 +161,3 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'stats/static'), ]
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/stats/Tiers'
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

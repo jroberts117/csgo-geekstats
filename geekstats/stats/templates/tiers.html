@@ -6,101 +6,133 @@
 {% block content %}
 
 <div class="page">
-<div class="container rowwrap m5px" align=center>
-	<div class="header master"><span title="Master tier is for players who keep a KDR greater than 1.5">MASTER</span></div>
-	<div class="container rowwrap">
-		<div class="container rowheader">
-			<div class="data focus">Player</div>
-			<div class="data">KDR</div>
-		</div>
-	{% for i in tier0 %}
-		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
-			<div class="data">{{i.kdr__avg|floatformat:2}}</div>
-		</div>
-	{% endfor %}
-	</div>
-	<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
-		This tier is restricted from buying or picking up: Buying armor, and using the Negev, autosniper or AWP.</div>
-</div>
-<div class="container rowwrap m5px" align=center>
-	<div class="header gold"><span title="Gold tier is for players who keep a KDR greater than 1.0">GOLD</span></div>
-	<div class="container rowwrap">
-		<div class="container rowheader">
-			<div class="data focus">Player</div>
-			<div class="data">KDR</div>
-		</div>
-	{% for i in tier1 %}
-		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
-			<div class="data">{{i.kdr__avg|floatformat:2}}</div>
-		</div>
-	{% endfor %}
-	</div>
-	<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
-		This tier is restricted from buying or picking up: Using the Negev, the autosniper and the AWP</div>
-</div>
-<div class="container rowwrap m5px" align=center>
-	<div class="header silver"><span title="Silver tier is for players who keep a KDR greater than .75 but less than 1.25">SILVER</span></div>
-	<div class="container rowwrap">
-		<div class="container rowheader">
-			<div class="data focus">Player</div>
-			<div class="data">KDR</div>
-		</div>
-	{% for i in tier2 %}
-		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
-		<div class="data">{{i.kdr__avg|floatformat:2}}</div>
-		</div>
- 	{% endfor %}
-	</div>
-	<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
-		This tier is restricted from buying or picking up: Using the autosniper, and the AWP</div></div>
 
-<div class="container rowwrap m5px" align=center>
-	<div class="header bronze"><span title="Bronze tier is for players who do not exceed a 1.0 KDR">BRONZE</span></div>
-	<div class="container rowwrap">
-		<div class="container rowheader">
-			<div class="data focus">Player</div>
-			<div class="data">KDR</div>
-		</div>
-	{% for i in tier3 %}
-		<div class="container row">
-			<div class="data focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
-		<div class="data">{{i.kdr__avg|floatformat:2}}</div>
-		</div>
-	{% endfor %}
+	<div class="highlightbox hbx4">
+		<div class="header master"><span title="Master tier is for players who keep a KDR greater than 1.5">MASTER</span></div>
+			<table class="zebra">
+				<tr class="black">
+					<td>Player</td>
+					<td>KDR</td>
+				</tr>
+				{% for i in tier0 %}
+				{% if user.get_username|upper == i.player|upper %}
+					<tr class="curr_user">
+				{% else %}
+					<tr>
+				{% endif %}
+						<td><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></td>
+						<td>{{i.kdr__avg|floatformat:2}}</td>	
+					</tr>
+				{% endfor %}
+			</table>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from buying or picking up: Buying armor, and using the Negev, autosniper or AWP.</div>
+		
 	</div>
+
+	<div class="highlightbox hbx4">
+		<div class="header gold"><span title="Gold tier is for players who keep a KDR greater than 1.0">GOLD</span></div>
+			<table class="zebra">
+				<tr class="black">
+					<td>Player</td>
+					<td>KDR</td>
+				</tr>
+				{% for i in tier1 %}
+				{% if user.get_username|upper == i.player|upper %}
+					<tr class="curr_user">
+				{% else %}
+					<tr>
+				{% endif %}
+						<td><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></td>
+						<td>{{i.kdr__avg|floatformat:2}}</td>	
+					</tr>
+				{% endfor %}
+			</table>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from buying or picking up: Using the Negev, the autosniper and the AWP</div>
+	</div>
+
+	<div class="highlightbox hbx4">
+		<div class="header silver"><span title="Silver tier is for players who keep a KDR greater than .75 but less than 1.25">SILVER</span></div>
+			<table class="zebra">
+				<tr class="black">
+					<td>Player</td>
+					<td>KDR</td>
+				</tr>
+				{% for i in tier2 %}
+				{% if user.get_username|upper == i.player|upper %}
+					<tr class="curr_user">
+				{% else %}
+					<tr>
+				{% endif %}
+						<td><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></td>
+						<td>{{i.kdr__avg|floatformat:2}}</td>	
+					</tr>
+				{% endfor %}
+			</table>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from buying or picking up: Using the autosniper, and the AWP</div>
+	</div>
+
+	<div class="highlightbox hbx4">
+		<div class="header bronze"><span title="Bronze tier is for players who do not exceed a 1.0 KDR">BRONZE</span></div>
+			<table class="zebra">
+				<tr class="black">
+					<td>Player</td>
+					<td>KDR</td>
+				</tr>
+				{% for i in tier3 %}
+				{% if user.get_username|upper == i.player|upper %}
+					<tr class="curr_user">
+				{% else %}
+					<tr>
+				{% endif %}
+						<td><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></td>
+						<td>{{i.kdr__avg|floatformat:2}}</td>	
+					</tr>
+				{% endfor %}
+			</table>
+			<div style="margin-top: 5px;background-color:white; color:silver; font-style:italic; font-size:12px;">
+				This tier is restricted from buying or picking up: Using the autosniper, and the AWP</div>
+	</div>
+
+
+
 </div>
-</div>
-<div class="tile500 acenter" style="margin-top:20px;" align="center">
+<div class="tile500 acenter">
 	<div class="header "><span title="Total Rank of Players In KDR Performance order">RANKED LIST</span></div>
-	<div class="container rowwrap">
-		<div class="container rowheader">
-			<div class="data short">Rank</div>
-			<div class="data medium focus">Player</div>
-			<div class="data short">Kills</div>
-			<div class="data short">Deaths</div>
-			<div class="data short">Assists</div>
-			<div class="data short">KDR</div>
-			<div class="data short"><span title="aKDR adds .25kills for every assist to KDR / total deaths">aKDR</span></div>
-			<div class="data short"><span title="Variance from average is based on last 180 days of play">AVG</span></div>
-		</div>
-	{% for i in players %}
-		<div class="{{ i.tier|lower }} container">
-		<div class="data acenter short" align=center>{{forloop.counter}}</div>
-		<div class="data medium focus"><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></div>
-		<div class="data short">{{i.kills__sum}}</div>
-		<div class="data short">{{i.deaths__sum}}</div>
-		<div class="data short">{{i.assists__sum}}</div>
-		<div class="data short">{{i.kdr__avg|floatformat:2}}</div>
-		<div class="data short">{{i.akdr__avg|floatformat:2}}</div>
-		<div class="data short">{{i.diffkdr|floatformat:2}}</div>
-		</div>
-	{% endfor %}
-	</div>
 
+	<table class="section_center">
+		<tr class="black">
+			<th>Rank</th>
+			<th>PLayer</th>
+			<th>Kills</th>
+			<th>Deaths</th>
+			<th>Assists</th>
+			<th>KDR</th>
+			<th><span title="aKDR adds .25kills for every assist to KDR / total deaths">aKDR</span></th>
+			<th><span title="Variance from average is based on last 180 days of play">AVG</span></th>
+		</tr>
+		{% for i in players %}
+		{% if user.get_username|upper == i.player|upper %}
+			<tr class="{{ i.tier|lower }} curr_user">
+		{% else %}
+			<tr class="{{ i.tier|lower }}">
+		{% endif %}
+				<td class="" align=center>{{forloop.counter}}</td>
+				<td class=""><a href="PlayerDetails?pid={{i.geekid}}">{{i.player}}</a></td>
+				<td class="">{{i.kills__sum}}</td>
+				<td class="">{{i.deaths__sum}}</td>
+				<td class="">{{i.assists__sum}}</td>
+				<td class="">{{i.kdr__avg|floatformat:2}}</td>
+				<td class="">{{i.akdr__avg|floatformat:2}}</td>
+				<td class="">{{i.diffkdr|floatformat:2}}</td>
+			</tr>
+		{% endfor %}
+
+	</table>
 </div>
+
 
 <!--
    {% if user.is_authenticated %}

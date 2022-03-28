@@ -7,6 +7,21 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+class AuthUser(models.Model):
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.IntegerField()
+    username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.CharField(max_length=254)
+    is_staff = models.IntegerField()
+    is_active = models.IntegerField()
+    date_joined = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user'
 
 class Action(models.Model):
     action_id = models.AutoField(primary_key=True)
@@ -130,7 +145,11 @@ class Geek(models.Model):
     tier = models.ForeignKey('Tier', models.DO_NOTHING, blank=True, null=True)
     generation = models.ForeignKey('Generation', models.DO_NOTHING, blank=True, null=True)
     is_member = models.IntegerField(blank=True, null=True)
-
+    valid_sent_date = models.DateField(blank=True, null=True)
+    validated = models.IntegerField(blank=True, null=True)
+    userid = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True) 
+    geek_code = models.CharField(max_length=250, blank=True, null=True)
+    
     class Meta:
         managed = False
         db_table = 'geek'
@@ -383,4 +402,28 @@ class FragDetails(models.Model):
         db_table = 'frag_details'
         db_tablespace = 'geek'
 
+class GeekAuthUser(models.Model):
+    geek_id = models.AutoField(primary_key=True)
+    handle = models.CharField(max_length=250, blank=True, null=True)
+    location = models.CharField(max_length=20, blank=True, null=True)
+    occupation = models.CharField(max_length=250, blank=True, null=True)
+    member_since = models.DateField(blank=True, null=True)
+    valid_sent_date = models.DateField()
+    validated = models.IntegerField()
+    geek_code = models.CharField(max_length=45)
+    authid = models.IntegerField()
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.IntegerField()
+    username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.CharField(max_length=254)
+    is_staff = models.IntegerField()
+    is_active = models.IntegerField()
+    date_joined = models.DateField()
 
+    class Meta:
+        managed = False
+        db_table = 'geek_auth_user'
+        db_tablespace = 'geek'

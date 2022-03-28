@@ -3,7 +3,7 @@ class GeekRouter:
     A router to control all database operations on models in the
     auth and contenttypes applications.
     """
-    route_db_tablespaces = {'geek'}
+    route_db_tablespaces = {'geek','geekfest'}
 
     def db_for_read(self, model, **hints):
         """

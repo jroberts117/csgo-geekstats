@@ -1,0 +1,49 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+	<div style="margin:auto; position:fixed; top:105px; left:45%;">
+
+  {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
+  
+  
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% else %}
+      <p class='fjoefin fmed' style="color:lightblue; text-align:center;">Please login </p>
+    {% endif %}
+  {% endif %}
+  
+  
+  <form method="post" action="{% url 'login' %}?next={{next}}">
+    {% csrf_token %}
+	<div class="">
+    <div class="black">LOGIN</div>
+		<div class="fsmall fjosefin fyellow" style="white-space:nowrap; overflow-x:auto; padding:3px;">
+			<div style="width:100px; display:inline-block; ">{{ form.username.label_tag }}</div>
+			<div style="width:200px; display:inline-block;">{{ form.username }}</div>
+		</div>
+		<div class="break"></div>
+		<div class="fsmall fjosefin fyellow" style="white-space:nowrap; overflow-x:auto; padding:3px;">
+			<div style="width:100px; display:inline-block;">{{ form.password.label_tag }}     </div>
+			<div style="width:200px; display:inline-block;">{{ form.password }}</div>
+		</div>
+		<div class="break"></div>
+		<div style="width:50px; margin:auto; padding:3px;"><input type="submit" value="login" /></div>
+		<div class="break"></div>
+	</div>
+  </form>
+  
+  {# Assumes you setup the password_reset view in your URLconf #}
+	<div style="margin-bottom:50px;"><a href="{% url 'password_reset' %}">Lost password?</a></div>
+	<input type="hidden" name="next" value="{{ next }}" />
+  </div>
+  <div style="height:100px;"> </div>
+{% endblock %}

@@ -4,50 +4,39 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
-<div class="page rowwrap">
-	<div class="container rowwrap">
-	<div class="container" style="background:black;">
-		<div class="rowheader data long">Handle</div>
-		<div class="rowheader data short">Kills</div>
-		<div class="rowheader data short">Deaths</div>
-		<div class="rowheader data short">KDR</div>
-		<div class="rowheader data short">aKDR</div>
-		<div class="rowheader data short">Tier</div>
-		<div class="rowheader data short">Matches</div>
-		<div class="rowheader data short">Gen</div>
-		<div class="rowheader data short">Location</div>
-		<div class="rowheader data long">Tenure</div>
-	</div>
-	{% for i in geeks %}
-	<div class="container row ">
-		<div class="data long"><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></div>
-		<div class="data short">{{i.kills}}</div>
-		<div class="data short">{{i.deaths}}</div>
-		<div class="data short">{{i.kdr}}</div>
-		<div class="data short">{{i.akdr}}</div>
-		<div class="data short">{{i.tier}}</div>
-		<div class="data short">{{i.matches}}</div>
-		<div class="data short">{{i.generation}}</div>
-		<div class="data short">{{i.location}}</div>
-		<div class="data long">{{i.tenure}} years</div>
-	
-	</div>
-	{% endfor %}
-	</div>
-</div>
-
-<div style="margin-top:20px;">
-<div class="fmed fbold"> UNTHINKABLE STATS VISUALIZER </DIV>
-<!-- <div class="fbold"> To be released soon...</div> -->
-<table width=100%>
-{% for i in perf %}
-	<tr>
-		{% for j in i %}
-			{{j|safe}}
+<section>
+	<table class="section_center zebra">
+		<tr class="black">
+			<th>Handle</th>
+			<th>Kills</th>
+			<th>Deaths</th>
+			<th>KDR</th>
+			<th>aKDR</th>
+			<th>Tier</th>
+			<th>Matches</th>
+			<th>Gen</th>
+			<th>Location</th>
+			<th>Tenure</th>
+		</tr>
+		{% for i in geeks %}
+		{% if user.get_username|upper == i.player|upper %}
+			<tr class="curr_user">
+		{% else %}
+			<tr>
+		{% endif %}
+			<td><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></td>
+			<td class="text_center">{{i.kills}}</td>
+			<td class="text_center">{{i.deaths}}</td>
+			<td class="text_right">{{i.kdr}}</td>
+			<td class="text_right">{{i.akdr}}</td>
+			<td class="text_center">{{i.tier}}</td>
+			<td class="text_center">{{i.matches}}</td>
+			<td class="text_center">{{i.generation}}</td>
+			<td class="text_center">{{i.location}}</td>
+			<td class="text_right">{{i.tenure}} years</td>
+		</tr>
 		{% endfor %}
-	</tr>
-{% endfor %}
-</table>
-</div>
-<div class='tableauPlaceholder' id='viz1624406167770' style='position: relative'><noscript><a href='#'><img alt='Seasonal Stats Visualizations v.2 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Se&#47;SeasonalStatsVisualizationv_2&#47;SeasonalStatsVisualization&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SeasonalStatsVisualizationv_2&#47;SeasonalStatsVisualization' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Se&#47;SeasonalStatsVisualizationv_2&#47;SeasonalStatsVisualization&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1624406167770');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+	</table>
+</section>
+
 {% endblock content %}

@@ -1,12 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.urls import reverse
 from django.template import loader
-from .geekmodels import Buy, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season
+from django.contrib.auth import login
+from django.contrib.auth import authenticate
+from django.core.mail import send_mail
+from .geekmodels import Buy, Geek, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser
 from .geekclasses import season, player
 import stats.functions as func
+from .forms import CustomUserCreationForm
 import operator, sys
 from django.db.models import Count, Sum, Avg, Min, Max
 import datetime
+import uuid
 from datetime import date, timedelta
 from collections import defaultdict
 from itertools import groupby
@@ -384,6 +390,12 @@ def geeks(request):
     template = loader.get_template('geeks.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Geeks', request.session['selector'])
 
+    if request.GET.get('code'):
+        Geek.objects.filter(geek_code=(request.GET.get('code'))).update(validated=1, geek_code='validated')    
+        return redirect("/accounts/login")            
+            
+
+
     ### BUILD GEEK DATA
     geekData = GeekInfo.objects.values().order_by('-tenure')
     
@@ -399,29 +411,48 @@ def playerdetails(request):
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
     template = loader.get_template('playerdetails.html')
-##    pid = request.GET.get('pid')
     pid = request.session['playerid']
+
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'])
+
+    geek = GeekAuthUser.objects.values('geek_id','handle','valid_sent_date','validated','username','first_name','email','member_since').filter(geek_id=pid) 
+    if request.GET.get('claim'):
+        claim = request.GET.get('claim')
+        if claim == 'claim' or claim == 'resend':
+            geek_code = uuid.uuid4()
+            password = geek[0]['first_name']+geek[0]['member_since'].strftime('%m%Y')
+            httplink = 'http://192.168.0.156:8000/Geeks?code='+str(geek_code)
+            # Players.objects.filter(username=request.user.id).update(last_seen=datetime.now())
+            Geek.objects.filter(geek_id=pid).update(valid_sent_date=date.today(), validated=0, geek_code=str(geek_code))
+            print(geek[0]['handle'])
+            send_mail(
+                'Welcome to The GeekFest',
+                'Your GeekFest Player name '+str(geek[0]['username'])+' has been claimed.  Your password is: '+password+' Click on this link to validate your email and login:  '+httplink,
+                'bot.geekfest@gmail.com',
+                [str(geek[0]['email'])],
+                fail_silently=False,)
+
+            print('send email')
+            
+        elif claim == 'resend':
+            print('resend email')
 
     ### BUILD THE PLAYER DETAIL DATA
     playerData = player(TiersData.objects.values('geekid','player','tier').filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
-    playerData.addWeapons('killer','weapon',FragDetails.objects.values('weapon').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-    playerData.addWeapons('victim','weapon',FragDetails.objects.values('weapon').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
-    playerData.addMaps('killer','map',FragDetails.objects.values('map').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-    playerData.addMaps('victim','map',FragDetails.objects.values('map').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
-    playerData.addMaps('assist','map',FragDetails.objects.values('map').filter(id=pid,type='assist',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
-    playerData.addOpps('killer','victim',FragDetails.objects.values('victim').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-    playerData.addOpps('victim','killer',FragDetails.objects.values('killer').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-    playerData.calcStats()
-##    print('for player '+playerData.name+' the top weapon is: '+playerData.topWeapon+' and the worst is: '+playerData.lowWeapon)
-##    for row in playerData.weapons:
-##        print('The weapon is: '+row.item+' for '+str(row.kills)+' kills and '+str(row.deaths)+' deaths')
-##    for row in playerData.opponents:
-##        print('The opponent is: '+row.item+' for '+str(row.kills)+' kills and '+str(row.deaths)+' deaths')
-
-
+    if playerData.name == 'No data':
+        playerData.nemesis = 'There is no player data for this date.  Please select a date when this player played.'
+    else:
+        playerData.addWeapons('killer','weapon',FragDetails.objects.values('weapon').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
+        playerData.addWeapons('victim','weapon',FragDetails.objects.values('weapon').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
+        playerData.addMaps('killer','map',FragDetails.objects.values('map').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
+        playerData.addMaps('victim','map',FragDetails.objects.values('map').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
+        playerData.addMaps('assist','map',FragDetails.objects.values('map').filter(id=pid,type='assist',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
+        playerData.addOpps('killer','victim',FragDetails.objects.values('victim').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
+        playerData.addOpps('victim','killer',FragDetails.objects.values('killer').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
+        playerData.calcStats()
+    
     context = {'player': playerData,
-##               'graph': graph,
+               'geek': geek,
                'title': 'GeekFest Geeks',
                'eventdates':request.session['eventdates'],
                'state':newstate,
@@ -449,9 +480,7 @@ def details(request):
     elif xWeapon != '':
         pdetails = FragDetails.objects.values().filter(id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
         details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']),all=True).order_by('match_datetime')
-##    details = func.get_pdetails(newstate, request)
     context = {'details' : details,
-##               'detailinfo' : detailinfo,
                'title': 'GeekFest Geeks',
                'eventdates':request.session['eventdates'],
                'state':newstate,
@@ -460,7 +489,6 @@ def details(request):
     return HttpResponse(template.render(context, request))
 
 def about(request):
-    #geeks = Geeks.objects.order_by('handle')
     mainmenu = StateInfo()
     mainmenu.set('About')
     template = loader.get_template('about.html')
@@ -475,9 +503,6 @@ def buys(request):
     mainmenu.set('About')
     context = {'buys': buycount, 'title': 'Buys', 'stateinfo': zip(mainmenu.menu,mainmenu.state), }
     return HttpResponse(template.render(context, request))
-
-
-
 
 
 
