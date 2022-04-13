@@ -81,7 +81,8 @@ WSGI_APPLICATION = 'geekstats.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "HOST": "cs.geekfestclan.com",
+        "HOST": "192.168.0.99",
+        # "HOST": "cs.geekfestclan.com",
         "PORT": "3306",
         "NAME": "geekfest",
         "USER": "geekfest",
@@ -95,7 +96,8 @@ DATABASES = {
     },
 	"geek": {
         "ENGINE": "django.db.backends.mysql",
-        "HOST": "cs.geekfestclan.com",
+        "HOST": "192.168.0.99",
+        # "HOST": "cs.geekfestclan.com",
         "PORT": "3306",
         "NAME": "geek",
         "USER": "geekfest",

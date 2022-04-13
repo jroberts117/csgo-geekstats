@@ -438,10 +438,13 @@ def playerdetails(request):
             print('resend email')
 
     ### BUILD THE PLAYER DETAIL DATA
-    playerData = player(TiersData.objects.values('geekid','player','tier').filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
+    playerData = player(TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
+                        .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
+                        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
     if playerData.name == 'No data':
         playerData.nemesis = 'There is no player data for this date.  Please select a date when this player played.'
     else:
+
         playerData.addWeapons('killer','weapon',FragDetails.objects.values('weapon').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
         playerData.addWeapons('victim','weapon',FragDetails.objects.values('weapon').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
         playerData.addMaps('killer','map',FragDetails.objects.values('map').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))

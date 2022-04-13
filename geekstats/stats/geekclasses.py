@@ -158,8 +158,11 @@ class player:
             self.assists = data[0]['assists__sum']
             self.KDR = round(data[0]['kdr__avg'],2)
             self.aKDR = round(data[0]['akdr__avg'],2)
+            self.diff_alltime_kdr = round(self.KDR - data[0]['alltime_kdr'],2)
+
         except:
             self.name = 'No data'
+        
         self.avgKDR = 0.0
         self.diffAvg = 0.0
         self.topVictim = ''

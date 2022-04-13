@@ -344,12 +344,16 @@ class TiersData(models.Model):
     geekid = models.IntegerField()
     player = models.CharField(max_length=250)
     tier = models.CharField(max_length=250)
+    generation = models.IntegerField()
     matchdate = models.DateField()
     kills = models.IntegerField()
     deaths = models.IntegerField() 
     assists = models.IntegerField()
     kdr = models.DecimalField(max_digits=8, decimal_places=2)
     akdr = models.DecimalField(max_digits=8, decimal_places=2)
+    alltime_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    year_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)
 
     class Meta:
         managed = False
@@ -380,6 +384,9 @@ class GeekInfo(models.Model):
     kdr = models.DecimalField(max_digits=8, decimal_places=2)
     akdr = models.DecimalField(max_digits=8, decimal_places=2)
     tenure = models.DecimalField(max_digits=8, decimal_places=2)
+    alltime_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    year_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)
     
     class Meta:
         managed = False

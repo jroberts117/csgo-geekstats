@@ -12,6 +12,8 @@
 			<th>Deaths</th>
 			<th>KDR</th>
 			<th>aKDR</th>
+			<th>1yr KDR</th>
+			<th>last 90 KDR</th>
 			<th>Tier</th>
 			<th>Matches</th>
 			<th>Gen</th>
@@ -29,6 +31,14 @@
 			<td class="text_center">{{i.deaths}}</td>
 			<td class="text_right">{{i.kdr}}</td>
 			<td class="text_right">{{i.akdr}}</td>
+			<td class="text_right">
+				<span {% if i.kdr <= i.year_kdr %} style="color:green;" {% else %}style="color:red;"{% endif %}>
+				{{i.year_kdr}}</span>
+			</td>
+			<td class="text_right">
+				<span {% if i.kdr <= i.last90_kdr %} style="color:green;" {% else %}style="color:red;"{% endif %}>
+					{{i.last90_kdr}}</span>
+				</td>
 			<td class="text_center">{{i.tier}}</td>
 			<td class="text_center">{{i.matches}}</td>
 			<td class="text_center">{{i.generation}}</td>
