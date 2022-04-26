@@ -8,7 +8,7 @@
 <div class="page">
 
 	<div class="highlightbox hbx4">
-		<div class="header master"><span title="Master tier is for players who keep a KDR greater than 1.5">MASTER</span></div>
+		<div class="header master"><span title="Master tier is for players like our lost hero West1 who keep a KDR greater than 1.5">{{ tier0.0.tier|upper}}</span></div>
 			<table class="zebra">
 				<tr class="black">
 					<td>Player</td>
@@ -31,7 +31,7 @@
 	</div>
 
 	<div class="highlightbox hbx4">
-		<div class="header gold"><span title="Gold tier is for players who keep a KDR greater than 1.0">GOLD</span></div>
+		<div class="header gold"><span title="Gold tier is for players who keep a KDR greater than 1.0">{{ tier1.0.tier|upper}}</span></div>
 			<table class="zebra">
 				<tr class="black">
 					<td>Player</td>
@@ -53,7 +53,7 @@
 	</div>
 
 	<div class="highlightbox hbx4">
-		<div class="header silver"><span title="Silver tier is for players who keep a KDR greater than .75 but less than 1.25">SILVER</span></div>
+		<div class="header silver"><span title="Silver tier is for players who keep a KDR greater than .75 but less than 1.25">{{ tier2.0.tier|upper}}</span></div>
 			<table class="zebra">
 				<tr class="black">
 					<td>Player</td>
@@ -75,7 +75,7 @@
 	</div>
 
 	<div class="highlightbox hbx4">
-		<div class="header bronze"><span title="Bronze tier is for players who do not exceed a 1.0 KDR">BRONZE</span></div>
+		<div class="header bronze"><span title="Bronze tier is for players who do not exceed a 1.0 KDR">{{ tier3.0.tier|upper}}</span></div>
 			<table class="zebra">
 				<tr class="black">
 					<td>Player</td>

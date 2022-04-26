@@ -215,21 +215,18 @@ def tiers(request):
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
     context['eventdates'] = request.session['eventdates']
     context['state'] = newstate
-    context['tier0'] = TiersData.objects.values('geekid','player')\
-                       .filter(tier="Master", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])\
-                       .order_by('-kdr__avg').annotate(Avg('kdr'))
-    context['tier1'] = TiersData.objects.values('geekid','player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
-    context['tier2'] = TiersData.objects.values('geekid','player').filter(tier="Silver", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
-    context['tier3'] = TiersData.objects.values('geekid','player').filter(tier="Bronze", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'))
-    context['players'] = TiersData.objects.values('geekid','player','tier').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
-    avgkdr = TiersData.objects.values('player').filter(matchdate__gte=newstate.days180ago, matchdate__lte=newstate.today).annotate(Avg('kdr'))
-    players = list(context['players'])
-    for geek in players:
-        for item in avgkdr:
-            if geek['player'] == item['player']:
-                geek['avgkdr'] = item['kdr__avg']
-                geek['diffkdr'] = geek['kdr__avg'] - item['kdr__avg']
-    context['players'] = players
+    context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+    context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
+    context['tier1'] = list(filter(lambda tiers: tiers['tier_id'] == 2, list(context['players'])))
+    context['tier2'] = list(filter(lambda tiers: tiers['tier_id'] == 3, list(context['players'])))
+    context['tier3'] = list(filter(lambda tiers: tiers['tier_id'] == 4, list(context['players'])))
+
+    for geek in context['players']:
+        try:
+            geek['diffkdr'] = geek['kdr__avg'] - geek['year_kdr']
+        except:
+            geek['diffkdr'] = 'n/a'
+
 
     return render(request, template, context)
 
@@ -421,7 +418,8 @@ def playerdetails(request):
         if claim == 'claim' or claim == 'resend':
             geek_code = uuid.uuid4()
             password = geek[0]['first_name']+geek[0]['member_since'].strftime('%m%Y')
-            httplink = 'http://192.168.0.156:8000/Geeks?code='+str(geek_code)
+            # httplink = 'http://192.168.0.156:8000/Geeks?code='+str(geek_code)
+            httplink = 'http://cs.geekfestclan.com/Geeks?code='+str(geek_code)
             # Players.objects.filter(username=request.user.id).update(last_seen=datetime.now())
             Geek.objects.filter(geek_id=pid).update(valid_sent_date=date.today(), validated=0, geek_code=str(geek_code))
             print(geek[0]['handle'])
@@ -441,6 +439,9 @@ def playerdetails(request):
     playerData = player(TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
                         .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
                         .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
+    print(TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
+                        .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
+                        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')).explain())
     if playerData.name == 'No data':
         playerData.nemesis = 'There is no player data for this date.  Please select a date when this player played.'
     else:

@@ -31,11 +31,11 @@
 			<td class="text_center">{{i.deaths}}</td>
 			<td class="text_right">{{i.kdr}}</td>
 			<td class="text_right">{{i.akdr}}</td>
-			<td class="text_right">
+			<td class="text_center">
 				<span {% if i.kdr <= i.year_kdr %} style="color:green;" {% else %}style="color:red;"{% endif %}>
 				{{i.year_kdr}}</span>
 			</td>
-			<td class="text_right">
+			<td class="text_center">
 				<span {% if i.kdr <= i.last90_kdr %} style="color:green;" {% else %}style="color:red;"{% endif %}>
 					{{i.last90_kdr}}</span>
 				</td>

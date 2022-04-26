@@ -344,6 +344,7 @@ class TiersData(models.Model):
     geekid = models.IntegerField()
     player = models.CharField(max_length=250)
     tier = models.CharField(max_length=250)
+    tier_id = models.IntegerField()
     generation = models.IntegerField()
     matchdate = models.DateField()
     kills = models.IntegerField()

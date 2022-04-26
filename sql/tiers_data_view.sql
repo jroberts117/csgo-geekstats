@@ -1,13 +1,14 @@
 CREATE 
     ALGORITHM = UNDEFINED 
-    DEFINER = `geekfest`@`%` 
+    DEFINER = `geekfest`@`localhost` 
     SQL SECURITY DEFINER
-VIEW `tiers_data` AS
+VIEW `geek`.`tiers_data` AS
     SELECT 
         UUID() AS `id`,
         `tot`.`geek_id` AS `geekid`,
         `tot`.`player` AS `player`,
         `tot`.`tier` AS `tier`,
+        `tot`.`generation_id` AS `generation`,
         `tot`.`matchdate` AS `matchdate`,
         SUM(`tot`.`kills`) AS `kills`,
         SUM(`tot`.`deaths`) AS `deaths`,
@@ -19,11 +20,18 @@ VIEW `tiers_data` AS
         IF((SUM(`tot`.`deaths`) = 0),
             999,
             ROUND(((SUM(`tot`.`kills`) + (SUM(`tot`.`assists`) * 0.25)) / SUM(`tot`.`deaths`)),
-                    2)) AS `aKDR`
+                    2)) AS `aKDR`,
+        `tot`.`alltime_kdr` AS `alltime_kdr`,
+        `tot`.`year_kdr` AS `year_kdr`,
+        `tot`.`last90_kdr` AS `last90_kdr`
     FROM
         (SELECT 
             `g`.`handle` AS `player`,
                 `g`.`geek_id` AS `geek_id`,
+                `g`.`generation_id` AS `generation_id`,
+                `g`.`alltime_kdr` AS `alltime_kdr`,
+                `g`.`year_kdr` AS `year_kdr`,
+                `g`.`last90_kdr` AS `last90_kdr`,
                 `t`.`tier_name` AS `tier`,
                 CAST(`sm`.`match_date` AS DATE) AS `matchdate`,
                 COUNT(`f`.`frag_id`) AS `kills`,
@@ -40,6 +48,10 @@ VIEW `tiers_data` AS
         GROUP BY `g`.`handle` , `sm`.`match_date` , `g`.`geek_id` UNION ALL SELECT 
             `g`.`handle` AS `player`,
                 `g`.`geek_id` AS `geek_id`,
+                `g`.`generation_id` AS `generation_id`,
+                `g`.`alltime_kdr` AS `alltime_kdr`,
+                `g`.`year_kdr` AS `year_kdr`,
+                `g`.`last90_kdr` AS `last90_kdr`,
                 `t`.`tier_name` AS `tier`,
                 CAST(`sm`.`match_date` AS DATE) AS `matchdate`,
                 0 AS `kills`,
@@ -56,6 +68,10 @@ VIEW `tiers_data` AS
         GROUP BY `g`.`handle` , `sm`.`match_date` , `g`.`geek_id` UNION ALL SELECT 
             `g`.`handle` AS `player`,
                 `g`.`geek_id` AS `geek_id`,
+                `g`.`generation_id` AS `generation_id`,
+                `g`.`alltime_kdr` AS `alltime_kdr`,
+                `g`.`year_kdr` AS `year_kdr`,
+                `g`.`last90_kdr` AS `last90_kdr`,
                 `t`.`tier_name` AS `tier`,
                 CAST(`sm`.`match_date` AS DATE) AS `matchdate`,
                 0 AS `kills`,
@@ -70,4 +86,5 @@ VIEW `tiers_data` AS
         WHERE
             (`a`.`is_tk_assist` = 0)
         GROUP BY `g`.`handle` , `sm`.`match_date` , `g`.`geek_id`) `tot`
-    GROUP BY `tot`.`matchdate` , `tot`.`tier` , `tot`.`player` , `tot`.`geek_id`
+    GROUP BY `tot`.`matchdate` , `tot`.`tier` , `tot`.`player` , `tot`.`geek_id` , `tot`.`generation_id`
+    ORDER BY `tot`.`matchdate` DESC
