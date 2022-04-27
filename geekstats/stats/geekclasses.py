@@ -151,6 +151,7 @@ class item:
 class player:
     def __init__(self, data):
         try:
+            lst = list(data)                                                    # Cache data to avoid running the query multiple times
             self.id = data[0]['geekid']
             self.name = data[0]['player']
             self.kills = data[0]['kills__sum']

@@ -9,12 +9,13 @@ from .geekmodels import Buy, Geek, TeamWins, TiersData, Frag, MatchRound, Death,
 from .geekclasses import season, player
 import stats.functions as func
 from .forms import CustomUserCreationForm
+import logging
 import operator, sys
-from django.db.models import Count, Sum, Avg, Min, Max
+from django.db.models import Count, Sum, Avg, Min, Max, Q
 import datetime
 import uuid
 from datetime import date, timedelta
-from collections import defaultdict
+from collections import defaultdict, Counter
 from itertools import groupby
 
 ###############################################################
@@ -74,6 +75,15 @@ class state:
 mainmenu = StateInfo()
 newstate = state()
 #################  Functions ##########################
+def listbuilder(lst,type):
+    xlst = []
+    for i in lst:
+        xlst.append(i[type])
+    wlst = Counter(xlst)
+    nlist = []
+    for x in wlst:
+        nlist.append({type:x,'id__count':wlst[x]})
+    return(nlist)
 
 def index(request):
 ##    geeks = Geeks.objects.order_by('handle')
@@ -405,6 +415,7 @@ def geeks(request):
     return HttpResponse(template.render(context, request))
 
 def playerdetails(request):
+
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
     template = loader.get_template('playerdetails.html')
@@ -412,7 +423,9 @@ def playerdetails(request):
 
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'])
 
+    ### SETUP VALIDATION LOGIC FOR REGISTERED PLAYERS
     geek = GeekAuthUser.objects.values('geek_id','handle','valid_sent_date','validated','username','first_name','email','member_since').filter(geek_id=pid) 
+    lst = list(geek)
     if request.GET.get('claim'):
         claim = request.GET.get('claim')
         if claim == 'claim' or claim == 'resend':
@@ -432,27 +445,36 @@ def playerdetails(request):
 
             print('send email')
             
-        elif claim == 'resend':
+        elif claim == 'resend': 
             print('resend email')
 
     ### BUILD THE PLAYER DETAIL DATA
-    playerData = player(TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
+    psumm = (TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
                         .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
                         .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
-    print(TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
-                        .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
-                        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')).explain())
+    playerData = player(psumm)
+
     if playerData.name == 'No data':
         playerData.nemesis = 'There is no player data for this date.  Please select a date when this player played.'
     else:
+        pdata = (FragDetails.objects.values('id','match_date','killer','victim','victim_id','map','weapon','type')
+                     .filter(Q (id=pid) | Q(victim_id=pid),match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'])
+                     .order_by('id','type'))
 
-        playerData.addWeapons('killer','weapon',FragDetails.objects.values('weapon').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-        playerData.addWeapons('victim','weapon',FragDetails.objects.values('weapon').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
-        playerData.addMaps('killer','map',FragDetails.objects.values('map').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-        playerData.addMaps('victim','map',FragDetails.objects.values('map').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
-        playerData.addMaps('assist','map',FragDetails.objects.values('map').filter(id=pid,type='assist',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('id__count'))
-        playerData.addOpps('killer','victim',FragDetails.objects.values('victim').filter(id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
-        playerData.addOpps('victim','killer',FragDetails.objects.values('killer').filter(victim_id=pid,type='kill',match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).annotate(Count('id')).order_by('-id__count'))
+        # lst = list(pdata.all())
+        kdata = list(filter(lambda p: p['type'] == 'kill', list(pdata)))
+        laplayer = list(filter(lambda p: p['type'] == 'assist', list(pdata)))
+        lkplayer = list(filter(lambda w: str(w['id']) == pid, list(kdata)))
+        lvplayer = list(filter(lambda w: str(w['victim_id']) == pid, list(kdata)))
+
+        playerData.addWeapons('killer','weapon',listbuilder(lkplayer,'weapon'))
+        playerData.addWeapons('victim','weapon',listbuilder(lvplayer,'weapon'))
+        playerData.addMaps('killer','map',listbuilder(lkplayer,'map'))
+        playerData.addMaps('victim','map',listbuilder(lvplayer,'map'))
+        playerData.addMaps('assist','map',listbuilder(laplayer,'map'))
+        playerData.addOpps('killer','victim',listbuilder(lkplayer,'victim'))
+        playerData.addOpps('victim','killer',listbuilder(lvplayer,'killer'))
+
         playerData.calcStats()
     
     context = {'player': playerData,
