@@ -4,7 +4,7 @@ import collections
 #import query as qry
 #import numpy as np
 from dateutil.relativedelta import relativedelta
-from datetime import date
+from datetime import date, datetime
 data = []
 import sys
 
@@ -364,6 +364,14 @@ def get_perf_data(state):
     data = qry.get_query('perf_data',state)
     graph_data = playerGraph(data)
     return graph_data
+
+def unique_dates(datelist):
+    xDates = []
+    for i in datelist:
+        if xDates.count(i['match_date'].strftime("%m-%d-%Y")) == 0:
+            xDates.append(i['match_date'].strftime("%m-%d-%Y"))
+    return xDates 
+        
     
 ##    df = qry.get_df()
 ##    dates = df.eDate.unique()                                       #finds unique dates for header data

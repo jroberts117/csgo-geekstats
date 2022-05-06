@@ -1,21 +1,130 @@
 @charset "utf-8";
 
+html {
+	scroll-padding-top: 150px;
+}
+body {
+	/* font-family: 'Heebo', sans-serif;
+	font-family: 'Electrolize', sans-serif;
+	font-family: 'Heebo', sans-serif;
+	font-family: 'Press Start 2P', cursive; */
+	font-family: 'Electrolize', Verdana, Arial, serif;
+
+	margin:auto;
+}
+#main {
+	margin-top: 230px;
+}
 .page {
 	display: flex;
 	justify-content: space-evenly;
 	align-items: flex-start;
 	margin: auto;
 	box-sizing: border-box;
-	font-family: Verdana, Arial, serif;
+
 }
+header {
+    background-color: #fff;
+    box-shadow: 0 1px 6px 0 rgb(0,0,0,0.15);
+    height: 180px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+	z-index:9999;
+}
+
 .title {
-	margin: 5px auto;
+	margin: auto;
 	text-align: center;
 	background: darkred;
 	font-size: 28px;
 
 	color: white;
 }
+.dateSelector {
+	all: revert;
+	vertical-align: middle;
+	height: 42px;
+	border: none;
+}
+.dateSelector fieldset {
+	all: revert;
+	display:inline-block;
+	border: none;
+}
+
+.dateSelector .label {
+	all: revert;
+	padding-top: 10px;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.dateSelector form {
+	all: revert;
+	display: inline-block;
+	width: 430px;
+	vertical-align: top;
+}
+
+.buttons {
+	all: revert;
+	display: inline-block;
+	padding-top: 5px;
+	vertical-align: top;
+}
+
+.buttons .button {
+	all: revert;
+	display: block;
+	font-size: 8px;
+	width: 70px;
+}
+input[type=date] {
+	all:revert;
+	padding: 5px;
+	text-align: center;
+	font-family: 'Electrolize';
+
+  }
+
+  input[type=submit] {
+	background-color: #fbeee0;
+	border: 1px solid #422800;
+	border-radius: 30px;
+	box-shadow: #422800 1px 1px 0 0;
+	color: #422800;
+	cursor: pointer;
+	display: inline-block;
+	font-weight: 400;
+	font-size: 10px;
+	padding: 0 5px;
+	line-height: 20px;
+	text-align: center;
+	text-decoration: none;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: manipulation;
+  }
+  
+  input[type=submit]:hover {
+	background-color: #fff;
+  }
+  
+  input[type=submit]:active {
+	box-shadow: #422800 1px 1px 0 0;
+	transform: translate(1px, 1px);
+  }
+
+  select {
+	all:revert;
+	padding: 5px;
+	width: 240px;
+	text-align: center;
+	font-family: 'Electrolize';
+}
+
 .cgeek{
 	background: #f1f3f4;
 }
@@ -70,14 +179,7 @@
 	flex: 0 0 auto;
 	border: 1px solid gray;
 }
-.header{
-	text-align: center;
-	background: lightgray;
-	width:100%;
-	font-size: 16px;
-	margin: 3px;
 
-}
 
 
 .orow {
@@ -290,3 +392,26 @@ a {
 .radius {
     border-radius: 0.1rem !important;
 }
+
+/********************************* Fixed and New GF Styles  ***********************************/
+.login {
+	position: fixed;
+    height: 25px;
+    top: 100px;
+	right: 50px;;
+    display: inline-block;
+}
+
+.login-text {
+	display: inline-block;
+    vertical-align: top;
+    color: lightgray;
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+.login-img {
+	display: inline-block;
+    vertical-align: top;
+}
+	

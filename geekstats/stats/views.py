@@ -63,13 +63,17 @@ class state:
         self.page = ''
         self.season = ''
         self.selector = ''
-    def setsession(self,start,end,compare,value,page, selector):
+        self.event_dates = func.unique_dates(list(SeasonMatch.objects.values('match_date').distinct().order_by('-match_date')))
+        self.seasons = list(Season.objects.values('name').distinct().order_by('-start_date'))
+        self.datetype = ''
+    def setsession(self,start,end,compare,value,page, selector, datetype):
         self.start_date = start
         self.end_date = end
         self.compare = compare
         self.value = value
         self.page = page
         self.selector = selector
+        self.datetype = datetype
 
 #################  Global Variables ##########################
 mainmenu = StateInfo()
@@ -83,6 +87,7 @@ def listbuilder(lst,type):
     nlist = []
     for x in wlst:
         nlist.append({type:x,'id__count':wlst[x]})
+    nlist = sorted(nlist, key=lambda d: d['id__count'], reverse=True)
     return(nlist)
 
 def index(request):
@@ -94,7 +99,7 @@ def index(request):
 def awards(request):
     mainmenu.set('Awards')
     template = loader.get_template('awards.html')
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Awards', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Awards', request.session['selector'],request.session['datetype'])
     try:
         newstate.value=request.GET['aid']
         request.session['aid'] = newstate.value
@@ -179,19 +184,19 @@ def teams(request):
     template = loader.get_template('teams.html')
 
     ### BUILD THE SEASON PICKLIST AND LOAD THE SESSION DATA BASED ON INPUT
-    seasons = Season.objects.values().order_by('-start_date')
-    if request.POST.get('seasonList',False):
-        curr_season = Season.objects.values().filter(name=request.POST['seasonList'])
-        request.session['start_date'] = curr_season[0]['start_date'].strftime('%Y-%m-%d')
-        request.session['end_date'] = curr_season[0]['end_date'].strftime('%Y-%m-%d')
-        request.session['season'] = curr_season[0]['name']
-    else:
-        request.session['start_date'] = seasons[0]['start_date'].strftime('%Y-%m-%d')
-        request.session['end_date'] = seasons[0]['end_date'].strftime('%Y-%m-%d')
-        request.session['season'] = seasons[0]['name']
-##    seasons = func.get_team_seasons(newstate,request)
+#     seasons = Season.objects.values().order_by('-start_date')
+#     if request.POST.get('seasonList',False):
+#         curr_season = Season.objects.values().filter(name=request.POST['seasonList'])
+#         request.session['start_date'] = curr_season[0]['start_date'].strftime('%Y-%m-%d')
+#         request.session['end_date'] = curr_season[0]['end_date'].strftime('%Y-%m-%d')
+#         request.session['season'] = curr_season[0]['name']
+#     else:
+#         request.session['start_date'] = seasons[0]['start_date'].strftime('%Y-%m-%d')
+#         request.session['end_date'] = seasons[0]['end_date'].strftime('%Y-%m-%d')
+#         request.session['season'] = seasons[0]['name']
+# ##    seasons = func.get_team_seasons(newstate,request)
     newstate.season = request.session['season']
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'],request.session['datetype'])
 
     ### BUILD THE TEAMS DATA
     seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
@@ -205,8 +210,7 @@ def teams(request):
         teamInfo.calcWins()
     
 #    games,players = func.get_team_data(newstate)
-    context = {'seasons': seasons,
-               'gfgames':teamInfo,
+    context = {'gfgames':teamInfo,
 #               'players': players,
 #               'games': games,
                'title': 'GeekFest Teams',
@@ -220,10 +224,10 @@ def tiers(request):
     mainmenu.set('Tiers')
     context={}
     template = 'tiers.html'
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'],request.session['datetype'])
     context['title'] = 'GeekFest Tiers'
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
-    context['eventdates'] = request.session['eventdates']
+    context['eventdates'] = newstate.seasons
     context['state'] = newstate
     context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
     context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
@@ -241,40 +245,42 @@ def tiers(request):
     return render(request, template, context)
 
 ##### GEEKFEST XX: VIRTUAL CODE ######
-def gfxx(request):
-    mainmenu.set('Event')
-    template = loader.get_template('gfxxv.html')
-    newstate.setsession('2020-12-02','2020-12-02','',0,'Event', request.session['selector'])
+# def gfxx(request):
+#     mainmenu.set('Event')
+#     template = loader.get_template('gfxxv.html')
+#     newstate.setsession('2020-12-02','2020-12-02','',0,'Event', request.session['selector'])
 
-    players = func.get_stats_data(newstate)
-    players.sort(key=lambda players: players.kdr_v_avg, reverse=True)
-    print(players[0])
-    v_avg=[players[0],players[-1]]
+#     players = func.get_stats_data(newstate)
+#     players.sort(key=lambda players: players.kdr_v_avg, reverse=True)
+#     print(players[0])
+#     v_avg=[players[0],players[-1]]
     
-    players.sort(key=lambda players: players.kdr, reverse=True)
+#     players.sort(key=lambda players: players.kdr, reverse=True)
      
-    tier0 = [x for x in players if x.tier == 0]
-    tier1 = [x for x in players if x.tier == 1]
-    tier2 = [x for x in players if x.tier == 2]
-    tier3 = [x for x in players if x.tier == 3]
+#     tier0 = [x for x in players if x.tier == 0]
+#     tier1 = [x for x in players if x.tier == 1]
+#     tier2 = [x for x in players if x.tier == 2]
+#     tier3 = [x for x in players if x.tier == 3]
 
-    newstate.value = 'event'
-    award_types, awards = func.get_awards(newstate)
+#     newstate.value = 'event'
+#     award_types, awards = func.get_awards(newstate)
     
 
-    context = {'tier0':tier0, 'tier1': tier1, 'tier2': tier2, 'tier3':tier3, 'players':players, 'v_avg': v_avg,
-               'awards': awards, 'types':award_types,
-               'title': 'GeekFest Tiers',
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
-               'eventdates':request.session['eventdates'],
-               'state':newstate,
-               }
-    return HttpResponse(template.render(context, request))
+#     context = {'tier0':tier0, 'tier1': tier1, 'tier2': tier2, 'tier3':tier3, 'players':players, 'v_avg': v_avg,
+#                'awards': awards, 'types':award_types,
+#                'title': 'GeekFest Tiers',
+#                'stateinfo': zip(mainmenu.menu,mainmenu.state),
+#                'eventdates':request.session['eventdates'],
+#                'state':newstate,
+#                }
+#     return HttpResponse(template.render(context, request))
 
 def maps(request):
     mainmenu.set('Maps')
     template = loader.get_template('maps.html')
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'],request.session['datetype'])
+    print(newstate.seasons)    
+
     newstate.compare = 'map'
     #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
@@ -329,7 +335,7 @@ def maps(request):
 def weapons(request):
     mainmenu.set('Weapons')
     template = loader.get_template('weapons.html')
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Weapons', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Weapons', request.session['selector'],request.session['datetype'])
 
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
     rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
@@ -395,7 +401,7 @@ def geeks(request):
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
     template = loader.get_template('geeks.html')
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Geeks', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Geeks', request.session['selector'],request.session['datetype'])
 
     if request.GET.get('code'):
         Geek.objects.filter(geek_code=(request.GET.get('code'))).update(validated=1, geek_code='validated')    
@@ -421,7 +427,7 @@ def playerdetails(request):
     template = loader.get_template('playerdetails.html')
     pid = request.session['playerid']
 
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'],request.session['datetype'])
 
     ### SETUP VALIDATION LOGIC FOR REGISTERED PLAYERS
     geek = GeekAuthUser.objects.values('geek_id','handle','valid_sent_date','validated','username','first_name','email','member_since').filter(geek_id=pid) 
@@ -490,7 +496,7 @@ def details(request):
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
     template = loader.get_template('details.html')
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'Event Details', request.session['selector'],request.session['datetype'])
     pid = request.session['playerid']
     xOpp = request.session['opponentid']
     xMap = request.session['mapid']

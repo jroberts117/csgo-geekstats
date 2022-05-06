@@ -4,24 +4,6 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
-<input type="hidden" id="dateList" name="dateList" value="n/a">
-<div class="headband acenter">
-		<fieldset>
-			Showing Data For: 
-			<select name="seasonList">
-			
-			{% for i in seasons %}
-				<option value="{{i.name}}"
-				{% if i.name == state.season %}
-					selected
-				{% endif %}
-				>{{i.name}}</option>
-			{% endfor %}
-			</select>
-			<button type="submit">Submit</button>
-		</fieldset>
-		</form>
-</div>
 
 <table>
 	<tr class="black acenter">

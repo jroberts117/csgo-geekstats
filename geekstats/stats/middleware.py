@@ -10,6 +10,7 @@ class state:
         self.start_date = '2019-01-01'
         self.end_date = '2030-12-31'
         self.compare = 'date(eventTime)'
+        self.dateType = 'season'
         self.value = 0
         self.operator = '='
         self.clause = ''
@@ -30,51 +31,30 @@ class EventData(object):
         return(None)
         
     def __call__(self, request):
-
-######################### SETUP THE DATE AND SEASON PICKLIST FOR EVERY PAGE ##########################################################
-        
-        eventdates = []                                                         # eventdates is the pick list of dates and seasons
-        eventdates.append('Overall')
-        eventdates.append('------ Seasons')
-        data = list(Season.objects.values().order_by('-start_date'))            # Gets all the season date ranges
-        for i in data:
-            eventdates.append(i['name'])                                        # Adds the season names to the picklist
-        eventdates.append('------ Individual Dates')
-        dates = list(TiersData.objects.values('matchdate').order_by('-matchdate').distinct())
-        for i in dates:
-            eventdates.append(str(i['matchdate']))                              # Adds the individual dates to the picklist
-        request.session['eventdates'] = eventdates                              # Set the session to have all the dates for the ddlb
-
-######################### PROCESS REQUEST IF A DATE OR SEASON WAS SELECTED AND SET SESSION INFO ##########################################
-        
-        if request.method == 'POST':                                            # If a date or season was picked
-            if request.session.get('selector',False) and request.POST.get('dateList',False):
-                request.session['selector'] = request.POST['dateList']          # Set a session object for the item selected
-                if validate(request.POST['dateList']):                          # catch if it is a date or not
-##                    temp = datetime.datetime.strptime(request.POST['dateList'], '%Y-%m-%d')  # Test to see if it is a date
-                    request.session['start_date'] = request.POST['dateList']    # Set the session date ranges to the same thing
-                    request.session['end_date'] = request.POST['dateList']
-                else:                                                           # If they picked text
-                    if request.POST['dateList'] == 'Overall':                   # If they want everything get the max range from the db
-                        request.session['start_date'] = eventdates[-1]
-                        request.session['end_date'] = '2100-01-01'
-                    else:                                                       # If it's a season, then work with that
-                        try:
-##                          print('we received '+request.POST['dateList']+' and will try and look it up')
-                            data = list(Season.objects.values().filter(name=request.POST['dateList']))
-                            request.session['start_date'] = data[0]['start_date'].strftime('%Y-%m-%d')   # Set the dates
-                            request.session['end_date'] = data[0]['end_date'].strftime('%Y-%m-%d')
-                            request.session['season'] = data[0]['name']
-                        except:                                                 # Catches if a separator was selected
-                            pass
+        if request.method == 'POST' and 'dateType' in request.POST:                                            # If a date or season was picked or range
+            if request.POST['dateType'] == 'season':
+                season_dates = (Season.objects.values('name','start_date','end_date').filter(name=request.POST['dateList']))
+                request.session['start_date'] = season_dates[0]['start_date'].strftime('%Y-%m-%d')    # Set the session date ranges to be the season selected
+                request.session['end_date'] = season_dates[0]['end_date'].strftime('%Y-%m-%d')
+                request.session['selector'] = request.POST['dateList']
+            elif request.POST['dateType'] == 'match':
+                request.session['start_date'] = (datetime.datetime.strptime(request.POST['dateList'], '%m-%d-%Y')).strftime('%Y-%m-%d')    # Set the session date ranges to the match date selected
+                request.session['end_date'] = (datetime.datetime.strptime(request.POST['dateList'], '%m-%d-%Y')).strftime('%Y-%m-%d')
+                request.session['selector'] = request.POST['dateList']
+            elif request.POST['dateType'] == 'range':
+                request.session['start_date'] = request.POST['start_date']    # Set the session date ranges to the range selected
+                request.session['end_date'] = request.POST['end_date']
+            request.session['datetype'] = request.POST['dateType']
+            
                 
 ################ PROCESS THE PAGE IF NO DATE OR SEASON WAS SELECTED CAPTURE OTHER SESSION DATA  #######################################
         else:
             if not request.session.get('start_date',False):                     # If we don'thave a start date, this is the first load so default to the last play date
-##                print('NOT a POST and the start date is NOT already set')
-                request.session['start_date'] = str(dates[0]['matchdate'])
-                request.session['end_date'] = str(dates[0]['matchdate'])
-                request.session['selector'] = str(dates[0]['matchdate'])
+                last_date = list(SeasonMatch.objects.aggregate(Max('match_date')))
+                request.session['start_date'] = str(last_date[0]['match_date'])
+                request.session['end_date'] = str(last_date[0]['match_date'])
+                request.session['datetype'] = 'season'
+
 
             if request.GET.get('pid') != None:
                 request.session['playerid'] = request.GET.get('pid')    #  Capture the playerid
@@ -92,8 +72,6 @@ class EventData(object):
                 request.session['opponentid'] = request.GET.get('oid')
             else:
                 request.session['opponentid'] = ''
-
-                
             
         response = self.get_response(request)
         return(response)

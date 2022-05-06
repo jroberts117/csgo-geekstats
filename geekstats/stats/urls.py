@@ -14,7 +14,7 @@ urlpatterns = [
     path('About', views.about, name='about'),
     path('PlayerDetails', views.playerdetails, name='playerdetails'),
     path('Details', views.details, name='details'),
-    path('Event', views.gfxx, name='gfxx'),
+    # path('Event', views.gfxx, name='gfxx'),
     path('Buys', views.buys, name='buys'),
     path('GFMMXXII', views.event, name='event'),
 ]
