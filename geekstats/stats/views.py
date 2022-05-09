@@ -96,6 +96,16 @@ def index(request):
     context = {'title': 'GeekFest Stats'}
     return HttpResponse(template.render(context, request))
 
+#    █████████   █████   ███   █████   █████████   ███████████   ██████████    █████████ 
+#   ███░░░░░███ ░░███   ░███  ░░███   ███░░░░░███ ░░███░░░░░███ ░░███░░░░███  ███░░░░░███
+#  ░███    ░███  ░███   ░███   ░███  ░███    ░███  ░███    ░███  ░███   ░░███░███    ░░░ 
+#  ░███████████  ░███   ░███   ░███  ░███████████  ░██████████   ░███    ░███░░█████████ 
+#  ░███░░░░░███  ░░███  █████  ███   ░███░░░░░███  ░███░░░░░███  ░███    ░███ ░░░░░░░░███
+#  ░███    ░███   ░░░█████░█████░    ░███    ░███  ░███    ░███  ░███    ███  ███    ░███
+#  █████   █████    ░░███ ░░███      █████   █████ █████   █████ ██████████  ░░█████████ 
+# ░░░░░   ░░░░░      ░░░   ░░░      ░░░░░   ░░░░░ ░░░░░   ░░░░░ ░░░░░░░░░░    ░░░░░░░░░  
+                                                                                       
+                                                                                       
 def awards(request):
     mainmenu.set('Awards')
     template = loader.get_template('awards.html')
@@ -178,6 +188,17 @@ def awards(request):
                }
     return HttpResponse(template.render(context, request))
 
+#  ███████████ ██████████   █████████   ██████   ██████  █████████ 
+# ░█░░░███░░░█░░███░░░░░█  ███░░░░░███ ░░██████ ██████  ███░░░░░███
+# ░   ░███  ░  ░███  █ ░  ░███    ░███  ░███░█████░███ ░███    ░░░ 
+#     ░███     ░██████    ░███████████  ░███░░███ ░███ ░░█████████ 
+#     ░███     ░███░░█    ░███░░░░░███  ░███ ░░░  ░███  ░░░░░░░░███
+#     ░███     ░███ ░   █ ░███    ░███  ░███      ░███  ███    ░███
+#     █████    ██████████ █████   █████ █████     █████░░█████████ 
+#    ░░░░░    ░░░░░░░░░░ ░░░░░   ░░░░░ ░░░░░     ░░░░░  ░░░░░░░░░  
+                                                                 
+                                                                 
+                                                                 
 def teams(request):
     ### INITIALIZE THE PAGE
     mainmenu.set('Teams')
@@ -195,7 +216,12 @@ def teams(request):
 #         request.session['end_date'] = seasons[0]['end_date'].strftime('%Y-%m-%d')
 #         request.session['season'] = seasons[0]['name']
 # ##    seasons = func.get_team_seasons(newstate,request)
-    newstate.season = request.session['season']
+    if request.session['datetype'] != 'season':
+        curr_season = Season.objects.values().order_by('-start_date')
+        request.session['start_date'] = curr_season[0]['start_date'].strftime('%Y-%m-%d')
+        request.session['end_date'] = curr_season[0]['end_date'].strftime('%Y-%m-%d')
+        request.session['datetype'] = 'season'
+
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'],request.session['datetype'])
 
     ### BUILD THE TEAMS DATA
@@ -220,10 +246,23 @@ def teams(request):
                }
     return HttpResponse(template.render(context, request))
 
+#  ███████████ █████ ██████████ ███████████    █████████ 
+# ░█░░░███░░░█░░███ ░░███░░░░░█░░███░░░░░███  ███░░░░░███
+# ░   ░███  ░  ░███  ░███  █ ░  ░███    ░███ ░███    ░░░ 
+#     ░███     ░███  ░██████    ░██████████  ░░█████████ 
+#     ░███     ░███  ░███░░█    ░███░░░░░███  ░░░░░░░░███
+#     ░███     ░███  ░███ ░   █ ░███    ░███  ███    ░███
+#     █████    █████ ██████████ █████   █████░░█████████ 
+#    ░░░░░    ░░░░░ ░░░░░░░░░░ ░░░░░   ░░░░░  ░░░░░░░░░  
+                                                       
+                                                       
+                                                       
 def tiers(request):
     mainmenu.set('Tiers')
     context={}
     template = 'tiers.html'
+    if 'datetype' not in request.session:
+        request.session['datetype'] = 'season'
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'],request.session['datetype'])
     context['title'] = 'GeekFest Tiers'
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
@@ -274,6 +313,16 @@ def tiers(request):
 #                'state':newstate,
 #                }
 #     return HttpResponse(template.render(context, request))
+
+#  ██████   ██████   █████████   ███████████   █████████ 
+# ░░██████ ██████   ███░░░░░███ ░░███░░░░░███ ███░░░░░███
+#  ░███░█████░███  ░███    ░███  ░███    ░███░███    ░░░ 
+#  ░███░░███ ░███  ░███████████  ░██████████ ░░█████████ 
+#  ░███ ░░░  ░███  ░███░░░░░███  ░███░░░░░░   ░░░░░░░░███
+#  ░███      ░███  ░███    ░███  ░███         ███    ░███
+#  █████     █████ █████   █████ █████       ░░█████████ 
+# ░░░░░     ░░░░░ ░░░░░   ░░░░░ ░░░░░         ░░░░░░░░░  
+                                                       
 
 def maps(request):
     mainmenu.set('Maps')
@@ -331,7 +380,17 @@ def maps(request):
                }
     return HttpResponse(template.render(context, request))
 
-
+#  █████   ███   █████ ██████████   █████████   ███████████     ███████    ██████   █████  █████████ 
+# ░░███   ░███  ░░███ ░░███░░░░░█  ███░░░░░███ ░░███░░░░░███  ███░░░░░███ ░░██████ ░░███  ███░░░░░███
+#  ░███   ░███   ░███  ░███  █ ░  ░███    ░███  ░███    ░███ ███     ░░███ ░███░███ ░███ ░███    ░░░ 
+#  ░███   ░███   ░███  ░██████    ░███████████  ░██████████ ░███      ░███ ░███░░███░███ ░░█████████ 
+#  ░░███  █████  ███   ░███░░█    ░███░░░░░███  ░███░░░░░░  ░███      ░███ ░███ ░░██████  ░░░░░░░░███
+#   ░░░█████░█████░    ░███ ░   █ ░███    ░███  ░███        ░░███     ███  ░███  ░░█████  ███    ░███
+#     ░░███ ░░███      ██████████ █████   █████ █████        ░░░███████░   █████  ░░█████░░█████████ 
+#      ░░░   ░░░      ░░░░░░░░░░ ░░░░░   ░░░░░ ░░░░░           ░░░░░░░    ░░░░░    ░░░░░  ░░░░░░░░░  
+                                                                                                   
+                                                                                                   
+                                                                                                   
 def weapons(request):
     mainmenu.set('Weapons')
     template = loader.get_template('weapons.html')
@@ -397,6 +456,7 @@ def weapons(request):
                'stateinfo': zip(mainmenu.menu,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
+
 def geeks(request):
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
@@ -407,7 +467,15 @@ def geeks(request):
         Geek.objects.filter(geek_code=(request.GET.get('code'))).update(validated=1, geek_code='validated')    
         return redirect("/accounts/login")            
             
-
+#    █████████  ██████████ ██████████ █████   ████  █████████ 
+#   ███░░░░░███░░███░░░░░█░░███░░░░░█░░███   ███░  ███░░░░░███
+#  ███     ░░░  ░███  █ ░  ░███  █ ░  ░███  ███   ░███    ░░░ 
+# ░███          ░██████    ░██████    ░███████    ░░█████████ 
+# ░███    █████ ░███░░█    ░███░░█    ░███░░███    ░░░░░░░░███
+# ░░███  ░░███  ░███ ░   █ ░███ ░   █ ░███ ░░███   ███    ░███
+#  ░░█████████  ██████████ ██████████ █████ ░░████░░█████████ 
+#   ░░░░░░░░░  ░░░░░░░░░░ ░░░░░░░░░░ ░░░░░   ░░░░  ░░░░░░░░░  
+                                                            
 
     ### BUILD GEEK DATA
     geekData = GeekInfo.objects.values().order_by('-tenure')
@@ -419,6 +487,18 @@ def geeks(request):
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                }
     return HttpResponse(template.render(context, request))
+
+#  ███████████  ████                                             ██████████             █████               ███  ████         
+# ░░███░░░░░███░░███                                            ░░███░░░░███           ░░███               ░░░  ░░███         
+#  ░███    ░███ ░███   ██████   █████ ████  ██████  ████████     ░███   ░░███  ██████  ███████    ██████   ████  ░███   █████ 
+#  ░██████████  ░███  ░░░░░███ ░░███ ░███  ███░░███░░███░░███    ░███    ░███ ███░░███░░░███░    ░░░░░███ ░░███  ░███  ███░░  
+#  ░███░░░░░░   ░███   ███████  ░███ ░███ ░███████  ░███ ░░░     ░███    ░███░███████   ░███      ███████  ░███  ░███ ░░█████ 
+#  ░███         ░███  ███░░███  ░███ ░███ ░███░░░   ░███         ░███    ███ ░███░░░    ░███ ███ ███░░███  ░███  ░███  ░░░░███
+#  █████        █████░░████████ ░░███████ ░░██████  █████        ██████████  ░░██████   ░░█████ ░░████████ █████ █████ ██████ 
+# ░░░░░        ░░░░░  ░░░░░░░░   ░░░░░███  ░░░░░░  ░░░░░        ░░░░░░░░░░    ░░░░░░     ░░░░░   ░░░░░░░░ ░░░░░ ░░░░░ ░░░░░░  
+#                                ███ ░███                                                                                     
+#                               ░░██████                                                                                      
+#                                ░░░░░░                                                                                       
 
 def playerdetails(request):
 
@@ -492,6 +572,17 @@ def playerdetails(request):
                }
     return HttpResponse(template.render(context, request))
 
+#  ██████████   ██████████ ███████████   █████████   █████ █████        █████████ 
+# ░░███░░░░███ ░░███░░░░░█░█░░░███░░░█  ███░░░░░███ ░░███ ░░███        ███░░░░░███
+#  ░███   ░░███ ░███  █ ░ ░   ░███  ░  ░███    ░███  ░███  ░███       ░███    ░░░ 
+#  ░███    ░███ ░██████       ░███     ░███████████  ░███  ░███       ░░█████████ 
+#  ░███    ░███ ░███░░█       ░███     ░███░░░░░███  ░███  ░███        ░░░░░░░░███
+#  ░███    ███  ░███ ░   █    ░███     ░███    ░███  ░███  ░███      █ ███    ░███
+#  ██████████   ██████████    █████    █████   █████ █████ ███████████░░█████████ 
+# ░░░░░░░░░░   ░░░░░░░░░░    ░░░░░    ░░░░░   ░░░░░ ░░░░░ ░░░░░░░░░░░  ░░░░░░░░░  
+                                                                                
+                                                                                
+                                                                                
 def details(request):
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')

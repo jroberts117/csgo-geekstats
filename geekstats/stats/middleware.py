@@ -31,7 +31,7 @@ class EventData(object):
         return(None)
         
     def __call__(self, request):
-        if request.method == 'POST' and 'dateType' in request.POST:                                            # If a date or season was picked or range
+        if request.method == 'POST' and 'dateType' in request.POST and 'datetype' in request.session:                                            # If a date or season was picked or range
             if request.POST['dateType'] == 'season':
                 season_dates = (Season.objects.values('name','start_date','end_date').filter(name=request.POST['dateList']))
                 request.session['start_date'] = season_dates[0]['start_date'].strftime('%Y-%m-%d')    # Set the session date ranges to be the season selected
@@ -53,7 +53,7 @@ class EventData(object):
                 last_date = list(SeasonMatch.objects.aggregate(Max('match_date')))
                 request.session['start_date'] = str(last_date[0]['match_date'])
                 request.session['end_date'] = str(last_date[0]['match_date'])
-                request.session['datetype'] = 'season'
+                request.session['datetype'] = 'match'
 
 
             if request.GET.get('pid') != None:
