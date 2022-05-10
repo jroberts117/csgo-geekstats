@@ -160,7 +160,7 @@ def awards(request):
         actual_award = func.awards(sample['geekfest_award__award_title'], winner_award_data, award_name, sample['geekfest_award__award_category__category_name'],
             sample['geekfest_award__award_image_path'], sample['geekfest_award__award_description'], sample['geekfest_award__award_category__category_color'],
             sample['geekfest_award__award_category__award_category_id'])
-        print(actual_award)
+        # print(actual_award)
         awards_new.append(actual_award)
 
     def award_type_key_func(aw):
@@ -183,7 +183,6 @@ def awards(request):
                'types' : award_types,
                'title': 'GeekFest Awards',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
-               'eventdates':request.session['eventdates'],
                'state':newstate,
                }
     return HttpResponse(template.render(context, request))
@@ -241,7 +240,7 @@ def teams(request):
 #               'games': games,
                'title': 'GeekFest Teams',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
-               'eventdates':request.session['eventdates'],
+            #    'eventdates':request.session['eventdates'],
                'state':newstate,
                }
     return HttpResponse(template.render(context, request))
@@ -266,7 +265,6 @@ def tiers(request):
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'],request.session['datetype'])
     context['title'] = 'GeekFest Tiers'
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
-    context['eventdates'] = newstate.seasons
     context['state'] = newstate
     context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
     context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
@@ -328,7 +326,7 @@ def maps(request):
     mainmenu.set('Maps')
     template = loader.get_template('maps.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'],request.session['datetype'])
-    print(newstate.seasons)    
+    # print(newstate.seasons)    
 
     newstate.compare = 'map'
     #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
@@ -374,7 +372,6 @@ def maps(request):
 
     context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
-               'eventdates':request.session['eventdates'],
                'state':newstate,
                'mapstats':mapGroupData.values
                }
@@ -451,12 +448,19 @@ def weapons(request):
     newstate.compare = 'weapon'
     context = {'weapons': itemGroupedData.values,
                'title': 'GeekFest Weapons',
-               'eventdates':request.session['eventdates'],
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
-
+#    █████████  ██████████ ██████████ █████   ████  █████████ 
+#   ███░░░░░███░░███░░░░░█░░███░░░░░█░░███   ███░  ███░░░░░███
+#  ███     ░░░  ░███  █ ░  ░███  █ ░  ░███  ███   ░███    ░░░ 
+# ░███          ░██████    ░██████    ░███████    ░░█████████ 
+# ░███    █████ ░███░░█    ░███░░█    ░███░░███    ░░░░░░░░███
+# ░░███  ░░███  ░███ ░   █ ░███ ░   █ ░███ ░░███   ███    ░███
+#  ░░█████████  ██████████ ██████████ █████ ░░████░░█████████ 
+#   ░░░░░░░░░  ░░░░░░░░░░ ░░░░░░░░░░ ░░░░░   ░░░░  ░░░░░░░░░  
+                                                            
 def geeks(request):
     ### INITIALIZE THE PAGE AND SESSION DATA
     mainmenu.set('Geeks')
@@ -467,22 +471,13 @@ def geeks(request):
         Geek.objects.filter(geek_code=(request.GET.get('code'))).update(validated=1, geek_code='validated')    
         return redirect("/accounts/login")            
             
-#    █████████  ██████████ ██████████ █████   ████  █████████ 
-#   ███░░░░░███░░███░░░░░█░░███░░░░░█░░███   ███░  ███░░░░░███
-#  ███     ░░░  ░███  █ ░  ░███  █ ░  ░███  ███   ░███    ░░░ 
-# ░███          ░██████    ░██████    ░███████    ░░█████████ 
-# ░███    █████ ░███░░█    ░███░░█    ░███░░███    ░░░░░░░░███
-# ░░███  ░░███  ░███ ░   █ ░███ ░   █ ░███ ░░███   ███    ░███
-#  ░░█████████  ██████████ ██████████ █████ ░░████░░█████████ 
-#   ░░░░░░░░░  ░░░░░░░░░░ ░░░░░░░░░░ ░░░░░   ░░░░  ░░░░░░░░░  
-                                                            
+
 
     ### BUILD GEEK DATA
     geekData = GeekInfo.objects.values().order_by('-tenure')
     
     context = {'geeks': geekData,
                'title': 'GeekFest Geeks',
-               'eventdates':request.session['eventdates'],
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                }
@@ -521,7 +516,7 @@ def playerdetails(request):
             httplink = 'http://cs.geekfestclan.com/Geeks?code='+str(geek_code)
             # Players.objects.filter(username=request.user.id).update(last_seen=datetime.now())
             Geek.objects.filter(geek_id=pid).update(valid_sent_date=date.today(), validated=0, geek_code=str(geek_code))
-            print(geek[0]['handle'])
+            # print(geek[0]['handle'])
             send_mail(
                 'Welcome to The GeekFest',
                 'Your GeekFest Player name '+str(geek[0]['username'])+' has been claimed.  Your password is: '+password+' Click on this link to validate your email and login:  '+httplink,
@@ -529,15 +524,15 @@ def playerdetails(request):
                 [str(geek[0]['email'])],
                 fail_silently=False,)
 
-            print('send email')
+            # print('send email')
             
         elif claim == 'resend': 
             print('resend email')
 
     ### BUILD THE PLAYER DETAIL DATA
     psumm = (TiersData.objects.values('geekid','player','tier','alltime_kdr','year_kdr','last90_kdr')
-                        .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
-                        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
+                      .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
+                      .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
     playerData = player(psumm)
 
     if playerData.name == 'No data':
@@ -566,7 +561,6 @@ def playerdetails(request):
     context = {'player': playerData,
                'geek': geek,
                'title': 'GeekFest Geeks',
-               'eventdates':request.session['eventdates'],
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                }
@@ -605,7 +599,6 @@ def details(request):
         details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']),all=True).order_by('match_datetime')
     context = {'details' : details,
                'title': 'GeekFest Geeks',
-               'eventdates':request.session['eventdates'],
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                }

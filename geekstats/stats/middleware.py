@@ -1,8 +1,6 @@
 from django.http import HttpResponse
-import stats.query as qry
-import sys
 import datetime
-from .geekmodels import TiersData, Season
+from .geekmodels import TiersData, Season, SeasonMatch
 
 ## State is used in the middleware as a way to track default values 
 class state:
@@ -50,10 +48,12 @@ class EventData(object):
 ################ PROCESS THE PAGE IF NO DATE OR SEASON WAS SELECTED CAPTURE OTHER SESSION DATA  #######################################
         else:
             if not request.session.get('start_date',False):                     # If we don'thave a start date, this is the first load so default to the last play date
-                last_date = list(SeasonMatch.objects.aggregate(Max('match_date')))
-                request.session['start_date'] = str(last_date[0]['match_date'])
-                request.session['end_date'] = str(last_date[0]['match_date'])
+                last_date = SeasonMatch.objects.values('match_date').order_by('-match_date')[0]['match_date']
+
+                request.session['start_date'] = (last_date.strftime('%Y-%m-%d'))
+                request.session['end_date'] = (last_date.strftime('%Y-%m-%d'))
                 request.session['datetype'] = 'match'
+                request.session['selector'] = (last_date.strftime('%Y-%m-%d'))
 
 
             if request.GET.get('pid') != None:
