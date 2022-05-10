@@ -63,7 +63,7 @@ class state:
         self.page = ''
         self.season = ''
         self.selector = ''
-        self.event_dates = func.unique_dates(list(SeasonMatch.objects.values('match_date').distinct().order_by('-match_date')))
+        self.event_dates = func.unique_dates(list(SeasonMatch.objects.values('match_date').distinct().filter(~Q(map='None')).order_by('-match_date')))
         self.seasons = list(Season.objects.values('name').distinct().order_by('-start_date'))
         self.datetype = ''
     def setsession(self,start,end,compare,value,page, selector, datetype):
