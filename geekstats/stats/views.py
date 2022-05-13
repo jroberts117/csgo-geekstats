@@ -74,6 +74,8 @@ class state:
         self.page = page
         self.selector = selector
         self.datetype = datetype
+        self.event_dates = func.unique_dates(list(SeasonMatch.objects.values('match_date').distinct().filter(~Q(map='None')).order_by('-match_date')))
+        self.seasons = list(Season.objects.values('name').distinct().order_by('-start_date'))
 
 #################  Global Variables ##########################
 mainmenu = StateInfo()
