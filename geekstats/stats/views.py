@@ -337,7 +337,8 @@ def maps(request):
 
     killData = Frag.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id', 'round__match__match_date').annotate(num_frags=Count('frag_id')).order_by('round__match__match_date', '-num_frags')
     deathData = Death.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('round__match__map')
-
+    
+    # print(playData)
     mapGroupData = {}
 
     for k in killData:
@@ -370,12 +371,29 @@ def maps(request):
         if (d['num_deaths'] > 0):
             curPlayer['kdr'] = curPlayer['kills']/curPlayer['deaths']
         curPlayer['kdr'] = round(curPlayer['kdr'], 2)
+    # map_list = []
+    # for i in mapGroupData:
+    #     map_list.append(i)
+    # playData = (MatchRound.objects.values('win_side','match_id__map').filter(match__map__in=map_list)
+    #             .annotate(num_plays=Count('round_id')).order_by('match_id__map','win_side'))
+    
+    # print(playData)
+    # print(mapGroupData)
+    # for i in mapGroupData:
+    #     for j in playData:
+    #         if i == j['match_id__map']:
+                # if j['win_side'] == 'CT':
+                #     i['CT'] = j['num_plays']
+                # else:
+                #     i['T'] = j['num_plays']
 
+                # print(j['match_id__map'], j['win_side'], str(j['num_plays'], i.values))
 
     context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                'state':newstate,
-               'mapstats':mapGroupData.values
+               'mapstats':mapGroupData.values,
+            #    'playdata':playData
                }
     return HttpResponse(template.render(context, request))
 
@@ -477,9 +495,25 @@ def geeks(request):
 
     ### BUILD GEEK DATA
     geekData = GeekInfo.objects.values().order_by('-tenure')
-    
+
+    ### CALC ANY SEASON AWARDS
+    raw_award_data = GeekfestMatchAward.objects.select_related('match', 'season', 'geekfest_award', 'geekfest_award__award_category', 'geek').filter(geekfest_award__award_title='Colonel Sanders').values(
+        'geek__handle', 'geekfest_award__award_name', 'geekfest_award__award_title', 'geekfest_award__award_category__category_name',
+        'geekfest_award__award_image_path', 'geekfest_award__award_description', 'geekfest_award__award_value_type', 'match_id__season_id__name',
+        'geekfest_award__award_category__category_color','geekfest_award__award_category__award_category_id').annotate(
+            max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value')).order_by(
+                "match_id__season_id", "-sum_points")
+
+    curr_season = ""
+    award_winners = []
+    for row in raw_award_data:
+        if curr_season != row['match_id__season_id__name']:
+            curr_season = row['match_id__season_id__name']
+            award_winners.append([row['geek__handle'], row['sum_points'], row['match_id__season_id__name']])
+
     context = {'geeks': geekData,
                'title': 'GeekFest Geeks',
+               'awards': award_winners,
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                }
@@ -536,6 +570,7 @@ def playerdetails(request):
                       .filter(geekid=pid,matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
                       .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
     playerData = player(psumm)
+
 
     if playerData.name == 'No data':
         playerData.nemesis = 'There is no player data for this date.  Please select a date when this player played.'

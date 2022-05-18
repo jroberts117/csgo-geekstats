@@ -282,7 +282,7 @@ class Season(models.Model):
 class SeasonMatch(models.Model):
     match_id = models.AutoField(primary_key=True)
     match_date = models.DateTimeField()
-    season = models.ForeignKey(Season, models.DO_NOTHING, blank=True, null=True)
+    season = models.ForeignKey(Season, models.DO_NOTHING, blank=True)
     map = models.CharField(max_length=200)
     team_winner = models.ForeignKey('Team', models.DO_NOTHING, db_column='team_winner', blank=True, null=True)
 

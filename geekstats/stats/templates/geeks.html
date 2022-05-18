@@ -26,7 +26,14 @@
 		{% else %}
 			<tr>
 		{% endif %}
-			<td><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a></td>
+			<td><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a>
+			{% for a in awards %}
+				{% if a.0 == i.player %}
+					<span title="{{a.2}}:  {{a.1|floatformat:"0"}} chickens slaughtered">
+					<img src = "{%static 'images/chicken_award1.png' %}" style="height: 15px;"></span>
+				{% endif %}
+			{% endfor %}
+			</td>
 			<td class="text_center">{{i.kills}}</td>
 			<td class="text_center">{{i.deaths}}</td>
 			<td class="text_right">{{i.kdr}}</td>

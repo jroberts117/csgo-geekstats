@@ -63,6 +63,10 @@ header {
 	width: 70px;
 }
 
+table img {
+	display: inline-block;
+}
+
 input[type=submit] {
 	background-color: #fbeee0;
 	border: 1px solid #422800;
