@@ -6,6 +6,7 @@
 {% block content %}
 <!- Player summary stats box ->
 <section>
+	<div id="graph" class="pop-graph">{{chart|safe}}</div>
 	<div class="summary">
 		<span class="rowheader">PLAYER STATS FOR: </span>
 		<div class= "container" style="min-width: 50%; padding:5px;">
@@ -51,15 +52,20 @@
 				</div>
 			</div>
 			<table>
-				<tr class="header">
-					<td class="">Top Victim</td>
-					<td class="">Nemesis:</td>
+				<tr height="25px" class="header">
+					<td width="33%" class="">Top Victim</td>
+					<td width="33%" class="">Nemesis:</td>
+					<td rowspan=4 width="33%" onMouseOver="showGraph();" onMouseOut="hideGraph();">	{{chart|safe}}</td>
+				</tr>
+				<tr height="25px" class="fmed acenter">
+					<td class="floral">{{player.topVictim}}</td>
+					<td class="floral">{{player.nemesis}}</td>
+				</tr>
+				<tr height="25px" class="header">
 					<td class="">Best Weapon:</td>
 					<td class="">Favorite Map:</td>
 				</tr>
-				<tr class="fmed acenter">
-					<td class="floral">{{player.topVictim}}</td>
-					<td class="floral">{{player.nemesis}}</td>
+				<tr height="25px" class="fmed acenter">
 					<td class="floral">{{player.weapons.0.item}}</td>
 					<td class="floral">{{player.maps.0.item}}</td>
 				</tr>
@@ -138,6 +144,8 @@
 				{% endfor %}
 			</table>
 		</div>
+
+	
 </section>
 
  

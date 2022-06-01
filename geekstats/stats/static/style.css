@@ -521,4 +521,16 @@ a {
 	display: inline-block;
     vertical-align: top;
 }
+
+.pop-graph {
+	position: absolute;
+	margin-left: 200px;
+    width: 1000px;
+	padding: 5px;
+	background-color: darkred;
+    display: none;
+	border: 20px black dashed;
+	border-radius: 20px;
+
+}
 	

@@ -185,6 +185,18 @@ class GeekfestMatchAward(models.Model):
         db_table = 'geekfest_match_award'
         db_tablespace = 'geek'
 
+class GeekKDRHistory(models.Model):
+    geek_id = models.IntegerField()
+    handle = models.CharField(max_length=250, blank=True, null=True)
+    history_date = models.DateField(blank=True, null=True)
+    alltime_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    year_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        managed = False
+        db_table = 'geek_kdr_history'
+        db_tablespace = 'geek'
 
 class Generation(models.Model):
     generation_id = models.AutoField(primary_key=True)

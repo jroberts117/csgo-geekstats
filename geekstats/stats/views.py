@@ -5,7 +5,7 @@ from django.template import loader
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
-from .geekmodels import Buy, Geek, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser
+from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser
 from .geekclasses import season, player
 import stats.functions as func
 from .forms import CustomUserCreationForm
@@ -14,6 +14,8 @@ import operator, sys
 from django.db.models import Count, Sum, Avg, Min, Max, Q
 import datetime
 import uuid
+import pygal
+from pygal.style import Style
 from datetime import date, timedelta
 from collections import defaultdict, Counter
 from itertools import groupby
@@ -549,7 +551,7 @@ def playerdetails(request):
             geek_code = uuid.uuid4()
             password = geek[0]['first_name']+geek[0]['member_since'].strftime('%m%Y')
             # httplink = 'http://192.168.0.156:8000/Geeks?code='+str(geek_code)
-            httplink = 'http://cs.geekfestclan.com/Geeks?code='+str(geek_code)
+            httplink = 'http://stats.geekfestclan.com/Geeks?code='+str(geek_code)
             # Players.objects.filter(username=request.user.id).update(last_seen=datetime.now())
             Geek.objects.filter(geek_id=pid).update(valid_sent_date=date.today(), validated=0, geek_code=str(geek_code))
             # print(geek[0]['handle'])
@@ -594,9 +596,30 @@ def playerdetails(request):
         playerData.addOpps('victim','killer',listbuilder(lvplayer,'killer'))
 
         playerData.calcStats()
+
+    kdr_history = GeekKDRHistory.objects.values('handle','history_date','alltime_kdr','year_kdr','last90_kdr').filter(geek_id=pid).order_by('history_date')
+    custom_style = Style(background='#d3d3d3',plot_background='#fffaf0', label_font_family='Electrolize', legend_font_size=30, major_label_font_size=20, label_font_size=20, title_font_size=40)
+    line_chart = pygal.Line(height=400, legend_at_bottom=True, legend_at_bottom_columns=3, range=(0.2, 2.0), style=custom_style)
+    line_chart.title = 'KDR Performance'
+
+    dates = []
+    data1 = []
+    data2 = []
+    data3 = []
+    for i in kdr_history:
+        data1.append(i['last90_kdr'])
+        data2.append(i['year_kdr'])
+        data3.append(i['alltime_kdr'])
+        dates.append(i['history_date'].strftime('%m-%d'))
+    line_chart.x_labels = dates
+    line_chart.add('last90',data1)
+    line_chart.add('year',data2)
+    line_chart.add('alltime',data3)
+
     
     context = {'player': playerData,
                'geek': geek,
+               'chart': line_chart.render(disable_xml_declaration=True),
                'title': 'GeekFest Geeks',
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state),

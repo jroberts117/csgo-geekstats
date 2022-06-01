@@ -10,6 +10,17 @@
 	{% for i in mapstats %}
 	<div class="highlightbox">
 		<div class="header">{{i.map|upper}}</div>
+		
+        <!-- {% for j in playdata %}
+            {% if i.map == j.match_id__map %}
+                 {% if j.win_side == 'CT' %}
+                     CT Wins: {{j.num_plays}}
+                 {% else %}
+                     T Wins = {{j.num_plays}}
+				{% endif %}
+			{% endif %}
+		{% endfor %} -->
+
 			<table class="" style="background: linear-gradient(rgba(191,191,191,0.5),rgba(191,191,191,0.5)),url('/static/images/{{i.map}}.jpg');
 										background-repeat: no-repeat;background-size: cover;">
 				<tr class="black">

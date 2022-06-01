@@ -26,3 +26,12 @@
         document.getElementById("matchButton").style['display'] = "block";
         document.getElementById("seasonButton").style['display'] = "none";
     };
+
+    function showGraph() {
+        document.getElementById("graph").style['display'] = "block";
+    };
+    
+    function hideGraph() {
+        document.getElementById("graph").style['display'] = "none";
+    };
+    
