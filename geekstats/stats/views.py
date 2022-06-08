@@ -497,6 +497,10 @@ def geeks(request):
 
     ### BUILD GEEK DATA
     geekData = GeekInfo.objects.values().order_by('-tenure')
+    seasonWinners = list(Season.objects.values('name','master_win','gold_win','silver_win','bronze_win'))
+    for i in seasonWinners:
+        print(i)
+    print(seasonWinners)
 
     ### CALC ANY SEASON AWARDS
     raw_award_data = GeekfestMatchAward.objects.select_related('match', 'season', 'geekfest_award', 'geekfest_award__award_category', 'geek').filter(geekfest_award__award_title='Colonel Sanders').values(
@@ -516,6 +520,7 @@ def geeks(request):
     context = {'geeks': geekData,
                'title': 'GeekFest Geeks',
                'awards': award_winners,
+               'winners': seasonWinners,
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                }
@@ -597,9 +602,10 @@ def playerdetails(request):
 
         playerData.calcStats()
 
-    kdr_history = GeekKDRHistory.objects.values('handle','history_date','alltime_kdr','year_kdr','last90_kdr').filter(geek_id=pid).order_by('history_date')
+    kdr_history = GeekKDRHistory.objects.values('handle','history_date','alltime_kdr','year_kdr','last90_kdr').filter(geek_id=pid).order_by('-history_date')[:10]
+    kdr_history = reversed(kdr_history)
     custom_style = Style(background='#d3d3d3',plot_background='#fffaf0', label_font_family='Electrolize', legend_font_size=30, major_label_font_size=20, label_font_size=20, title_font_size=40)
-    line_chart = pygal.Line(height=400, legend_at_bottom=True, legend_at_bottom_columns=3, range=(0.2, 2.0), style=custom_style)
+    line_chart = pygal.Line(height=400, legend_at_bottom=True, legend_at_bottom_columns=3, style=custom_style)
     line_chart.title = 'KDR Performance'
 
     dates = []
@@ -619,6 +625,7 @@ def playerdetails(request):
     
     context = {'player': playerData,
                'geek': geek,
+               'data': kdr_history,
                'chart': line_chart.render(disable_xml_declaration=True),
                'title': 'GeekFest Geeks',
                'state':newstate,

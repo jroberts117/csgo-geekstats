@@ -147,13 +147,16 @@ class Geek(models.Model):
     is_member = models.IntegerField(blank=True, null=True)
     valid_sent_date = models.DateField(blank=True, null=True)
     validated = models.IntegerField(blank=True, null=True)
-    userid = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True) 
+    userid = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column="user_id", blank=True, null=True) 
     geek_code = models.CharField(max_length=250, blank=True, null=True)
     
     class Meta:
         managed = False
         db_table = 'geek'
         db_tablespace = 'geek'
+
+    def __str__(self):
+         return self.handle
 
 class GeekfestAward(models.Model):
     geekfest_award_id = models.AutoField(primary_key=True)
@@ -284,11 +287,18 @@ class Season(models.Model):
     name = models.CharField(max_length=250)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
+    master_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='master_win', related_name='geek_id1')
+    gold_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='gold_win', related_name='geek_id2')
+    silver_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='silver_win', related_name='geek_id3')
+    bronze_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='bronze_win', related_name='geek_id4')
 
     class Meta:
         managed = False
         db_table = 'season'
         db_tablespace = 'geek'
+
+    def __str__(self):
+         return self.name
 
 
 class SeasonMatch(models.Model):

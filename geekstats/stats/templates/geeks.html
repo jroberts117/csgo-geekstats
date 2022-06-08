@@ -4,6 +4,7 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <section>
 	<table class="section_center zebra">
 		<tr class="black">
@@ -27,6 +28,13 @@
 			<tr>
 		{% endif %}
 			<td><a href="PlayerDetails?pid={{i.id}}">{{i.player}}</a>
+			{% for w in winners %}
+				{% if w.master_win == i.id %} <span title="{{w.name}}"><i style="color:yellow; font-size: 20px;" class="material-icons">star</i></span>
+				{% elif w.gold_win == i.id %} <span title="{{w.name}}"><i style="color:gold; font-size: 20px;" class="material-icons">star</i></span>
+				{% elif w.silver_win == i.id %} <span title="{{w.name}}"><i style="color:silver; font-size: 20px;" class="material-icons">star</i></span>
+				{% elif w.bronze_win == i.id %} <span title="{{w.name}}"><i style="color:brown; font-size: 20px;" class="material-icons">star</i></span>
+				{% endif %}
+			{% endfor %}
 			{% for a in awards %}
 				{% if a.0 == i.player %}
 					<span title="{{a.2}}:  {{a.1|floatformat:"0"}} chickens slaughtered">

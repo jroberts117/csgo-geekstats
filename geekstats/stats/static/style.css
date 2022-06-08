@@ -135,6 +135,10 @@ input[type=submit] {
 	align-items: flex-start;
 }
 
+.summary .highlightbox{
+	padding-top: 25px;
+}
+
 .highlightbox {
 	min-width: 30%;
 	text-align: center;
@@ -175,6 +179,10 @@ table {
 
 td {
 	padding: 2px;
+}
+
+td span {
+	content: "\007C";
 }
 
 .text_right
