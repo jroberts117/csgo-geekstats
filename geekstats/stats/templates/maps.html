@@ -6,11 +6,41 @@
 {% block content %}
 
 
+
 <div class="page rowwrap">
 	{% for i in mapstats %}
 	<div class="highlightbox">
-		<div class="header">{{i.map|upper}}</div>
-		
+		<div class="header">
+			<div class="hddata hero">{{i.map|upper}} </div>
+			<div class="hddata info"> &nbsp;
+				<span title="{{i.rating}}">
+					<div class="box"
+					{% if i.rating > 1.5 %}
+						style="background: #00FF00;"
+					{% elif i.rating > 1 %}
+						style="background: #71B238;"
+					{% elif i.rating > 0.5 %}
+						style="background: #A6CB45;"
+					{% elif i.rating > 0 %}
+						style="background: #FEFCD7;"
+					{% elif i.rating > -0.5 %}
+						style="background: #F5B79B;"
+					{% elif i.rating > -1 %}
+						style="background: #F5B79B;"
+					{% elif i.rating >= -1.5 %}
+						style="background:  #FF5E99;"
+					{% elif i.rating < -1.5 %}
+						style="background: red;"
+					{% else %}
+						style="background: gray;"
+					{% endif %}
+					></div>Rating: &nbsp;
+				</span>
+			</div>
+			<div class="hddata info">CT Win: 
+				{% if i.ct_win_pct > 60 or i.ct_win_pct < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}
+					{{i.ct_win_pct|floatformat:1}}% </span> [{{i.plays}} {% if i.plays > 1 %} plays {% else %} play {% endif %}]</div>
+		</div>
         <!-- {% for j in playdata %}
             {% if i.map == j.match_id__map %}
                  {% if j.win_side == 'CT' %}

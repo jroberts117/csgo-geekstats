@@ -6,20 +6,20 @@
 {% block content %}
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <section>
-	<table class="section_center zebra">
+	<table class="section_center zebra js-sort-table">
 		<tr class="black">
 			<th>Handle</th>
-			<th>Kills</th>
-			<th>Deaths</th>
-			<th>KDR</th>
-			<th>aKDR</th>
-			<th>1yr KDR</th>
-			<th>last 90 KDR</th>
+			<th class="js-sort-number">Kills</th>
+			<th class="js-sort-number">Deaths</th>
+			<th class="js-sort-number">KDR</th>
+			<th class="js-sort-number">aKDR</th>
+			<th class="js-sort-number">1yr KDR</th>
+			<th class="js-sort-number">last 90 KDR</th>
 			<th>Tier</th>
-			<th>Matches</th>
+			<th class="js-sort-number">Matches</th>
 			<th>Gen</th>
 			<th>Location</th>
-			<th>Tenure</th>
+			<th class="js-sort-number">Tenure</th>
 		</tr>
 		{% for i in geeks %}
 		{% if user.get_username|upper == i.player|upper %}

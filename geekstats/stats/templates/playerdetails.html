@@ -82,11 +82,11 @@
 	<!- Weapon stats box ->
 	<div class="highlightbox">
 		<div class="header">Weapon Stats</div>
-			<table class="zebra">
+			<table class="zebra js-sort-table">
 				<tr class="black">
-					<td>Weapon</td>
-					<td>K</td>
-					<td>D</td>
+					<th>Weapon</th>
+					<th class="js-sort-number">K</th>
+					<th class="js-sort-number">D</th>
 				</tr>
 				{% for i in player.weapons %}
 				<tr>
@@ -102,13 +102,13 @@
 	 <!- Opponents stats box ->
 	<div class="highlightbox">
 	<div class="header">Opponent Stats</div>
-		<table class="zebra">
+		<table class="zebra js-sort-table">
 			<tr class="black">
 	
-				<td>Opponent</td>
-				<td>K</td>
-				<td>D</td>
-				<td>KDR</td>
+				<th>Opponent</th>
+				<th class="js-sort-number">K</th>
+				<th class="js-sort-number">D</th>
+				<th class="js-sort-number">KDR</th>
 			</tr>
 			{% for i in player.opponents %}
 			<tr>
@@ -125,13 +125,13 @@
 	  <!- Maps stats box ->
 	  <div class="highlightbox">
 		<div class="header">Map Stats</div>
-			<table class="zebra">
+			<table class="zebra js-sort-table">
 				<tr class="black">
-					<td>Map</td>
-					<td>K</td>
-					<td>D</td>
-					<td>A</td>
-					<td>KDR</td>
+					<th>Map</th>
+					<th class="js-sort-number">K</th>
+					<th class="js-sort-number">D</th>
+					<th class="js-sort-number">A</th>
+					<th class="js-sort-number">KDR</th>
 				</tr>
 				{% for i in player.maps %}
 				<tr>

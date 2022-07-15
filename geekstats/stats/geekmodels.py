@@ -255,6 +255,18 @@ class MatchAward(models.Model):
         db_table = 'match_award'
         db_tablespace = 'geek'
 
+class Maps(models.Model):
+    idmap =  models.AutoField(primary_key=True)
+    map = models.CharField(max_length=1000)
+    type = models.CharField(max_length=1000)
+    theme = models.CharField(max_length=1000)
+    votescore = models.DecimalField(max_digits=12, decimal_places=4, blank=True, null=True)
+    balance = models.CharField(max_length=1000)
+    
+    class Meta:
+        managed = False
+        db_table = 'map'
+        db_tablespace = 'geek'
 
 class MatchRound(models.Model):
     round_id = models.AutoField(primary_key=True)
@@ -262,6 +274,7 @@ class MatchRound(models.Model):
     ct_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True, related_name="ct_teams")
     t_team = models.ForeignKey('Team', models.DO_NOTHING, blank=True, null=True, related_name="t_teams")
     win_side = models.CharField(max_length=100, blank=True, null=True)
+    map_id = models.ForeignKey('Maps', models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -457,3 +470,16 @@ class GeekAuthUser(models.Model):
         managed = False
         db_table = 'geek_auth_user'
         db_tablespace = 'geek'
+
+class MapData(models.Model):
+    map = models.CharField(max_length=250, blank=True, null=True)
+    match_date = models.DateField(blank=True, null=True)
+    win_side = models.CharField(max_length=250, blank=True, null=True)
+    type = models.CharField(max_length=250, blank=True, null=True)
+    theme = models.CharField(max_length=250, blank=True, null=True)
+    votescore = models.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        managed = False
+        db_table = 'map_data'
+        db_tablespace = 'geek' 

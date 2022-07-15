@@ -5,7 +5,7 @@ from django.template import loader
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
-from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser
+from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData
 from .geekclasses import season, player
 import stats.functions as func
 from .forms import CustomUserCreationForm
@@ -270,7 +270,7 @@ def tiers(request):
     context['title'] = 'GeekFest Tiers'
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
     context['state'] = newstate
-    context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+    context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
     context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
     context['tier1'] = list(filter(lambda tiers: tiers['tier_id'] == 2, list(context['players'])))
     context['tier2'] = list(filter(lambda tiers: tiers['tier_id'] == 3, list(context['players'])))
@@ -281,6 +281,7 @@ def tiers(request):
             geek['diffkdr'] = geek['kdr__avg'] - geek['year_kdr']
         except:
             geek['diffkdr'] = 'n/a'
+        geek['weapon'] = FragDetails.objects.values('weapon').filter(killer=geek['player'],match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count')[0]
 
 
     return render(request, template, context)
@@ -373,23 +374,39 @@ def maps(request):
         if (d['num_deaths'] > 0):
             curPlayer['kdr'] = curPlayer['kills']/curPlayer['deaths']
         curPlayer['kdr'] = round(curPlayer['kdr'], 2)
-    # map_list = []
-    # for i in mapGroupData:
-    #     map_list.append(i)
-    # playData = (MatchRound.objects.values('win_side','match_id__map').filter(match__map__in=map_list)
-    #             .annotate(num_plays=Count('round_id')).order_by('match_id__map','win_side'))
-    
-    # print(playData)
-    # print(mapGroupData)
-    # for i in mapGroupData:
-    #     for j in playData:
-    #         if i == j['match_id__map']:
-                # if j['win_side'] == 'CT':
-                #     i['CT'] = j['num_plays']
-                # else:
-                #     i['T'] = j['num_plays']
 
-                # print(j['match_id__map'], j['win_side'], str(j['num_plays'], i.values))
+    ###########  Add the map win % and rating  ###################
+    map_data = (MapData.objects.values('map','win_side','type','theme','votescore').annotate(wins=Count('win_side')))
+    map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
+
+    map_data_list = []
+    last_map = ''
+    curr_rec = {}
+    for i in map_data:
+        curr_map = i['map']
+        if i['map'] == last_map:
+            if curr_rec['win_side'] == 'CT' and i['win_side'] == 'TERRORIST':
+                curr_rec['other_side'] = i['wins']
+            else:
+                curr_rec['other_side'] = curr_rec['wins']
+                curr_rec['win_side'] = 'CT'
+                curr_rec['wins'] = i['wins']
+            curr_rec['CT_win_pct'] = (curr_rec['wins'] / (curr_rec['other_side'] + curr_rec['wins']))*100
+        else:
+            if len(curr_rec) > 0:
+                map_data_list.append(curr_rec)
+            curr_rec = i
+        last_map = i['map']
+    map_data_list.append(curr_rec)
+
+    for i in mapGroupData:
+        for j in map_data_list:
+            if i == j['map']:
+                mapGroupData[i]['ct_win_pct'] = j['CT_win_pct']
+                mapGroupData[i]['rating'] = j['votescore']
+        for k in map_plays:
+            if i == k['map']:
+                mapGroupData[i]['plays'] = k['plays']
 
     context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
@@ -498,9 +515,6 @@ def geeks(request):
     ### BUILD GEEK DATA
     geekData = GeekInfo.objects.values().order_by('-tenure')
     seasonWinners = list(Season.objects.values('name','master_win','gold_win','silver_win','bronze_win'))
-    for i in seasonWinners:
-        print(i)
-    print(seasonWinners)
 
     ### CALC ANY SEASON AWARDS
     raw_award_data = GeekfestMatchAward.objects.select_related('match', 'season', 'geekfest_award', 'geekfest_award__award_category', 'geek').filter(geekfest_award__award_title='Colonel Sanders').values(
