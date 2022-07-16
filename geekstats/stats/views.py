@@ -275,13 +275,23 @@ def tiers(request):
     context['tier1'] = list(filter(lambda tiers: tiers['tier_id'] == 2, list(context['players'])))
     context['tier2'] = list(filter(lambda tiers: tiers['tier_id'] == 3, list(context['players'])))
     context['tier3'] = list(filter(lambda tiers: tiers['tier_id'] == 4, list(context['players'])))
+    
+    weapons_list = FragDetails.objects.values('killer', 'weapon').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count')
 
     for geek in context['players']:
         try:
             geek['diffkdr'] = geek['kdr__avg'] - geek['year_kdr']
         except:
             geek['diffkdr'] = 'n/a'
-        geek['weapon'] = FragDetails.objects.values('weapon').filter(killer=geek['player'],match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count')[0]
+        high = 0
+        for item in weapons_list:
+            if item['killer'] == geek['player']:
+                if item['weapon__count'] > high:
+                    geek['weapon'] = item
+                    high = item['weapon__count']
+
+        # geek['weapon'] = FragDetails.objects.values('weapon').filter(killer=geek['player'],match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count')[0]
+        # print(FragDetails.objects.values('weapon').filter(killer=geek['player'],match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count').query)
 
 
     return render(request, template, context)

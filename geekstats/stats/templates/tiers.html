@@ -9,7 +9,7 @@
 <section class="winners">
 	<div class="award-section">
 		<div class="award master">
-			<div class="img"  style="background-image:url('/static/images/geeks/{{tier0.0.player}}.png');"></div>
+			<div class="img"  style="background-image:url('/static/images/geeks/{{tier0.0.player|lower}}.png');"></div>
 			<div class="awardcontent">
 				<div class="aw-header master">
 					<div>
@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<div class="award gold">
-			<div class="img"  style="background-image:url('/static/images/geeks/{{tier1.0.player}}.png');"></div>
+			<div class="img"  style="background-image:url('/static/images/geeks/{{tier1.0.player|lower}}.png');"></div>
 			<div class="awardcontent">
 				<div class="aw-header gold">
 					<div>
@@ -49,7 +49,7 @@
 			</div>
 		</div>
 		<div class="award silver">
-			<div class="img"  style="background-image:url('/static/images/geeks/{{tier2.0.player}}.png');"></div>
+			<div class="img"  style="background-image:url('/static/images/geeks/{{tier2.0.player|lower}}.png');"></div>
 			<div class="awardcontent">
 				<div class="aw-header silver">
 					<div>
@@ -69,7 +69,7 @@
 			</div>
 		</div>
 		<div class="award bronze">
-			<div class="img"  style="background-image:url('/static/images/geeks/{{tier3.0.player}}.png');"></div>
+			<div class="img"  style="background-image:url('/static/images/geeks/{{tier3.0.player|lower}}.png');"></div>
 			<div class="awardcontent">
 				<div class="aw-header bronze">
 					<div>
@@ -107,7 +107,7 @@
 			<th class="js-sort-number">Assists</th>
 			<th class="js-sort-number">KDR</th>
 			<th class="js-sort-number"><span title="aKDR adds .25kills for every assist to KDR / total deaths">KDR w/ assist</span></th>
-			<th class="js-sort-number"><span title="Variance from average is based on last 180 days of play">vs 1yr AVG</span></th>
+			<th class="js-sort-number"><span title="Variance from average is based on last year of play">vs 1yr AVG</span></th>
 			<th>Top Weapon</th>
 			<th class="js-sort-number">All Time KDR</th>
 			<th class="">Tier</th>
