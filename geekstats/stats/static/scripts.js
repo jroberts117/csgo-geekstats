@@ -1,4 +1,5 @@
 
+
                 
     document.getElementById("rangeButton").onclick = function() {
         document.getElementById("dateSeasons").style['display'] = "none";

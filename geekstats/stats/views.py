@@ -1,3 +1,4 @@
+from django.forms import DecimalField, IntegerField
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.urls import reverse
@@ -5,13 +6,14 @@ from django.template import loader
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
-from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData
+from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData, SeasonWins, TeamGeek, Tier, Team
 from .geekclasses import season, player
 import stats.functions as func
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, GeeksForm
 import logging
 import operator, sys
-from django.db.models import Count, Sum, Avg, Min, Max, Q
+from django.db import models
+from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
 import datetime
 import uuid
 import pygal
@@ -207,25 +209,72 @@ def teams(request):
     mainmenu.set('Teams')
     template = loader.get_template('teams.html')
 
-    ### BUILD THE SEASON PICKLIST AND LOAD THE SESSION DATA BASED ON INPUT
-#     seasons = Season.objects.values().order_by('-start_date')
-#     if request.POST.get('seasonList',False):
-#         curr_season = Season.objects.values().filter(name=request.POST['seasonList'])
-#         request.session['start_date'] = curr_season[0]['start_date'].strftime('%Y-%m-%d')
-#         request.session['end_date'] = curr_season[0]['end_date'].strftime('%Y-%m-%d')
-#         request.session['season'] = curr_season[0]['name']
-#     else:
-#         request.session['start_date'] = seasons[0]['start_date'].strftime('%Y-%m-%d')
-#         request.session['end_date'] = seasons[0]['end_date'].strftime('%Y-%m-%d')
-#         request.session['season'] = seasons[0]['name']
-# ##    seasons = func.get_team_seasons(newstate,request)
     if request.session['datetype'] != 'season':
         curr_season = Season.objects.values().order_by('-start_date')
+        request.session['season'] = curr_season[0]['name']
         request.session['start_date'] = curr_season[0]['start_date'].strftime('%Y-%m-%d')
         request.session['end_date'] = curr_season[0]['end_date'].strftime('%Y-%m-%d')
         request.session['datetype'] = 'season'
 
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'],request.session['datetype'])
+    newstate.season = request.session['season']
+    tab = 0
+    # except:
+    #     newstate.season = 'Unspecified'
+
+    ### PROCESS ANY FORMS SUBMITTED
+    if request.POST.get('team1mbrs'):
+        team1 = request.POST.get('team1')
+        team2 = request.POST.get('team2')
+        tab = 1
+        team1mbrs = request.POST.getlist('team1mbrs')
+        team2mbrs = request.POST.getlist('team2mbrs')
+        print(team2mbrs)
+        team1capt = int(request.POST.get('team1capt'))
+        team2capt = int(request.POST.get('team2capt'))
+        team1cocapt = int(request.POST.get('team1cocapt'))
+        team2cocapt = int(request.POST.get('team2cocapt'))
+        print('co-cap',str(team2cocapt))
+        curr_team1 = TeamGeek.objects.filter(team__name=team1)
+        curr_team1.delete()
+        for i in team1mbrs:
+            id = Geek.objects.get(geek_id=int(i))
+            team = Team.objects.get(name=team1)
+            tier = Tier.objects.get(tier_name=id.tier)
+            currTEST_team1 = TeamGeek(geek=id, team=team, tier=tier)
+            currTEST_team1.save()
+        team.captain_id = team1capt
+        team.co_captain_id = team1cocapt
+        team.save()
+        curr_team2 = TeamGeek.objects.filter(team__name=team2)
+        curr_team2.delete()
+        for i in team2mbrs:
+            id = Geek.objects.get(geek_id=int(i))
+            team = Team.objects.get(name=team2)
+            tier = Tier.objects.get(tier_name=id.tier)
+            currTEST_team2 = TeamGeek(geek=id, team=team, tier=tier)
+            currTEST_team2.save()
+        team.captain_id = team2capt
+        team.co_captain_id = team2cocapt
+        team.save()
+    elif request.POST.get('seasonName'):
+        name = request.POST.get('seasonName')
+        start = request.POST.get('startDate')
+        end = request.POST.get('endDate')
+        team1 =  request.POST.get('team1Name')
+        team1desc =  request.POST.get('team1Desc')
+        team2 =  request.POST.get('team2Name')
+        team2desc =  request.POST.get('team2Desc')
+        team1capt = int(request.POST.get('team1capt'))
+        team2capt = int(request.POST.get('team2capt'))
+        team1cocapt = int(request.POST.get('team1cocapt'))
+        team2cocapt = int(request.POST.get('team2cocapt'))
+        curr_temp_season = Season(name=name, start_date=start, end_date=end)
+        curr_temp_season.save()
+        curr_temp_team1 = Team(season_id=curr_temp_season.season_id, name=team1, description=team1desc, captain_id=team1capt, co_captain_id=team1cocapt)
+        curr_temp_team1.save()
+        curr_temp_team2 = Team(season_id=curr_temp_season.season_id, name=team2, description=team2desc, captain_id=team2capt, co_captain_id=team2cocapt)
+        curr_temp_team2.save()
 
     ### BUILD THE TEAMS DATA
     seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
@@ -237,10 +286,71 @@ def teams(request):
             teamInfo.addMatches(TeamWins.objects.values().filter(match_date=date['match_date']).order_by('map'))
 
         teamInfo.calcWins()
+    else:
+        teamInfo.setTeams(Team.objects.values().filter(season_id__name=newstate.season).annotate(team_name=F('name'))) 
+
+    teamInfo.set_player_list(request,teamInfo.team1,1)
+    teamInfo.set_player_list(request,teamInfo.team2,2)
+
+    # team_data = TeamGeek.objects.values('geek','team','tier').filter(team__name=teamInfo.team1)
+    # temp_list = []
+    # for i in team_data:
+    #     temp_list.append(i['geek'])
+    # tempPlayers = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=temp_list, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+    # temp_listNoScore = []
+    # for i in temp_list:
+    #     found=0
+    #     for j in tempPlayers:
+    #         if i == j['geekid']:
+    #             found=1
+    #             break
+    #     if not found:
+    #         temp_listNoScore.append(i)
+
+    # tempGeeks = Geek.objects.values('tier','year_kdr','alltime_kdr').filter(geek_id__in=temp_listNoScore).annotate(player=F('handle'), geekid=F('geek_id'), 
+    #                                 kills=Value(0, output_field=models.IntegerField()), kdr__avg=Value(0, output_field=models.IntegerField()), kills__sum=Value(0, output_field=models.IntegerField()),
+    #                                 deaths__sum=Value(0, output_field=models.IntegerField()), assists__sum=Value(0, output_field=models.IntegerField()), akdr__avg=Value(0, output_field=models.IntegerField()))
+    # print(tempGeeks)
+    # teamInfo.addPlayers(tempPlayers,1)
+    # teamInfo.addPlayers(tempGeeks,1)
+    # team_data = TeamGeek.objects.values('geek','team','tier').filter(team__name=teamInfo.team2)
+    # temp_list = []
+    # for i in team_data:
+    #     temp_list.append(i['geek'])
+    # teamInfo.addPlayers(TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=temp_list, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')),2)
+    teamInfo.team1performance = teamInfo.team1seasonkdr - teamInfo.team1startkdr
+    teamInfo.team2performance = teamInfo.team2seasonkdr - teamInfo.team2startkdr
+    teamInfo.team1advantage = teamInfo.team1startkdr - teamInfo.team2startkdr
+    teamInfo.team2advantage = teamInfo.team2startkdr - teamInfo.team1startkdr
+    teamInfo.team1capt = Team.objects.values('captain_id').filter(name=teamInfo.team1)
+    teamInfo.team1cocapt = Team.objects.values('co_captain_id').filter(name=teamInfo.team1)
+    teamInfo.team2capt = Team.objects.values('captain_id').filter(name=teamInfo.team2)
+    teamInfo.team2cocapt = Team.objects.values('co_captain_id').filter(name=teamInfo.team2)
+
+    print(teamInfo.team1capt, teamInfo.team2capt)
+    win_data = SeasonWins.objects.values('match_date','match_id','map','round_id','win_side','season','winner').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'])
+    # tier_data = player(TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=teamInfo.team1players, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
+
+    Team1Geeks = Geek.objects.values('geek_id','handle').filter(alltime_kdr__gte=0).order_by('alltime_kdr')
+    for i in Team1Geeks:
+        for j in teamInfo.team1players:
+            if j.name == i['handle']:
+                i['selected'] = 1
+
+    Team2Geeks = Geek.objects.values('geek_id','handle').filter(alltime_kdr__gte=0).order_by('alltime_kdr')
+    for i in Team2Geeks:
+        for j in teamInfo.team2players:
+            if j.name == i['handle']:
+                i['selected'] = 1
+
     
-#    games,players = func.get_team_data(newstate)
+
     context = {'gfgames':teamInfo,
-#               'players': players,
+                'rounds':win_data,
+                'geeks1':Team1Geeks,
+                'geeks2':Team2Geeks,
+                'tab':tab,
+#               'players': players, 
 #               'games': games,
                'title': 'GeekFest Teams',
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
@@ -388,6 +498,8 @@ def maps(request):
     ###########  Add the map win % and rating  ###################
     map_data = (MapData.objects.values('map','win_side','type','theme','votescore').annotate(wins=Count('win_side')))
     map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
+    print(map_data.query)
+    print(map_plays.query)
 
     map_data_list = []
     last_map = ''
@@ -623,6 +735,9 @@ def playerdetails(request):
         playerData.addMaps('assist','map',listbuilder(laplayer,'map'))
         playerData.addOpps('killer','victim',listbuilder(lkplayer,'victim'))
         playerData.addOpps('victim','killer',listbuilder(lvplayer,'killer'))
+        playerData.avatar = (Geek.objects.values('avatar').filter(geek_id=playerData.id)[0]['avatar'])
+        print(playerData.avatar)
+
 
         playerData.calcStats()
 

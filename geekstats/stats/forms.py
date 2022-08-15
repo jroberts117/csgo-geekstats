@@ -17,6 +17,8 @@ from .geekmodels import Geek
 # ##        fields = ['__all__'] 
 #         exclude = ['last_check']
 
+# GEEKS = Geek.objects.values('geek_id','handle').filter(alltime_kdr__gte=0).order_by('alltime_kdr')
+TeamGeeks = [['1', 'Doug'],['2', 'Edge']]
 
 class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
@@ -27,3 +29,8 @@ class CustomUserCreationForm(UserCreationForm):
             
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ("email",) 
+
+class GeeksForm(forms.Form):
+    TeamGeeks = list(Geek.objects.values_list('geek_id','handle').filter(alltime_kdr__gte=0).order_by('alltime_kdr'))
+    geeks_field = forms.MultipleChoiceField(choices = TeamGeeks)
+	

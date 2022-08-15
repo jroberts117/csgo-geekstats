@@ -4,49 +4,358 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
-
 <table>
-	<tr class="black acenter">
-		<td>SEASON INFO</td>
-		<td style="background:darkslategray;">TEAM 1</td>
-		<td style="background:darkred;">TEAM 2</td>
+	<tr>
+		<th><div class="team {% if tab != 1 %} btnactive {% endif %}" id="btnteam">Team Performance</div></th>
+		<th><div class="team {% if tab == 1 %} btnactive {% endif %}" id="btnplayer">Player Performance</div></th>
 	</tr>
-	<tr class="acenter">
-		<td></td>
-		<td class="fbig fbold cgeek">{{gfgames.team1}}</td>
-		<td class="fbig fbold cfest">{{gfgames.team2}}</td>
-	</tr>
-	<tr class="acenter">
-		<td></td>
-		<td class="fbig fbold cgeek">{{gfgames.team1wins}}</td>
-		<td class="fbig fbold cfest">{{gfgames.team2wins}}</td>
-	</tr>
-	<tr class="acenter">
-		<td></td>
-		<td class="cgeek">{{gfgames.team1matchwins}} matches won</td>
-		<td class="cfest">{{gfgames.team2matchwins}} matches won</td>
-	</tr>
-	<tr class="acenter">
-		<td></td>
-		<td class="cgeek">{{gfgames.team1rdwins}} rounds won</td>
-		<td class="cfest">{{gfgames.team2rdwins}} rounds won</td>
-	</tr>
-	{% for i in gfgames.match %}
-	<tr class="black acenter">
-		<td colspan="4">{{i.date}}</td>
-	</tr>
-	{% for j in i.round %}
-	<tr class="acenter">
-		<td class="fbold fmed"><a href="http://maps.geekfestclan.com/{{j.map}}.bsp">{{j.map|lower}}</a></td>
-		<td class="fmed cgeek">{% if j.score.0 == None %}			--	{% else %}{{j.score.0}}{% endif %}</td>
-		<td class="fmed cfest">{% if j.score.1 == None %}			--	{% else %}{{j.score.1}}{% endif %}</td>
-	</tr>
-	{% endfor %}
-	{% endfor %}
 </table>
 
+{% if tab == 1 %}
+<div class="tabteam" id="teamperf" style="display:none;">
+{% else %}
+<div class="tabteam" id="teamperf" style="display:inline-block;">
+{% endif %}
+<!-- 
+a88888b.                              dP               .d88888b                                               
+d8'   `88                              88               88.    "'                                              
+88        88d888b. .d8888b. .d8888b. d8888P .d8888b.    `Y88888b. .d8888b. .d8888b. .d8888b. .d8888b. 88d888b. 
+88        88'  `88 88ooood8 88'  `88   88   88ooood8          `8b 88ooood8 88'  `88 Y8ooooo. 88'  `88 88'  `88 
+Y8.   .88 88       88.  ... 88.  .88   88   88.  ...    d8'   .8P 88.  ... 88.  .88       88 88.  .88 88    88 
+ Y88888P' dP       `88888P' `88888P8   dP   `88888P'     Y88888P  `88888P' `88888P8 `88888P' `88888P' dP    dP 
+                                                                                                               
+                                                                                                                -->
+<div id="adminSeason" style="border:2px solid black; display: none;">
+	<form method="POST" action="Teams">
+		{% csrf_token %}
+		<input type="hidden" name="form" value="season">
+	<table style="width:95%; margin:auto;">		
+		<tr height="50" style="padding:25px;">
+			<td colspan="2">Season Name: <input type="text" size="50" name="seasonName"></td>
+			<td>Start Date: <input name="startDate" type="date"></td>
+			<td>End Date: <input name="endDate" type="date"></td>
+		</tr>
+		<tr class="cgeek" height="25" >
+			<td>Team 1 Name: <input type="text" size="50" name="team1Name"></td>
+			<td>Team 1 description: <input type="text" size="50" name="team1Desc"></td>
+			<td align="center">
+				Captain: <select name="team1capt" id="" style="width:200px;">
+					{% for geek in geeks1 %}
+					<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team1capt.0.captain_id %} selected {% endif %} >{{geek.handle}}</option>
+					{% endfor %}
+				</select>
+			</td>
+			<td align="center">
+				Co-Captain: <select name="team1cocapt" id="" style="width:200px;">
+					{% for geek in geeks1 %}
+					<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team1cocapt.0.captain_id %} selected {% endif %} >{{geek.handle}}</option>
+					{% endfor %}
+				</select>
+			</td>
+
+		</tr>
+		<tr class="cfest" height="25" >
+			<td>Team 2 Name: <input type="text" size="50" name="team2Name"></td>
+			<td>Team 2 description: <input type="text" size="50" name="team2Desc"></td>
+			<td align="center">
+				Captain: <select name="team2capt" id="" style="width:200px;">
+					{% for geek in geeks2 %}
+					<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team2capt.0.captain_id %} selected {% endif %} >{{geek.handle}}</option>
+					{% endfor %}
+				</select>
+			</td>
+			<td align="center">
+				Co-Captain: <select name="team2cocapt" id="" style="width:200px;">
+					{% for geek in geeks2 %}
+					<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team2capt.0.cocaptain_id %} selected {% endif %} >{{geek.handle}}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3"><div style="margin: auto; text-align: center; padding: 15px;"><input type="submit" value="Create Season"></div></td>
+		</tr>
+	</table>
+	</form>
+</div>
+
+<!-- 
+888888ba  oo                   dP                      .d88888b                                               
+88    `8b                      88                      88.    "'                                              
+88     88 dP .d8888b. 88d888b. 88 .d8888b. dP    dP    `Y88888b. .d8888b. .d8888b. .d8888b. .d8888b. 88d888b. 
+88     88 88 Y8ooooo. 88'  `88 88 88'  `88 88    88          `8b 88ooood8 88'  `88 Y8ooooo. 88'  `88 88'  `88 
+88    .8P 88       88 88.  .88 88 88.  .88 88.  .88    d8'   .8P 88.  ... 88.  .88       88 88.  .88 88    88 
+8888888P  dP `88888P' 88Y888P' dP `88888P8 `8888P88     Y88888P  `88888P' `88888P8 `88888P' `88888P' dP    dP 
+                      88                        .88                                                           
+                      dP                    d8888P                                                             -->
+	<table>
+		<tr class="black acenter">
+			<td colspan="2">SEASON INFO</td>
+			<td style="background:darkslategray;">TEAM 1</td>
+			<td style="background:darkred;">TEAM 2</td>
+		</tr>
+		<tr class="acenter">
+			<td colspan="2" rowspan="2" class="fbig fbold" style="padding-top: 35px;">{{gfgames.name}}</td>
+			<td class="fbig fbold cgeek">{{gfgames.team1}}</td>
+			<td class="fbig fbold cfest">{{gfgames.team2}}</td>
+		</tr>
+		<tr class="acenter">
+			<td class="fbig fbold cgeek">{{gfgames.team1wins}}</td>
+			<td class="fbig fbold cfest">{{gfgames.team2wins}}</td>
+		</tr>
+		<tr class="acenter">
+			<td colspan="2">{% if request.user.is_staff %}
+				<div class="cfest" style="width:50%; margin:auto; padding:10px;"> 
+					Staff Admin: <input type="button" id="adminbtn" class="adminbtn" value="Create Season">
+					<input type="button" class="adminbtn" id="editSeasonButton" value="Edit/Delete Seasons" onclick="window.location.href='/admin/stats/season/';" target="_blank">
+				</div>
+					{% endif %}
+			</td>
+			<td class="cgeek">{{gfgames.team1matchwins}} matches won</td>
+			<td class="cfest">{{gfgames.team2matchwins}} matches won</td>
+		</tr>
+		<tr class="acenter">
+			<td colspan="2"></td>
+			<td class="cgeek">{{gfgames.team1rdwins}} rounds won</td>
+			<td class="cfest">{{gfgames.team2rdwins}} rounds won</td>
+		</tr>
+		
+		{% for i in gfgames.match %}
+		<tr class="black acenter">
+			<td colspan="4">{{i.date}}</td>
+		</tr>
+		{% for j in i.round %}
+		<tr class="acenter">
+			<td class="fbold fmed"><a href="http://maps.geekfestclan.com/{{j.map}}.bsp">{{j.map|lower}} </a></td>
+			<td align="left">
+			{% for k in rounds %}
+				{% if k.map == j.map %}
+				<div class="box">
+					{% if k.win_side == 'TERRORIST' and k.winner == gfgames.team1 %}
+						<div class="tbox" style="">T</div> 
+					{% elif k.win_side == 'CT' and k.winner == gfgames.team1 %}
+						<div class="ctbox" style="">CT</div> 
+					{% elif k.win_side == 'TERRORIST' and k.winner == gfgames.team2 %}
+						<div class="t2box" style="">T</div> 
+					{% elif k.win_side == 'CT' and k.winner == gfgames.team2 %}
+						<div class="ct2box" style="">CT</div> 
+					{% else %} 
+						<div class="xbox" style="">X</div> 
+					{% endif %} 
+				{% endif %} 
+				</div>
+			{% endfor %} 
+			</td>
+			<td class="fmed cgeek">{% if j.score.0 == None %}			--	{% else %}{{j.score.0}}{% endif %}		</td>
+			<td class="fmed cfest">{% if j.score.1 == None %}			--	{% else %}{{j.score.1}}{% endif %}</td>
+		</tr>
+		{% endfor %}
+		{% endfor %}
+	</table>
+</div>
+<!-- 
+d888888P                                 .d88888b    dP              dP            
+   88                                    88.    "'   88              88            
+   88    .d8888b. .d8888b. 88d8b.d8b.    `Y88888b. d8888P .d8888b. d8888P .d8888b. 
+   88    88ooood8 88'  `88 88'`88'`88          `8b   88   88'  `88   88   Y8ooooo. 
+   88    88.  ... 88.  .88 88  88  88    d8'   .8P   88   88.  .88   88         88 
+   dP    `88888P' `88888P8 dP  dP  dP     Y88888P    dP   `88888P8   dP   `88888P' 
+                                                                                   
+                                                                                   		 -->
 
 
 
+{% if tab == 1 %}
+<div class="tabteam" id="playerperf" style="display:inline-block;">
+{% else %}
+<div class="tabteam" id="playerperf" style="display:none;">
+{% endif %}
+
+<div style="padding-top: 15px;" class="container">
+	<div style="width:49%; display:inline-block; ">
+		<div class="container cgeek">
+			<div style="padding: 5px; display: inline-block; width:70%;" class="fbig fbold">Team: {{gfgames.team1}}</div>
+			<div style="padding: 5px; display: inline-block; margin-top:10px; position:absolute; color:white; background-color: {% if gfgames.team1advantage < 0 %} darkred; {% else %} darkgreen; {%endif%} ">KDR Advantage: {{gfgames.team1advantage}}</div>
+		</div>
+	<table>
+		<tr>
+			<th align="left">Player</th>
+			<th>Alltime KDR</th>
+			<th>Season KDR</th>
+			<th>Performance</th>
+			<th>Kills</th>
+			<th>Deaths</th>
+		</tr>
+		{% for i in gfgames.team1players %}
+		<tr>
+			<td>{{i.name}}</td>
+			<td align="center">{{i.alltime_kdr}}</td>
+			<td align="center">{{i.KDR}}</td>
+			<td align="center">{{i.diff_alltime_kdr}}</td>
+			<td align="center">{{i.kills}}</td>
+			<td align="center">{{i.deaths}}</td>
+		</tr>
+		{% endfor %}
+		<tr class="cgeek">
+			<td>TOTAL</td>
+			<td align="center"><span style="color:{% if gfgames.team1startkdr > gfgames.team2startkdr %}green{% else %}red{%endif%};">{{gfgames.team1startkdr|floatformat:2}}</span></td>
+			<td align="center"><span style="color:{% if gfgames.team1seasonkdr > gfgames.team2seasonkdr %}green{% else %}red{%endif%};">{{gfgames.team1seasonkdr|floatformat:2}}</span></td>
+			<td align="center"><span style="color:{% if gfgames.team1performance > gfgames.team2performance %}green{% else %}red{%endif%};">{{gfgames.team1performance|floatformat:2}}</span></td>
+			<td></td>
+			<td></td>
+		</tr>
+
+	</table>
+
+	</div>
+	<div style="width:49%; display:inline-block; padding:5px;">
+		<div class="container cfest">
+			<div style="padding: 5px; display: inline-block; width:70%;" class="fbig fbold">Team: {{gfgames.team2}}</div>
+			<div style="padding: 5px; display: inline-block; margin-top:10px; position:absolute; color:white; background-color: {% if gfgames.team2advantage < 0 %} darkred; {% else %} darkgreen; {%endif%} ">KDR Advantage: {{gfgames.team2advantage}}</div>
+		</div>
+		
+		<table>
+			<tr>
+				<th align="left">Player</th>
+				<th>Alltime KDR</th>
+				<th>Season KDR</th>
+				<th>Performance</th>
+				<th>Kills</th>
+				<th>Deaths</th>
+			</tr>
+			{% for i in gfgames.team2players %}
+			<tr>
+				<td>{{i.name}}</td>
+				<td align="center">{{i.alltime_kdr}}</td>
+				<td align="center">{{i.KDR}}</td>
+				<td align="center">{{i.diff_alltime_kdr}}</td>
+				<td align="center">{{i.kills}}</td>
+				<td align="center">{{i.deaths}}</td>
+			</tr>
+			{% endfor %}
+			<tr class="cfest">
+				<td>TOTAL</td>
+				<td align="center">Avg KDR:  <span style="color:{% if gfgames.team2startkdr > gfgames.team1startkdr %}green{% else %}red{%endif%};">{{gfgames.team2startkdr|floatformat:2}}</span></td>
+				<td align="center"><span style="color:{% if gfgames.team2seasonkdr > gfgames.team1seasonkdr %}green{% else %}red{%endif%};">{{gfgames.team2seasonkdr|floatformat:2}}</span></td>
+				<td align="center"><span style="color:{% if gfgames.team2performance > gfgames.team1performance %}green{% else %}red{%endif%};">{{gfgames.team2performance|floatformat:2}}</span></td>
+				<td></td>
+				<td></td>
+			</tr>
+
+		</table>
+	</div>
+<!-- 	
+d888888P                                  .d888888        dP            oo          oo            dP                       dP   oo                   
+   88                                    d8'    88        88                                      88                       88                        
+   88    .d8888b. .d8888b. 88d8b.d8b.    88aaaaa88a .d888b88 88d8b.d8b. dP 88d888b. dP .d8888b. d8888P 88d888b. .d8888b. d8888P dP .d8888b. 88d888b. 
+   88    88ooood8 88'  `88 88'`88'`88    88     88  88'  `88 88'`88'`88 88 88'  `88 88 Y8ooooo.   88   88'  `88 88'  `88   88   88 88'  `88 88'  `88 
+   88    88.  ... 88.  .88 88  88  88    88     88  88.  .88 88  88  88 88 88    88 88       88   88   88       88.  .88   88   88 88.  .88 88    88 
+   dP    `88888P' `88888P8 dP  dP  dP    88     88  `88888P8 dP  dP  dP dP dP    dP dP `88888P'   dP   dP       `88888P8   dP   dP `88888P' dP    dP 
+                                                                                                                                                      -->
+                                                                                                                                                     
 	
+	
+	{% if request.user.is_staff %}
+	<form method="POST" action="Teams">
+		{% csrf_token %}
+		<input type="hidden" name="team1" value="{{gfgames.team1}}">
+		<input type="hidden" name="team2" value="{{gfgames.team2}}">
+		<input type="hidden" name="tab" value="players">
+		
+	<div style="width:49%; display:inline-block; padding:5px;">
+			<table>
+				<tr>
+					<th colspan="6"><div style="margin-top: 20px; padding:5px; font-size:16px;">TEAM ADMINISTRATION</div></th>
+				</tr>
+				<tr class="cgeek">
+					<td colspan=2 align="center">
+						Captain: <select name="team1capt" id="" style="width:200px;">
+							{% for geek in geeks1 %}
+							<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team1capt.0.captain_id %} selected {% endif %} >{{geek.handle}}</option>
+							{% endfor %}
+						</select>
+					</td>
+					<td colspan=4 align="center">
+						Co-Captain: <select name="team1cocapt" id="" style="width:200px;">
+							{% for geek in geeks1 %}
+							<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team1cocapt.0.co_captain_id %} selected {% endif %} >{{geek.handle}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				<tr class="cgeek">
+					<td colspan="6" align="center">
+						<select name="team1mbrs" size="20" multiple>
+							{% for geek in geeks1 %}
+							<option value="{{geek.geek_id}}" {% if geek.selected == 1%} selected {% endif %} >{{geek.handle}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				
+				</tr>
+
+			</table>
+		</div>
+		<div style="width:49%; display:inline-block; padding:5px;">
+				<table>
+					<tr>
+						<th colspan="6"><div style="margin-top: 20px; padding:5px; font-size:16px;">TEAM ADMINISTRATION</div></th>
+					</tr>
+					<tr class="cfest">
+						<td colspan=2 align="center">
+							Captain: <select name="team2capt" id="" style="width:200px;">
+								{% for geek in geeks2 %}
+								<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team2capt.0.captain_id %} selected {% endif %} >{{geek.handle}}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td colspan=4 align="center">
+							Co-Captain: <select name="team2cocapt" id="" style="width:200px;">
+								{% for geek in geeks2 %}
+								<option value="{{geek.geek_id}}" {% if geek.geek_id == gfgames.team2cocapt.0.co_captain_id %} selected {% endif %} >{{geek.handle}}</option>
+								{% endfor %}
+							</select>
+						</td>
+					</tr>
+					<tr class="cfest">
+						<td colspan="6" align="center">
+							<select name="team2mbrs" size="20" multiple>
+								{% for geek in geeks2 %}
+								<option value="{{geek.geek_id}}" {% if geek.selected == 1%} selected {% endif %} >{{geek.handle}}</option>
+								{% endfor %}
+							</select>
+						</td>
+					</tr>
+				</table>
+
+		</div>
+		<div style="margin: auto; width:100%; text-align: center; padding: 10px;"><input type="submit" value="Submit"></div>
+	{% endif %}
+	</div>
+	</form>
+</div>
+
+<script type="text/JavaScript">
+	document.getElementById("btnteam").onclick = function() {
+		document.getElementById("teamperf").style['display'] = "inline-block";
+		document.getElementById("playerperf").style['display'] = "none";
+		document.getElementById("btnteam").classList.toggle("btnactive");
+		document.getElementById("btnplayer").classList.toggle("btnactive");
+	};
+
+	document.getElementById("btnplayer").onclick = function() {
+		document.getElementById("playerperf").style['display'] = "inline-block";
+		document.getElementById("teamperf").style['display'] = "none";
+		document.getElementById("btnteam").classList.toggle("btnactive");
+		document.getElementById("btnplayer").classList.toggle("btnactive");
+	};
+
+	document.getElementById("adminbtn").onclick = function() {
+		if (document.getElementById("adminSeason").style['display'] !== 'none') {
+			document.getElementById("adminSeason").style['display'] = "none";	
+		} else {
+			document.getElementById("adminSeason").style['display'] = "inline-block";
+		}
+	};
+</script>
 {% endblock content %}

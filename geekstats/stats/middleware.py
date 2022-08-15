@@ -35,6 +35,7 @@ class EventData(object):
                 request.session['start_date'] = season_dates[0]['start_date'].strftime('%Y-%m-%d')    # Set the session date ranges to be the season selected
                 request.session['end_date'] = season_dates[0]['end_date'].strftime('%Y-%m-%d')
                 request.session['selector'] = request.POST['dateList']
+                request.session['season'] = request.POST['dateList']
             elif request.POST['dateType'] == 'match':
                 request.session['start_date'] = (datetime.datetime.strptime(request.POST['dateList'], '%m-%d-%Y')).strftime('%Y-%m-%d')    # Set the session date ranges to the match date selected
                 request.session['end_date'] = (datetime.datetime.strptime(request.POST['dateList'], '%m-%d-%Y')).strftime('%Y-%m-%d')

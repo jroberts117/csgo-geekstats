@@ -186,3 +186,6 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'stats/static'), ]
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/stats/Tiers'
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

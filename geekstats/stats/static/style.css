@@ -348,7 +348,37 @@ td span {
 	border-radius: 3px;
 	margin-bottom: 1px;
 }
+table .box {
+	display: inline-block;
+	text-align: center;
+	font-size: 14px;
+	line-height: 25px;
+    height: 25px;
+    width: 25px;
+    border-radius: 5px;
+ }
 
+ table .tbox {
+    background-color: darkslategray;
+	color:yellow;
+ }
+ table .ctbox {
+    background-color: darkslategray;
+	color:white;
+ }
+ table .t2box {
+    background-color: darkred;
+	color:white;
+ }
+ table .ct2box {
+    background-color: darkred;
+	color:white;
+ }
+ table .xbox {
+    background-color: gray;
+	color:black;
+ }
+ 
 
 
 .row {
@@ -513,6 +543,36 @@ a {
   padding: 2px 0px;
   border: none;
   border-top: none;
+}
+
+.team {
+	margin: 5px;
+	padding: 2px;
+	border-radius: 10px;
+	background-color: lightgrey;
+	color: gray;
+	height: 20px;
+	padding-top: 5px;
+}
+
+.team:hover{
+	background: #7fc469;
+	color: #fff;
+}
+
+.team:active{
+	background: #bb4242;
+	color: #fff;
+}
+
+.btnactive {
+	background: #bb4242;
+	color: #fff;
+}
+
+.tabteam {
+	display: inline-block;
+	width: 100%;
 }
 /********************************* GFXX:V Styles ***********************************/
 .gfxx_title {

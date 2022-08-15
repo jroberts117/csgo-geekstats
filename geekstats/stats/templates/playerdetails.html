@@ -13,10 +13,13 @@
 			<div class="highlightbox"> 
 				<div class="fbig">
 	{% if player.name == 'No data' %} 
-					{{geek.0.handle}} </div>
+					</div>
 					<div class="fmed">{{player.nemesis}} </div></div>
 	{% else %}
-						{{player.name}}
+				{% if player.avatar != None %}
+				<div><img src ="/static/images/geeks/{{player.avatar}}" height="150"></div>
+				{% endif %}
+				{{player.name}}
 				{% if geek.0.validated < 1 %} 
 					{% if geek.0.email|length > 5 %} 
 						{% if geek.0.valid_sent_date %} 

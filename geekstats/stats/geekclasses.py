@@ -3,6 +3,11 @@
 #  * Custom class objects provide a logical structure to store data for
 #  * display when leveraging data models becomes too cumbersome
 
+from .geekmodels import Geek, TiersData, TeamGeek
+from django.db import models
+from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
+
+
 ########################################################################
 ### ROUND
 ###     This class contains the data for a round which includes the map
@@ -55,8 +60,15 @@ class season:
         self.team2matchwins = 0
         self.team2rdwins = 0
         self.match = []
+        self.team1players = []
+        self.team2players = []
+        self.team1startkdr = 0
+        self.team1seasonkdr = 0
+        self.team2startkdr = 0
+        self.team2seasonkdr = 0
 
     def setTeams(self, data):
+        print(data[0]['team_name'])
         self.team1 = data[0]['team_name']
         self.team2 = data[1]['team_name']
 ##        print(self.team1, self.team2)
@@ -76,6 +88,40 @@ class season:
             curr_map = row['map']
         curr_match.round.append(curr_round)
         self.match.append(curr_match)
+
+    def addPlayers(self, data, team):
+        for i in data:
+            if team == 1:
+                self.team1players.append(player([i]))
+                self.team1startkdr += i['alltime_kdr']
+                self.team1seasonkdr += i['kdr__avg']
+            else:
+                self.team2players.append(player([i]))
+                self.team2startkdr += i['alltime_kdr']
+                self.team2seasonkdr += round(i['kdr__avg'],2)
+
+    def set_player_list(self, request, team, teamnbr):
+        team_data = TeamGeek.objects.values('geek','team','tier').filter(team__name=team)
+        temp_list = []
+        for i in team_data:
+            temp_list.append(i['geek'])
+        tempPlayers = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=temp_list, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+        temp_listNoScore = []
+        for i in temp_list:
+            found=0
+            for j in tempPlayers:
+                if i == j['geekid']:
+                    found=1
+                    break
+            if not found:
+                temp_listNoScore.append(i)
+
+        tempGeeks = Geek.objects.values('tier','year_kdr','alltime_kdr').filter(geek_id__in=temp_listNoScore).annotate(player=F('handle'), geekid=F('geek_id'), 
+                                        kills=Value(0, output_field=models.IntegerField()), kdr__avg=Value(0, output_field=models.IntegerField()), kills__sum=Value(0, output_field=models.IntegerField()),
+                                        deaths__sum=Value(0, output_field=models.IntegerField()), assists__sum=Value(0, output_field=models.IntegerField()), akdr__avg=Value(0, output_field=models.IntegerField()))
+
+        self.addPlayers(tempPlayers,teamnbr)
+        self.addPlayers(tempGeeks,teamnbr)
 
     def calcWins(self):
         for match in self.match:
@@ -160,6 +206,7 @@ class player:
             self.KDR = round(data[0]['kdr__avg'],2)
             self.aKDR = round(data[0]['akdr__avg'],2)
             self.diff_alltime_kdr = round(self.KDR - data[0]['alltime_kdr'],2)
+            self.alltime_kdr = data[0]['alltime_kdr']
 
         except:
             self.name = 'No data'
@@ -177,6 +224,7 @@ class player:
         self.weapons = []
         self.opponents = []
         self.maps = []
+        self.avatar = ''
 
     def addWeapons(self,mType,field,data):
         if mType == 'killer':
@@ -243,6 +291,7 @@ class player:
             
         mapTotKill = sum(row.kills for row in self.maps)
         mapTotDeath = sum(row.deaths for row in self.maps)
+
         
             
    

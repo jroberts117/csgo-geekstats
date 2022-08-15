@@ -5,7 +5,10 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+
 from django.db import models
+
+from stats.functions import season
 
 class AuthUser(models.Model):
     password = models.CharField(max_length=128)
@@ -148,7 +151,11 @@ class Geek(models.Model):
     valid_sent_date = models.DateField(blank=True, null=True)
     validated = models.IntegerField(blank=True, null=True)
     userid = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column="user_id", blank=True, null=True) 
+    alltime_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    year_kdr = models.DecimalField(max_digits=8, decimal_places=2)
     geek_code = models.CharField(max_length=250, blank=True, null=True)
+    last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    avatar = models.ImageField(upload_to='stats/avatars', blank=True)
     
     class Meta:
         managed = False
@@ -156,7 +163,7 @@ class Geek(models.Model):
         db_tablespace = 'geek'
 
     def __str__(self):
-         return self.handle
+         return self.handle + '('+str(self.geek_id)+')'
 
 class GeekfestAward(models.Model):
     geekfest_award_id = models.AutoField(primary_key=True)
@@ -340,6 +347,8 @@ class Team(models.Model):
         db_table = 'team'
         db_tablespace = 'geek'
 
+    def __str__(self):
+         return self.name
 
 class TeamEventAction(models.Model):
     team_event_action_id = models.AutoField(primary_key=True)
@@ -354,15 +363,6 @@ class TeamEventAction(models.Model):
         db_tablespace = 'geek'
 
 
-class TeamGeek(models.Model):
-    geek = models.OneToOneField(Geek, models.DO_NOTHING, primary_key=True)
-    team = models.ForeignKey(Team, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'team_geek'
-        unique_together = (('geek', 'team'),)
-        db_tablespace = 'geek'
 
 
 class Tier(models.Model):
@@ -374,6 +374,26 @@ class Tier(models.Model):
         managed = False
         db_table = 'tier'
         db_tablespace = 'geek'
+
+    def __str__(self):
+         return self.tier_name
+
+class TeamGeek(models.Model):
+    teamgeek_id = models.AutoField(primary_key=True)
+    geek = models.ForeignKey(Geek, models.DO_NOTHING)
+    team = models.ForeignKey(Team, models.DO_NOTHING)
+    tier = models.ForeignKey(Tier, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'team_geek'
+        unique_together = (('geek', 'team'),)
+        db_tablespace = 'geek'    
+        
+    def __str__(self):
+         return str(self.team) + ':  '+str(self.geek)
+
+
 
 class TiersData(models.Model):
     geekid = models.IntegerField()
@@ -482,4 +502,18 @@ class MapData(models.Model):
     class Meta:
         managed = False
         db_table = 'map_data'
+        db_tablespace = 'geek' 
+
+class SeasonWins(models.Model):
+    match_date = models.DateField(blank=True, null=True)
+    match_id = models.IntegerField()
+    map = models.CharField(max_length=250, blank=True, null=True)
+    round_id = models.IntegerField()
+    win_side = models.CharField(max_length=250)
+    season = models.CharField(max_length=250)
+    winner = models.CharField(max_length=250)
+
+    class Meta:
+        managed = False
+        db_table = 'season_wins'
         db_tablespace = 'geek' 
