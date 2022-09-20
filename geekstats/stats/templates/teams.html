@@ -10,7 +10,92 @@
 		<th><div class="team {% if tab == 1 %} btnactive {% endif %}" id="btnplayer">Player Performance</div></th>
 	</tr>
 </table>
-
+{% if gfgames.gold_winner %}
+<section class="winners">
+	<div class="award-section">
+		<div class="award master">
+			<div class="img"  style="background-image:url('/static/images/geeks/{{gfgames.master_winner|lower}}.png');"></div>
+			<div class="awardcontent">
+				<div class="aw-header master">
+					<div>
+						<span class="awardname" value="KDR > 1.">MASTER</span>
+					</div>
+					<div>
+						<span class="chev1 chev"></span>
+						<span class="chev2 chev"></span>
+						<span class="chev3 chev"></span>
+						<span class="chev4 chev"></span>
+						<span class="chev5 chev"></span>
+					</div>
+				</div>
+				<div class="player">{{gfgames.master_winner}}</div>
+				<div class="statinfo">master and commander </div>
+				<!-- <div class="statinfo">{{tier0.0.kdr__avg|floatformat:2}} K/D</div> -->
+			</div>
+		</div>
+		<div class="award gold">
+			<div class="img"  style="background-image:url('/static/images/geeks/{{gfgames.gold_winner|lower}}.png');"></div>
+			<div class="awardcontent">
+				<div class="aw-header gold">
+					<div>
+						<span class="awardname">GOLD</span>
+					</div>
+					<div>
+						<span class="chev1 chev"></span>
+						<span class="chev2 chev"></span>
+						<span class="chev3 chev"></span>
+						<span class="chev4 chev"></span>
+						<span class="chev5 chev"></span>
+					</div>
+				</div>
+				<div class="player">{{gfgames.gold_winner}}</div>
+				<div class="statinfo">all that glitters </div>
+				<div class="statinfo">{{tier1.0.kdr__avg|floatformat:2}} K/D</div>
+			</div>
+		</div>
+		<div class="award silver">
+			<div class="img"  style="background-image:url('/static/images/geeks/{{gfgames.silver_winner|lower}}.png');"></div>
+			<div class="awardcontent">
+				<div class="aw-header silver">
+					<div>
+						<span class="awardname">SILVER</span>
+					</div>
+					<div>
+						<span class="chev1 chev"></span>
+						<span class="chev2 chev"></span>
+						<span class="chev3 chev"></span>
+						<span class="chev4 chev"></span>
+						<span class="chev5 chev"></span>
+					</div>
+				</div>
+				<div class="player">{{gfgames.silver_winner}}</div>
+				<div class="statinfo">more than a silver lining</div>
+				<div class="statinfo">{{tier2.0.kdr__avg|floatformat:2}} K/D</div>
+			</div>
+		</div>
+		<div class="award bronze">
+			<div class="img"  style="background-image:url('/static/images/geeks/{{gfgames.bronze_winner|lower}}.png');"></div>
+			<div class="awardcontent">
+				<div class="aw-header bronze">
+					<div>
+						<span class="awardname">BRONZE</span>
+					</div>
+					<div>
+						<span class="chev1 chev"></span>
+						<span class="chev2 chev"></span>
+						<span class="chev3 chev"></span>
+						<span class="chev4 chev"></span>
+						<span class="chev5 chev"></span>
+					</div>
+				</div>
+				<div class="player">{{gfgames.bronze_winner}}</div>
+				<div class="statinfo">&nbsp;harder than hard</div>
+				<div class="statinfo">{{tier3.1.kdr__avg|floatformat:2}} K/D</div>
+			</div>
+		</div>
+	</div>
+</section>
+{%endif%}
 {% if tab == 1 %}
 <div class="tabteam" id="teamperf" style="display:none;">
 {% else %}
@@ -95,7 +180,10 @@ Y8.   .88 88       88.  ... 88.  .88   88   88.  ...    d8'   .8P 88.  ... 88.  
 			<td style="background:darkred;">TEAM 2</td>
 		</tr>
 		<tr class="acenter">
-			<td colspan="2" rowspan="2" class="fbig fbold" style="padding-top: 35px;">{{gfgames.name}}</td>
+			<td colspan="2" rowspan="2" class="fbig fbold" style="padding-top: 35px;">
+				<div>{{gfgames.name}}</div>
+				<div class="fsmall">{{gfgames.description}}</div>
+			</td>
 			<td class="fbig fbold cgeek">{{gfgames.team1}}</td>
 			<td class="fbig fbold cfest">{{gfgames.team2}}</td>
 		</tr>
@@ -130,7 +218,10 @@ Y8.   .88 88       88.  ... 88.  .88   88   88.  ...    d8'   .8P 88.  ... 88.  
 			<td align="left">
 			{% for k in rounds %}
 				{% if k.map == j.map %}
-				<div class="box">
+				<div class="box">{% if k.match_date == i.date %}MATCH{%endif%}
+
+<!-- FIX THE TWO MAP ERROR HERE WITH A DATE COMPARISON -->
+
 					{% if k.win_side == 'TERRORIST' and k.winner == gfgames.team1 %}
 						<div class="tbox" style="">T</div> 
 					{% elif k.win_side == 'CT' and k.winner == gfgames.team1 %}
@@ -235,7 +326,7 @@ d888888P                                 .d88888b    dP              dP
 			{% endfor %}
 			<tr class="cfest">
 				<td>TOTAL</td>
-				<td align="center">Avg KDR:  <span style="color:{% if gfgames.team2startkdr > gfgames.team1startkdr %}green{% else %}red{%endif%};">{{gfgames.team2startkdr|floatformat:2}}</span></td>
+				<td align="center"><span style="color:{% if gfgames.team2startkdr > gfgames.team1startkdr %}green{% else %}red{%endif%};">{{gfgames.team2startkdr|floatformat:2}}</span></td>
 				<td align="center"><span style="color:{% if gfgames.team2seasonkdr > gfgames.team1seasonkdr %}green{% else %}red{%endif%};">{{gfgames.team2seasonkdr|floatformat:2}}</span></td>
 				<td align="center"><span style="color:{% if gfgames.team2performance > gfgames.team1performance %}green{% else %}red{%endif%};">{{gfgames.team2performance|floatformat:2}}</span></td>
 				<td></td>

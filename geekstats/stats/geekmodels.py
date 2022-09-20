@@ -305,12 +305,13 @@ class PlayerEventAction(models.Model):
 class Season(models.Model):
     season_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250)
+    description = models.CharField(max_length=500)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
-    master_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='master_win', related_name='geek_id1')
-    gold_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='gold_win', related_name='geek_id2')
-    silver_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='silver_win', related_name='geek_id3')
-    bronze_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='bronze_win', related_name='geek_id4')
+    master_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='master_win', related_name='geek_id1',null=True)
+    gold_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='gold_win', related_name='geek_id2',null=True)
+    silver_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='silver_win', related_name='geek_id3',null=True)
+    bronze_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='bronze_win', related_name='geek_id4',null=True)
 
     class Meta:
         managed = False

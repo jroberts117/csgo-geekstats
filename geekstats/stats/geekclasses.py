@@ -47,8 +47,13 @@ class gfMatch:
 ###     displayed on the teams page
 ########################################################################
 class season:
-    def __init__(self, title):
-        self.name = title
+    def __init__(self, seasondata):
+        self.name = seasondata['name']
+        self.description = seasondata['description']
+        self.master_winner = seasondata['master_win__handle']
+        self.gold_winner = seasondata['gold_win__handle']
+        self.silver_winner = seasondata['silver_win__handle']
+        self.bronze_winner = seasondata['bronze_win__handle']
         self.team1 = ''
         self.team1avg = 0
         self.team1wins = 0

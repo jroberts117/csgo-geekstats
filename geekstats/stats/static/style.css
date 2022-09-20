@@ -361,6 +361,7 @@ table .box {
  table .tbox {
     background-color: darkslategray;
 	color:yellow;
+	border-radius: 20px;
  }
  table .ctbox {
     background-color: darkslategray;
@@ -369,6 +370,7 @@ table .box {
  table .t2box {
     background-color: darkred;
 	color:white;
+	border-radius: 20px;
  }
  table .ct2box {
     background-color: darkred;

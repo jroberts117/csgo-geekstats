@@ -217,7 +217,13 @@ def teams(request):
         request.session['datetype'] = 'season'
 
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Teams', request.session['selector'],request.session['datetype'])
-    newstate.season = request.session['season']
+
+    try:
+        newstate.season = request.session['season']
+    except:
+        request.session['season'] = 'Rock The Vote'
+        newstate.season = request.session['season']
+
     tab = 0
     # except:
     #     newstate.season = 'Unspecified'
@@ -277,47 +283,25 @@ def teams(request):
         curr_temp_team2.save()
 
     ### BUILD THE TEAMS DATA
-    seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
-    teamInfo = season(newstate.season)
-    if seasonData:
+    #seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
+    seasonData = Team.objects.values().filter(season_id__name=newstate.season)
+    print(Team.objects.values().filter(season_id__name=newstate.season).query)
+    seasonInfo = Season.objects.values('name','description','master_win__handle','gold_win__handle','silver_win__handle','bronze_win__handle').filter(name=newstate.season)
+    print(seasonData)
+    teamInfo = season(seasonInfo[0])
+    try:
+        print(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct().query)
         teamInfo.setTeams(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct())
         dates = TeamWins.objects.values('match_date').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct()
         for date in dates:
             teamInfo.addMatches(TeamWins.objects.values().filter(match_date=date['match_date']).order_by('map'))
 
         teamInfo.calcWins()
-    else:
+    except:
         teamInfo.setTeams(Team.objects.values().filter(season_id__name=newstate.season).annotate(team_name=F('name'))) 
 
     teamInfo.set_player_list(request,teamInfo.team1,1)
     teamInfo.set_player_list(request,teamInfo.team2,2)
-
-    # team_data = TeamGeek.objects.values('geek','team','tier').filter(team__name=teamInfo.team1)
-    # temp_list = []
-    # for i in team_data:
-    #     temp_list.append(i['geek'])
-    # tempPlayers = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=temp_list, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
-    # temp_listNoScore = []
-    # for i in temp_list:
-    #     found=0
-    #     for j in tempPlayers:
-    #         if i == j['geekid']:
-    #             found=1
-    #             break
-    #     if not found:
-    #         temp_listNoScore.append(i)
-
-    # tempGeeks = Geek.objects.values('tier','year_kdr','alltime_kdr').filter(geek_id__in=temp_listNoScore).annotate(player=F('handle'), geekid=F('geek_id'), 
-    #                                 kills=Value(0, output_field=models.IntegerField()), kdr__avg=Value(0, output_field=models.IntegerField()), kills__sum=Value(0, output_field=models.IntegerField()),
-    #                                 deaths__sum=Value(0, output_field=models.IntegerField()), assists__sum=Value(0, output_field=models.IntegerField()), akdr__avg=Value(0, output_field=models.IntegerField()))
-    # print(tempGeeks)
-    # teamInfo.addPlayers(tempPlayers,1)
-    # teamInfo.addPlayers(tempGeeks,1)
-    # team_data = TeamGeek.objects.values('geek','team','tier').filter(team__name=teamInfo.team2)
-    # temp_list = []
-    # for i in team_data:
-    #     temp_list.append(i['geek'])
-    # teamInfo.addPlayers(TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=temp_list, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')),2)
     teamInfo.team1performance = teamInfo.team1seasonkdr - teamInfo.team1startkdr
     teamInfo.team2performance = teamInfo.team2seasonkdr - teamInfo.team2startkdr
     teamInfo.team1advantage = teamInfo.team1startkdr - teamInfo.team2startkdr
@@ -327,7 +311,6 @@ def teams(request):
     teamInfo.team2capt = Team.objects.values('captain_id').filter(name=teamInfo.team2)
     teamInfo.team2cocapt = Team.objects.values('co_captain_id').filter(name=teamInfo.team2)
 
-    print(teamInfo.team1capt, teamInfo.team2capt)
     win_data = SeasonWins.objects.values('match_date','match_id','map','round_id','win_side','season','winner').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'])
     # tier_data = player(TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=teamInfo.team1players, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
 
@@ -498,8 +481,7 @@ def maps(request):
     ###########  Add the map win % and rating  ###################
     map_data = (MapData.objects.values('map','win_side','type','theme','votescore').annotate(wins=Count('win_side')))
     map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
-    print(map_data.query)
-    print(map_plays.query)
+
 
     map_data_list = []
     last_map = ''
