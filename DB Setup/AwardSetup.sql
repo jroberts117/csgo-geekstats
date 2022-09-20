@@ -436,6 +436,14 @@ WHERE f.is_teamkill=0 AND mr.match_id={match} AND
 GROUP BY geek_id', 'sql', 'sum');
 
 
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Total Assists', 'Always a Bridesmaid', 'The number of assists', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, geek_id, COUNT(*) as value
+ FROM geek.assist a
+ 	JOIN geek.match_round mr ON a.round_id=mr.round_id
+ WHERE a.is_tk_assist=0 AND mr.match_id={match}
+ GROUP BY geek_id', 'sql', 'sum');
+
 
 
 
