@@ -146,6 +146,10 @@ input[type=submit] {
 	margin: 4px;
 }
 
+
+.hover_img a span { position:absolute; display:none; z-index:99; }
+.hover_img a:hover span { display:block; }
+
 .hbx4 {
 	min-width: 22%;
 }
@@ -338,6 +342,17 @@ td span {
 	float:right;
 
 }
+
+#myMap {
+	background-image: url('/static/images/searchicon.png');
+	background-position: 10px 10px;
+	background-repeat: no-repeat;
+	width: 90%;
+	font-size: 16px;
+	padding: 12px 20px 12px 40px;
+	border: 1px solid #ddd;
+	margin-bottom: 12px;
+  }
 
 .header .box{
 	border: 1px dotted gray;

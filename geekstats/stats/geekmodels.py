@@ -265,10 +265,21 @@ class MatchAward(models.Model):
 class Maps(models.Model):
     idmap =  models.AutoField(primary_key=True)
     map = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000)
     type = models.CharField(max_length=1000)
     theme = models.CharField(max_length=1000)
+    workshop_link = models.CharField(max_length=1000)
     votescore = models.DecimalField(max_digits=12, decimal_places=4, blank=True, null=True)
     balance = models.CharField(max_length=1000)
+    ct_wins = models.IntegerField(blank=True, null=True)
+    t_wins = models.IntegerField(blank=True, null=True)    
+    plays = models.IntegerField(blank=True, null=True)
+    s_plays = models.IntegerField(blank=True, null=True)
+    last_play = models.IntegerField(blank=True, null=True)
+    hero_image = models.CharField(max_length=1000)
+    thumbnail = models.CharField(max_length=1000)
+    image2 = models.CharField(max_length=1000)
+    image3 = models.CharField(max_length=1000)
     
     class Meta:
         managed = False

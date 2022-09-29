@@ -42,9 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'mathfilters',
     'stats',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -189,3 +191,7 @@ LOGIN_REDIRECT_URL = '/stats/Tiers'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+INTERNAL_IPS = [
+    '127.0.0.1','192.168.0.207',
+]

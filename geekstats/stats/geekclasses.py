@@ -297,7 +297,56 @@ class player:
         mapTotKill = sum(row.kills for row in self.maps)
         mapTotDeath = sum(row.deaths for row in self.maps)
 
-        
+########################################################################
+### MAP Details
+###     This class contains the detail level data for a map
+########################################################################
+class map_detail:
+    def __init__(self, data):
+        self.id = 0
+        name = 'none'
+        count = 0
+
+########################################################################
+### MAP
+###     This class contains the high level data for a map
+###     It contains subclasses for players and weapons used on it
+########################################################################
+class map_summary:
+    def __init__(self, data):
+        # print(data)
+        self.id = data['idmap']
+        self.name = data['map']
+        self.description = data['description']
+        self.type = data['type']
+        self.theme = data['theme']
+        self.rating = data['votescore']
+        if data['ct_wins'] :
+            self.t_wins = data['t_wins']
+            self.ct_wins = data['ct_wins']
+            self.balance = round((self.ct_wins / (self.ct_wins + self.t_wins))*100,1)
+        else:
+            self.t_wins = 0.00
+            self.ct_wins = 0.00
+            self.balance = 0.00
+        self.last_play = data['last_play']
+        self.top_player = 'none'
+        self.top_gun = 'none'
+        self.kills = 0
+        self.ninja = 0
+        self.thumb = 'none'
+        self.plays = data['plays']
+        if data['s_plays']:
+            self.s_plays = data['s_plays']
+        else:
+            self.s_plays = 0
+        self.players = []
+        self.weapons = []
+        self.hero_image = data['hero_image']
+
+
+
+
             
    
         

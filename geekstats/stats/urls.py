@@ -11,6 +11,7 @@ urlpatterns = [
     path('Weapons', views.weapons, name='weapons'),
     path('Tiers', views.tiers, name='tiers'),
     path('Maps', views.maps, name='maps'),
+    path('Map2', views.map2, name='map2'),
     path('About', views.about, name='about'),
     path('PlayerDetails', views.playerdetails, name='playerdetails'),
     path('Details', views.details, name='details'),

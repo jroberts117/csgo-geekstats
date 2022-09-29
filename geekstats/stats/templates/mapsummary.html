@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<div style="text-align:center; padding-top: 15px;">
+    <input id="myMap" onkeyup="myFunction()" type="text" name="map" placeholder="map name" title="Type in a name">
+</div>
+
+
+
+<table id="myTable" class="section_center zebra js-sort-table">
+    <tr class="black">
+        <th class="js-sort-number">Rating</th>
+        <th class="js-sort-text">Map</th>
+        <th class="js-sort-text">Plays</th>
+        <th class="js-sort-text">Seasons</th>
+        <th class="js-sort-number">CT Win %</th>
+        <th>Type</th>
+        <th>Theme</th>
+        <th>Top Geek</th>
+        <th>Top Gun</th>
+        <th class="js-sort-number">Last Play (days)</th>
+    </tr>
+
+    {% for i in maps %}
+    <tr>
+        <td class="text_center">
+            <div class="hddata info"> &nbsp;
+				<span title="{{i.rating}}">
+					<div class="box"
+					{% if i.rating > 1.5 %}
+						style="background: #00FF00;"
+					{% elif i.rating > 1 %}
+						style="background: #71B238;"
+					{% elif i.rating > 0.5 %}
+						style="background: #A6CB45;"
+					{% elif i.rating > 0 %}
+						style="background: #FEFCD7;"
+					{% elif i.rating > -0.5 %}
+						style="background: #F5B79B;"
+					{% elif i.rating > -1 %}
+						style="background: #F5B79B;"
+					{% elif i.rating >= -1.5 %}
+						style="background:  #FF5E99;"
+					{% elif i.rating < -1.5 %}
+						style="background: red;"
+					{% else %}
+						style="background: gray;"
+					{% endif %}
+					></div>
+				</span>
+			</div>
+        </td>
+        <td>
+            <div class="hover_img">
+                <a href="#">{{ i.name }}<span><img src="{% static 'images/'%}{{i.name}}.jpg" alt="no image on server" height="400" /></span></a>
+                {% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
+                {% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct}}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
+                {% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct}}% of kills were from HMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
+           </div>
+        </td>
+        <td class="text_center">{{ i.plays }}</td>
+        <td class="text_center">{{ i.s_plays }}</td>
+        <td class="text_center">
+            <div class="hddata info">
+				{% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}
+					{{i.balance|floatformat:1}}% </span> 
+            </div>
+        </td>
+        <td class="text_center">{{ i.type }}</td>
+        <td class="text_center">{{ i.theme }}</td>
+        <td class="text_center">{% with i.players|last as last %} {{ last.item }} {%endwith%}</td>
+        <td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" align="center"></span>{%endwith%}</td>
+        <td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<script>
+    function myFunction() {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myMap");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }       
+      }
+    }
+    </script>
+{% endblock content %}
+
+<!-- <form id="mapSearch" method=post action="{{state.page}}">
+    {% csrf_token %}
+    <fieldset class="" style="text-align: center;"> -->
+        <!-- <label for="lowrating">Rating: </label><input id="lowrating" type="text" name="low_rating" value="-2" size="2">
+        <label for="hirating">to </label>to <input id="hirating" type="text" name="hi_rating" value="2" size="2">
+        <label for="type">Type: </label>
+        <select id="type" name="type" style="width:100px;">
+            <option value="All" selected>All</option>
+            <option value="Hostage">Hostage</option>
+            <option value="Defusal">Defusal</option>
+            <option value="Other">Other</option>
+        </select>
+        <label for="theme">Theme: </label>
+        Theme: <select id="theme" name="theme" style="width:150px;">
+            <option value="All" selected>All</option>
+            {% for i in themes %}
+            <option value="{{i.item}}">{{i.item}}</option>
+            {% endfor %}
+        </select>
+        <label for="balanced">Balanced</label><input type="checkbox" name="balanced" id="balanced">
+        <input type="submit" class="button-gf" value="Search"></input>
+    </fieldset>
+</form>	 -->
