@@ -52,6 +52,11 @@ SET m.last_play = sm.last_play;
 update map m
 set m.theme = 'not specified'
 where m.theme is null;
+
+# Update map scores with new metascore
+update map
+set metascore = round(((votescore+2)/4)*100,0)
+where votescore is not null;
  
 
 # FOR USE INSIDE OF DJANGO TO ONLY GET TOP values

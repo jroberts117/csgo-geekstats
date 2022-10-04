@@ -420,6 +420,26 @@ def tiers(request):
 #                }
 #     return HttpResponse(template.render(context, request))
 
+def list_builder(data,element):
+    data = sorted(data, key=lambda g: g[element])
+    dataList = []
+    key_func = lambda x: x[element]
+    for key, group in groupby(data, key_func):
+        # print(key[:3])
+        if key[:3] != 'BOT' and key != 'n/a':
+            # print(key)
+            dataList.append({'item': key, 'count':len([ele for ele in (list(group)) if isinstance(ele,dict)])})
+    # result = [m for m in fragList if 'de_cbble' in m]
+    result = sorted(dataList, key=lambda g: g['count'])
+    return(result)
+
+def item_getter(data,item):
+    itemList = list(filter(lambda n: n['item'] == item, data))
+    if itemList:
+        return(itemList[0]['count'])
+    else:
+        return(0)
+
 #  ██████   ██████   █████████   ███████████   █████████ 
 # ░░██████ ██████   ███░░░░░███ ░░███░░░░░███ ███░░░░░███
 #  ░███░█████░███  ░███    ░███  ░███    ░███░███    ░░░ 
@@ -512,33 +532,44 @@ def maps(request):
             if i == k['map']:
                 mapGroupData[i]['plays'] = k['plays']
 
+    #####  NEW MAP CONTENT ####
+    MapList = []
+
+    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','ct_wins','t_wins','plays','s_plays','last_play','hero_image')
+    dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
+    themes = list_builder(dataMap,'theme')
+
+    for j in dataMap:
+        MapList.append(map_summary(j))
+    
+    for m in MapList:
+        dataRec = list(filter(lambda dat: dat['map'] == m.name, list(dataFrag)))
+        m.players = list_builder(dataRec,'killer')
+        m.weapons = list_builder(dataRec,'weapon')
+        for w in m.weapons:
+            m.kills += w['count']
+        m.knives = item_getter(m.weapons,'Knife') + item_getter(m.weapons, 'knife_karambit')+ item_getter(m.weapons, 'knife_butterfly')
+        m.grenades = item_getter(m.weapons,'hegrenade')
+        m.flames = item_getter(m.weapons,'inferno')
+        m.tazes = item_getter(m.weapons,'taser')
+        m.snipes = item_getter(m.weapons,'awp') + item_getter(m.weapons,'g3sg1') + item_getter(m.weapons,'scar20') + item_getter(m.weapons,'ssg08')
+        m.snipe_pct = round(m.snipes / m.kills,2)*100 if m.kills > 0 else 0
+        m.hmg = item_getter(m.weapons,'Yakospray') + item_getter(m.weapons,'m249')
+        m.hmg_pct = round(m.hmg / m.kills,2)*100 if m.kills > 0 else 0
+        if m.plays:
+            m.ninja = int(round((m.knives + m.grenades + m.flames + m.tazes) / m.plays,0))
+        m.ninja_pct = round(m.ninja / m.kills,2)*100 if m.kills > 0 else 0
+
     context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'maps':MapList,
                'state':newstate,
                'mapstats':mapGroupData.values,
             #    'playdata':playData
                }
     return HttpResponse(template.render(context, request))
 
-def list_builder(data,element):
-    data = sorted(data, key=lambda g: g[element])
-    dataList = []
-    key_func = lambda x: x[element]
-    for key, group in groupby(data, key_func):
-        # print(key[:3])
-        if key[:3] != 'BOT' and key != 'n/a':
-            # print(key)
-            dataList.append({'item': key, 'count':len([ele for ele in (list(group)) if isinstance(ele,dict)])})
-    # result = [m for m in fragList if 'de_cbble' in m]
-    result = sorted(dataList, key=lambda g: g['count'])
-    return(result)
 
-def item_getter(data,item):
-    itemList = list(filter(lambda n: n['item'] == item, data))
-    if itemList:
-        return(itemList[0]['count'])
-    else:
-        return(0)
 
 def map2(request):
     mainmenu.set('Maps')
@@ -577,28 +608,6 @@ def map2(request):
         if m.plays:
             m.ninja = int(round((m.knives + m.grenades + m.flames + m.tazes) / m.plays,0))
         m.ninja_pct = round(m.ninja / m.kills,2)*100 if m.kills > 0 else 0
-        # print(m.weapons)
-
-    # print(geeks[-1]['geek'])
-    # result = list(filter(lambda geeks: geeks['map'], list(fragList)))
-    
-    
-    # geek1 = sum(g.get('killer') == 'Warrior' for g in result)
-    # # res = list(set(val for dic in fragList for val['killer'] in dic.values()))
-    
-    # Find geeks:
-    
-    # print(dataFrag(filter(map='de_cbble').annotate(count=Count(map)))
-    # print(Counter(x['map'] for x in fragList))
-    # for key, value in groupby(fragList, key=operator.itemgetter('map')):
-    #     print(key)
-
-
-        
-    
-
-
-
 
     context = {'title': 'GeekFest Map Summary', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),

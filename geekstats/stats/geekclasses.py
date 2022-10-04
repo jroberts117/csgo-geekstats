@@ -321,6 +321,10 @@ class map_summary:
         self.type = data['type']
         self.theme = data['theme']
         self.rating = data['votescore']
+        if data['metascore']:
+            self.metascore = data['metascore']
+        else:
+            self.metascore = 'NR'
         if data['ct_wins'] :
             self.t_wins = data['t_wins']
             self.ct_wins = data['ct_wins']

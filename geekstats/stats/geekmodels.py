@@ -280,6 +280,7 @@ class Maps(models.Model):
     thumbnail = models.CharField(max_length=1000)
     image2 = models.CharField(max_length=1000)
     image3 = models.CharField(max_length=1000)
+    metascore = models.IntegerField(blank=True, null=True)    
     
     class Meta:
         managed = False

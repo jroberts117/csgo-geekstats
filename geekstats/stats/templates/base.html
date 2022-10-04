@@ -42,7 +42,7 @@
 				{% endif %}
 			</div>
 
-			<div class="dateSelector">
+			<div class="dateSelector" id="dateselector">
 					{% if state.page and state.page != "Event" and state.page != "Geeks" and state.page != "Event Details"  %}
 					<div class="label">Showing Data For: </div>
 					<form id="dateSeasons" method=post action="{{state.page}}">
