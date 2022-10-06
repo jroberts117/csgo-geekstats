@@ -4,7 +4,9 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
+
 <div class="page rowwrap">
+	{% if not weapons %}<P>You must be logged in to see Weapons Data</P>{% endif %}
 	{% for i in weapons %}
 	<div class="highlightbox">
 		<div class="header">

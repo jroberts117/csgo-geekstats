@@ -287,6 +287,17 @@ class Maps(models.Model):
         db_table = 'map'
         db_tablespace = 'geek'
 
+class MapRating(models.Model):
+    rating_id = models.AutoField(primary_key=True)
+    map = models.ForeignKey('Maps', models.DO_NOTHING)
+    geek = models.ForeignKey(Geek, models.DO_NOTHING)
+    rating = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'map_rating'
+        db_tablespace = 'geek'
+
 class MatchRound(models.Model):
     round_id = models.AutoField(primary_key=True)
     match = models.ForeignKey('SeasonMatch', models.DO_NOTHING, related_name='rounds')

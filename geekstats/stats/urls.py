@@ -1,7 +1,7 @@
 from django.urls import path
 import sys
 
-from . import views
+from . import views, apiviews
 
 urlpatterns = [
     path('', views.tiers, name='index'),
@@ -18,4 +18,5 @@ urlpatterns = [
     # path('Event', views.gfxx, name='gfxx'),
     path('Buys', views.buys, name='buys'),
     path('GFMMXXII', views.event, name='event'),
+    path('rating/', apiviews.map_rating, name='map_rating'),
 ]

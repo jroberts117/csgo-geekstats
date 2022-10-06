@@ -27,7 +27,7 @@ SECRET_KEY = 'u_dltse0*#unyk7noswy$7meqac)1#qz%fznva3!l+q_$*nl9j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['73.89.143.101', 'localhost', '192.168.0.208', '127.0.0.1','geekfest.duckdns.org','test.geekfestclan.com','stats.geekfestclan.com']
+ALLOWED_HOSTS = ['73.89.143.101', 'localhost', '192.168.0.208', '127.0.0.1','geekfest.duckdns.org','test.geekfestclan.com','stats.geekfestclan.com', 'test.geekfest.live']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'corsheaders',
     'mathfilters',
     'stats',
     'debug_toolbar',
@@ -54,8 +55,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'stats.middleware.EventData',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True   
 
 ROOT_URLCONF = 'geekstats.urls'
 

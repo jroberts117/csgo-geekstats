@@ -6,7 +6,7 @@ from django.template import loader
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
-from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData, SeasonWins, TeamGeek, Tier, Team, Maps
+from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData, SeasonWins, TeamGeek, Tier, Team, Maps, MapRating
 from .geekclasses import season, player, map_summary
 import stats.functions as func
 from .forms import CustomUserCreationForm, GeeksForm
@@ -283,14 +283,10 @@ def teams(request):
         curr_temp_team2.save()
 
     ### BUILD THE TEAMS DATA
-    #seasonData = TeamWins.objects.values().filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('-match_date')
     seasonData = Team.objects.values().filter(season_id__name=newstate.season)
-    print(Team.objects.values().filter(season_id__name=newstate.season).query)
     seasonInfo = Season.objects.values('name','description','master_win__handle','gold_win__handle','silver_win__handle','bronze_win__handle').filter(name=newstate.season)
-    print(seasonData)
     teamInfo = season(seasonInfo[0])
     try:
-        print(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct().query)
         teamInfo.setTeams(TeamWins.objects.values('team_name').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct())
         dates = TeamWins.objects.values('match_date').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct()
         for date in dates:
@@ -312,7 +308,6 @@ def teams(request):
     teamInfo.team2cocapt = Team.objects.values('co_captain_id').filter(name=teamInfo.team2)
 
     win_data = SeasonWins.objects.values('match_date','match_id','map','round_id','win_side','season','winner').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'])
-    # tier_data = player(TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(geekid__in=teamInfo.team1players, matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr')))
 
     Team1Geeks = Geek.objects.values('geek_id','handle').filter(alltime_kdr__gte=0).order_by('alltime_kdr')
     for i in Team1Geeks:
@@ -462,6 +457,7 @@ def maps(request):
     rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
 
     killData = Frag.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id', 'round__match__match_date').annotate(num_frags=Count('frag_id')).order_by('round__match__match_date', '-num_frags')
+    
     deathData = Death.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('round__match__map')
     
     # print(playData)
@@ -533,10 +529,19 @@ def maps(request):
                 mapGroupData[i]['plays'] = k['plays']
 
     #####  NEW MAP CONTENT ####
+    # NEW API LOGIC:  https://www.agiliq.com/blog/2019/04/drf-polls/
+
     MapList = []
 
     dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','ct_wins','t_wins','plays','s_plays','last_play','hero_image')
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
+    if request.user.is_authenticated:
+        current_user = request.user
+        userid = Geek.objects.values('geek_id').filter(userid=current_user.id)[0]['geek_id']
+        dataRating = MapRating.objects.annotate(count=F('rating'), item=F('map__map')).values('item', 'count').filter(geek__userid=current_user.id)
+        print(dataRating)
+    else:
+        userid = 'none'
     themes = list_builder(dataMap,'theme')
 
     for j in dataMap:
@@ -559,12 +564,15 @@ def maps(request):
         if m.plays:
             m.ninja = int(round((m.knives + m.grenades + m.flames + m.tazes) / m.plays,0))
         m.ninja_pct = round(m.ninja / m.kills,2)*100 if m.kills > 0 else 0
+        if request.user.is_authenticated:
+            m.geek_rating = item_getter(dataRating,m.name)
 
     context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
                'maps':MapList,
                'state':newstate,
                'mapstats':mapGroupData.values,
+               'userid':userid,
             #    'playdata':playData
                }
     return HttpResponse(template.render(context, request))

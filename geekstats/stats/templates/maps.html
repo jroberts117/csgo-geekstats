@@ -5,6 +5,7 @@
 
 {% block content %}
 
+
 <table>
 	<tr>
 		<th><div class="team {% if tab != 1 %} btnactive {% endif %}" id="btnplays">Map Plays</div></th>
@@ -13,6 +14,7 @@
 </table>
 
 <div id="mapplays" class="page rowwrap">
+	{% if not mapstats %}<P>You must be logged in to see Map Play Data</P>{% endif %}
 	{% for i in mapstats %}
 	<div class="highlightbox">
 		<div class="header">
@@ -89,6 +91,9 @@
 		<tr class="black">
 			<th class="js-sort-number">GeekScore</th>
 			<th class="js-sort-text">Map</th>
+			{% if user.is_authenticated %}
+				<th class="js-sort-text">Your Rating</th>
+			{% endif %}
 			<th class="js-sort-text">Plays</th>
 			<th class="js-sort-text">Seasons</th>
 			<th class="js-sort-number">CT Win %</th>
@@ -124,6 +129,22 @@
 					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct}}% of kills were from HMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
 			   </div>
 			</td>
+			{% if user.is_authenticated %}
+				<td>
+					<ul class="list-inline rating-list" style="background-color: transparent; border-right:none;">
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 5)"><i id="star5-{{i.id}}" class="fa fa-star {% if i.geek_rating > 4 %}checked{% endif %}" title="Greatest map EVER!!!"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 4)"><i id="star4-{{i.id}}" class="fa fa-star {% if i.geek_rating > 3 %}checked{% endif %}" title="I like it!"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 3)"><i id="star3-{{i.id}}" class="fa fa-star {% if i.geek_rating > 2 %}checked{% endif %}" title="It's playable"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 2)"><i id="star2-{{i.id}}" class="fa fa-star {% if i.geek_rating > 1 %}checked{% endif %}" title="meh"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 1)"><i id="star1-{{i.id}}" class="fa fa-star {% if i.geek_rating > 0 %}checked{% endif %}" title="Pure rubbish"></i></li>
+					</ul>
+					<!-- <span class="fa fa-star checked"></span>
+					<span class="fa fa-star checked"></span>
+					<span class="fa fa-star checked"></span>
+					<span class="fa fa-star highlighted"></span>
+					<span class="fa fa-star"></span> -->
+				</td>
+			{% endif %}
 			<td class="text_center">{{ i.plays }}</td>
 			<td class="text_center">{{ i.s_plays }}</td>
 			<td class="text_center">
@@ -160,6 +181,54 @@
 			  }
 			}       
 		  }
+		}
+
+		function ratingUpdate(map, geek, rating) {
+
+			var form = new FormData();
+			form.append("map_id", map);
+			form.append("user_id", geek);
+			form.append("rating", rating);
+
+			var settings = {
+			"url": "http://test.geekfest.live:8000/api/stats/rating/",
+			"method": "POST",
+			"timeout": 0,
+			"headers": {
+				"Cookie": "sessionid=fkcrfqey2igzl8m9alg6qlsihcd0n89j"
+			},
+			"processData": false,
+			"mimeType": "multipart/form-data",
+			"contentType": false,
+			"data": form
+			};
+
+			$.ajax(settings).done(function (response) {
+			console.log(response);
+			});
+
+			var ele5 = 'star5-' + map, ele4 = 'star4-' + map, ele3 = 'star3-' + map, ele2 = 'star2-' + map, ele1 = 'star1-' + map;
+			document.getElementById(ele5).classList.remove('checked');
+			document.getElementById(ele4).classList.remove('checked');
+			document.getElementById(ele3).classList.remove('checked');
+			document.getElementById(ele2).classList.remove('checked');
+			document.getElementById(ele1).classList.remove('checked');
+
+			if (rating>4) {
+				document.getElementById(ele5).classList.add('checked');
+			} 
+			if (rating>3) {
+				document.getElementById(ele4).classList.add('checked');
+			} 
+			if (rating>2) {
+				document.getElementById(ele3).classList.add('checked');
+			} 
+			if (rating>1) {
+				document.getElementById(ele2).classList.add('checked');
+			} 
+			if (rating>0) {
+				document.getElementById(ele1).classList.add('checked');
+			} 
 		}
 		</script>
 </div>

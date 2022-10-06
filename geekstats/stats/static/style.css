@@ -354,6 +354,14 @@ td span {
 	margin-bottom: 12px;
   }
 
+.checked {
+	color: orange;
+  }
+
+.highlighted {
+	color:greenyellow;
+}
+
 .header .box{
 	border: 1px dotted gray;
 	float: right;
@@ -794,4 +802,19 @@ a {
 	font-size: 14px;
   }
 
+  .rating-list li {
+	float: right;
+	color: #ddd;
+	padding: 1px;
+  }
   
+  .rating-list li:hover,
+  .rating-list li:hover ~ li {
+	color: #00ff22;
+  }
+  
+  
+  .rating-list {
+	display: inline-block;
+	list-style: none;
+  }
