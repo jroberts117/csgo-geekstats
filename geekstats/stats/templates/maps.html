@@ -5,6 +5,8 @@
 
 {% block content %}
 
+{% csrf_token %}
+
 
 <table>
 	<tr>
@@ -191,13 +193,13 @@
 			form.append("rating", rating);
 
 			var settings = {
-			"url": "http://stats.geekfestclan.com/api/stats/rating/",
-			// "url": "http://test.geekfest.live:8000/api/stats/rating/",
+			//"url": "http://stats.geekfestclan.com/api/stats/rating/",
+			"url": "http://test.geekfest.live:8000/api/stats/rating/",
 			"method": "POST",
 			"timeout": 0,
-			"headers": {
-				"Cookie": "sessionid=fkcrfqey2igzl8m9alg6qlsihcd0n89j"
-			},
+			// "headers": {
+			// 	"Cookie": "sessionid=fkcrfqey2igzl8m9alg6qlsihcd0n89j"
+			// },
 			"processData": false,
 			"mimeType": "multipart/form-data",
 			"contentType": false,
