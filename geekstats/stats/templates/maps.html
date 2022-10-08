@@ -126,7 +126,7 @@
 					<a href="#">{{ i.name }}<span><img src="{% static 'images/'%}{{i.name}}.jpg" alt="no image on server" height="400" /></span></a>
 					{% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
 					{% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct}}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
-					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct}}% of kills were from HMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
+					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct}}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
 			   </div>
 			</td>
 			{% if user.is_authenticated %}
@@ -191,7 +191,8 @@
 			form.append("rating", rating);
 
 			var settings = {
-			"url": "http://test.geekfest.live:8000/api/stats/rating/",
+			"url": "http://stats.geekfestclan.com/api/stats/rating/",
+			// "url": "http://test.geekfest.live:8000/api/stats/rating/",
 			"method": "POST",
 			"timeout": 0,
 			"headers": {
