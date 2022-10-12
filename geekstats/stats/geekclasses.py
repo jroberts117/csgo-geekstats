@@ -323,8 +323,10 @@ class map_summary:
         self.rating = data['votescore']
         if data['metascore']:
             self.metascore = data['metascore']
+            self.votes = data['votes']
         else:
             self.metascore = 'NR'
+            self.votes = 0
         if data['ct_wins'] :
             self.t_wins = data['t_wins']
             self.ct_wins = data['ct_wins']

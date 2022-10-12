@@ -94,9 +94,9 @@
 			<th class="js-sort-number">GeekScore</th>
 			<th class="js-sort-text">Map</th>
 			{% if user.is_authenticated %}
-				<th class="js-sort-text">Your Rating</th>
+				<th class="js-sort-input">Your Rating</th>
 			{% endif %}
-			<th class="js-sort-text">Plays</th>
+			<th class="js-sort-text" style="padding-left:5px;">Plays</th>
 			<th class="js-sort-text">Seasons</th>
 			<th class="js-sort-number">CT Win %</th>
 			<th>Type</th>
@@ -120,19 +120,19 @@
 					{% else %}
 						style="background: gray;"
 					{% endif %}
-					>{{i.metascore}}</div>
+					><span title="{{i.votes}} votes">{{i.metascore}}</span></div>
 				</div>
 			</td>
 			<td>
 				<div class="hover_img">
-					<a href="#">{{ i.name }}<span><img src="{% static 'images/'%}{{i.name}}.jpg" alt="no image on server" height="400" /></span></a>
+					<a href="#">{{ i.name }}<span><img src="{% static 'images/'%}{{i.name}}.jpg" alt="no image on server" height="400" onerror="this.src=&quot;{% static 'images/'%}map_not_found.png&quot; ;"/></span></a>
 					{% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
 					{% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct}}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
 					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct}}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
 			   </div>
 			</td>
 			{% if user.is_authenticated %}
-				<td>
+				<td style="min-width: 110px;"><input type="hidden" value="{{i.geek_rating}}">
 					<ul class="list-inline rating-list" style="background-color: transparent; border-right:none;">
 						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 5)"><i id="star5-{{i.id}}" class="fa fa-star {% if i.geek_rating > 4 %}checked{% endif %}" title="Greatest map EVER!!!"></i></li>
 						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 4)"><i id="star4-{{i.id}}" class="fa fa-star {% if i.geek_rating > 3 %}checked{% endif %}" title="I like it!"></i></li>
@@ -165,6 +165,8 @@
 	
 	</table>
 	
+	<!-- HIDE COLUMNS ON MOBILE TO ALLOW ALL STARS TO FIT ON ONE LINE -->
+
 	<script>
 
 

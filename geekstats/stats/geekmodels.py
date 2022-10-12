@@ -281,6 +281,7 @@ class Maps(models.Model):
     image2 = models.CharField(max_length=1000)
     image3 = models.CharField(max_length=1000)
     metascore = models.IntegerField(blank=True, null=True)    
+    votes = models.IntegerField(blank=True, null=True)
     
     class Meta:
         managed = False
