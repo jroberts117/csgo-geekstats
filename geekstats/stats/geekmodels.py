@@ -288,6 +288,9 @@ class Maps(models.Model):
         db_table = 'map'
         db_tablespace = 'geek'
 
+    def __str__(self):
+         return self.map
+
 class MapRating(models.Model):
     rating_id = models.AutoField(primary_key=True)
     map = models.ForeignKey('Maps', models.DO_NOTHING)
@@ -332,10 +335,10 @@ class Season(models.Model):
     description = models.CharField(max_length=500)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
-    master_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='master_win', related_name='geek_id1',null=True)
-    gold_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='gold_win', related_name='geek_id2',null=True)
-    silver_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='silver_win', related_name='geek_id3',null=True)
-    bronze_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='bronze_win', related_name='geek_id4',null=True)
+    master_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='master_win', related_name='geek_id1',null=True, blank=True)
+    gold_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='gold_win', related_name='geek_id2',null=True, blank=True)
+    silver_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='silver_win', related_name='geek_id3',null=True, blank=True)
+    bronze_win = models.ForeignKey('Geek', models.DO_NOTHING, db_column='bronze_win', related_name='geek_id4',null=True, blank=True)
 
     class Meta:
         managed = False

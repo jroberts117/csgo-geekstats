@@ -660,6 +660,7 @@ def weapons(request):
                 'item_description' : k['item__decscription'],
                 'player_info' : {}
             }
+
         itemGroupedData[k['item__decscription']]['player_info'][k['geek_id']] = {
             'player': k['geek__handle'],
             'id': k['geek_id'],
