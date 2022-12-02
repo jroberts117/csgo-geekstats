@@ -235,12 +235,12 @@ def teams(request):
         tab = 1
         team1mbrs = request.POST.getlist('team1mbrs')
         team2mbrs = request.POST.getlist('team2mbrs')
-        print(team2mbrs)
+        # print(team2mbrs)
         team1capt = int(request.POST.get('team1capt'))
         team2capt = int(request.POST.get('team2capt'))
         team1cocapt = int(request.POST.get('team1cocapt'))
         team2cocapt = int(request.POST.get('team2cocapt'))
-        print('co-cap',str(team2cocapt))
+        # print('co-cap',str(team2cocapt))
         curr_team1 = TeamGeek.objects.filter(team__name=team1)
         curr_team1.delete()
         for i in team1mbrs:
@@ -291,10 +291,13 @@ def teams(request):
         dates = TeamWins.objects.values('match_date').filter(match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).distinct()
         for date in dates:
             teamInfo.addMatches(TeamWins.objects.values().filter(match_date=date['match_date']).order_by('map'))
-
         teamInfo.calcWins()
+        for match in teamInfo.match:
+            for round in match.round:
+                teamInfo.maps.append(round.map)
     except:
         teamInfo.setTeams(Team.objects.values().filter(season_id__name=newstate.season).annotate(team_name=F('name'))) 
+    teamInfo.addMapRating(teamInfo.maps)
 
     teamInfo.set_player_list(request,teamInfo.team1,1)
     teamInfo.set_player_list(request,teamInfo.team2,2)
@@ -320,8 +323,10 @@ def teams(request):
         for j in teamInfo.team2players:
             if j.name == i['handle']:
                 i['selected'] = 1
+    teamInfo.geekidlist = [geek.id for geek in teamInfo.team1players]
+    teamInfo.geekidlist+=[geek.id for geek in teamInfo.team2players]
 
-    
+       
 
     context = {'gfgames':teamInfo,
                 'rounds':win_data,

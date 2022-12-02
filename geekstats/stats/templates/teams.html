@@ -175,12 +175,12 @@ Y8.   .88 88       88.  ... 88.  .88   88   88.  ...    d8'   .8P 88.  ... 88.  
                       dP                    d8888P                                                             -->
 	<table>
 		<tr class="black acenter">
-			<td colspan="2">SEASON INFO</td>
+			<td colspan="3">SEASON INFO</td>
 			<td style="background:darkslategray;">TEAM 1</td>
 			<td style="background:darkred;">TEAM 2</td>
 		</tr>
 		<tr class="acenter">
-			<td colspan="2" rowspan="2" class="fbig fbold" style="padding-top: 35px;">
+			<td colspan="3" rowspan="2" class="fbig fbold" style="padding-top: 35px;">
 				<div>{{gfgames.name}}</div>
 				<div class="fsmall">{{gfgames.description}}</div>
 			</td>
@@ -192,7 +192,7 @@ Y8.   .88 88       88.  ... 88.  .88   88   88.  ...    d8'   .8P 88.  ... 88.  
 			<td class="fbig fbold cfest">{{gfgames.team2wins}}</td>
 		</tr>
 		<tr class="acenter">
-			<td colspan="2">{% if request.user.is_staff %}
+			<td colspan="3">{% if request.user.is_staff %}
 				<div class="cfest" style="width:50%; margin:auto; padding:10px;"> 
 					Staff Admin: <input type="button" id="adminbtn" class="adminbtn" value="Create Season">
 					<input type="button" class="adminbtn" id="editSeasonButton" value="Edit/Delete Seasons" onclick="window.location.href='/admin/stats/season/';" target="_blank">
@@ -203,19 +203,41 @@ Y8.   .88 88       88.  ... 88.  .88   88   88.  ...    d8'   .8P 88.  ... 88.  
 			<td class="cfest">{{gfgames.team2matchwins}} matches won</td>
 		</tr>
 		<tr class="acenter">
-			<td colspan="2"></td>
+			<td colspan="3"></td>
 			<td class="cgeek">{{gfgames.team1rdwins}} rounds won</td>
 			<td class="cfest">{{gfgames.team2rdwins}} rounds won</td>
 		</tr>
 		
 		{% for i in gfgames.match %}
 		<tr class="black acenter">
-			<td colspan="4">{{i.date}}</td>
+			<td colspan="5">{{i.date}}</td>
+		</tr>
+		<tr class="acenter">
+			<td style="background: gray">Map</td>
+			<td style="background: gray">Score</td>
+			<td style="background: gray">Rounds</td>
+			<td style="background:darkslategray; color:white;">Wins</td>
+			<td style="background:darkred; color:white;">Wins</td>
 		</tr>
 		{% for j in i.round %}
 		<tr class="acenter">
-			<td class="fbold fmed"><a href="http://maps.geekfestclan.com/{{j.map}}.bsp">{{j.map|lower}} </a></td>
-			<td align="left">
+			<td class="fbold fmed" align="right"><a href="http://maps.geekfestclan.com/{{j.map}}.bsp">{{j.map|lower}}</a> </td>
+			<td>
+				<div class="hddata info" style="display: inline;""> &nbsp;
+					<div class="box"
+					{% if j.metascore > 75 %}
+						style="background: #6c3;"
+					{% elif j.metascore > 50 %}
+						style="background: #Fc3;"
+					{% elif j.metascore > -1 %}
+						style="background: #f00;"
+					{% else %}
+						style="background: gray;"
+					{% endif %}
+					>{{j.metascore}}</div>
+				</div>
+			</td>
+			<td align="left" style="padding-left:15px;">
 			{% for k in rounds %}
 				{% if k.map == j.map %}
 				<div class="box">{% if k.match_date == i.date %}MATCH{%endif%}

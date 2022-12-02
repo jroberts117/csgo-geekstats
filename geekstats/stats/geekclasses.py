@@ -3,7 +3,7 @@
 #  * Custom class objects provide a logical structure to store data for
 #  * display when leveraging data models becomes too cumbersome
 
-from .geekmodels import Geek, TiersData, TeamGeek
+from .geekmodels import Geek, TiersData, TeamGeek, Maps
 from django.db import models
 from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
 
@@ -17,6 +17,7 @@ class gfRound:
     def __init__(self, data):
         self.map = data
         self.score = [0,0]
+        self.metascore = 0
 
     def __str__(self):
         return self.map        
@@ -65,6 +66,7 @@ class season:
         self.team2matchwins = 0
         self.team2rdwins = 0
         self.match = []
+        self.maps = []
         self.team1players = []
         self.team2players = []
         self.team1startkdr = 0
@@ -105,6 +107,14 @@ class season:
                 self.team2startkdr += i['alltime_kdr']
                 self.team2seasonkdr += round(i['kdr__avg'],2)
 
+    def addMapRating(self, data):
+        mapscores = Maps.objects.values('map','metascore').filter(map__in=data)
+        for match in self.match:
+            for round in match.round:
+                for map in mapscores:
+                    if round.map == map['map']:
+                        round.metascore = map['metascore']
+
     def set_player_list(self, request, team, teamnbr):
         team_data = TeamGeek.objects.values('geek','team','tier').filter(team__name=team)
         temp_list = []
@@ -124,7 +134,7 @@ class season:
         tempGeeks = Geek.objects.values('tier','year_kdr','alltime_kdr').filter(geek_id__in=temp_listNoScore).annotate(player=F('handle'), geekid=F('geek_id'), 
                                         kills=Value(0, output_field=models.IntegerField()), kdr__avg=Value(0, output_field=models.IntegerField()), kills__sum=Value(0, output_field=models.IntegerField()),
                                         deaths__sum=Value(0, output_field=models.IntegerField()), assists__sum=Value(0, output_field=models.IntegerField()), akdr__avg=Value(0, output_field=models.IntegerField()))
-
+        
         self.addPlayers(tempPlayers,teamnbr)
         self.addPlayers(tempGeeks,teamnbr)
 

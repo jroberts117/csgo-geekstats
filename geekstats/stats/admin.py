@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .geekmodels import Season, TeamGeek, Geek, Maps
+from .geekmodels import Season, TeamGeek, Geek, Maps, Team
 import sys
 
 class SeasonAdmin(admin.ModelAdmin):
@@ -13,5 +13,6 @@ class SeasonAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Season)
 admin.site.register(TeamGeek)
+admin.site.register(Team)
 admin.site.register(Geek)
 admin.site.register(Maps)
