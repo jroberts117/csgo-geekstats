@@ -359,6 +359,17 @@ class map_summary:
         self.players = []
         self.weapons = []
         self.hero_image = data['hero_image']
+        self.no_obj_rounds = data['no_obj_rounds']
+        self.bomb_plant_rounds = data['bomb_plant_rounds']
+        self.bomb_explode_rounds = data['bomb_explode_rounds']
+        self.defuse_rounds = data['defuse_rounds']
+        self.total_rounds = self.no_obj_rounds + self.bomb_explode_rounds + self.bomb_plant_rounds + self.defuse_rounds
+        if self.total_rounds > 0:
+            self.obj_pct = (1-(self.no_obj_rounds/self.total_rounds))*100
+            self.success_rounds = (self.bomb_explode_rounds / self.total_rounds)*100
+        else:
+            self.obj_pct = 0
+            self.success_rounds = 0
 
 
 

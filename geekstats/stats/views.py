@@ -538,7 +538,7 @@ def maps(request):
 
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image')
+    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
     if request.user.is_authenticated:
         current_user = request.user

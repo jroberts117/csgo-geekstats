@@ -99,7 +99,7 @@
 			<th class="js-sort-text" style="padding-left:5px;">Plays</th>
 			<th class="js-sort-text">Seasons</th>
 			<th class="js-sort-number">CT Win %</th>
-			<th>Type</th>
+			<th><span title="% of rounds attempted / % of rounds succeeded">Objective</span></th>
 			<th>Theme</th>
 			<th>Top Geek</th>
 			<th>Top Gun</th>
@@ -129,6 +129,7 @@
 					{% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct|floatformat }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
 					{% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct|floatformat }}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
 					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct|floatformat }}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
+					{% if i.success_rounds > 20 %} <span title="{{i.success_rounds|floatformat:0 }}% of rounds played resulted in a bomb explosion win"><img src="{% static 'images/bomb'%}.png" height="25" align="center"></span>  {% endif %}
 			   </div>
 			</td>
 			{% if user.is_authenticated %}
@@ -140,11 +141,6 @@
 						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 2)"><i id="star2-{{i.id}}" class="fa fa-star {% if i.geek_rating > 1 %}checked{% endif %}" title="meh"></i></li>
 						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 1)"><i id="star1-{{i.id}}" class="fa fa-star {% if i.geek_rating > 0 %}checked{% endif %}" title="Pure rubbish"></i></li>
 					</ul>
-					<!-- <span class="fa fa-star checked"></span>
-					<span class="fa fa-star checked"></span>
-					<span class="fa fa-star checked"></span>
-					<span class="fa fa-star highlighted"></span>
-					<span class="fa fa-star"></span> -->
 				</td>
 			{% endif %}
 			<td class="text_center">{{ i.plays }}</td>
@@ -155,10 +151,10 @@
 						{{i.balance|floatformat:1}}% </span> 
 				</div>
 			</td>
-			<td class="text_center">{{ i.type }}</td>
+			<td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
 			<td class="text_center">{{ i.theme }}</td>
 			<td class="text_center">{% with i.players|last as last %} {{ last.item }} {%endwith%}</td>
-			<td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" align="center"></span>{%endwith%}</td>
+			<td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" onerror="this.src=&quot;{% static 'images/'%}searchicon.png&quot; ;" align="center"></span>{%endwith%}</td>
 			<td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
 		</tr>
 		{% endfor %}

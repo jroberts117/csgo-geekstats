@@ -282,6 +282,10 @@ class Maps(models.Model):
     image3 = models.CharField(max_length=1000)
     metascore = models.IntegerField(blank=True, null=True)    
     votes = models.IntegerField(blank=True, null=True)
+    no_obj_rounds = models.IntegerField(blank=True, null=True)
+    bomb_plant_rounds = models.IntegerField(blank=True, null=True)
+    bomb_explode_rounds = models.IntegerField(blank=True, null=True)
+    defuse_rounds = models.IntegerField(blank=True, null=True)
     
     class Meta:
         managed = False
@@ -545,3 +549,6 @@ class SeasonWins(models.Model):
         managed = False
         db_table = 'season_wins'
         db_tablespace = 'geek' 
+
+
+    
