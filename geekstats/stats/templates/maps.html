@@ -154,7 +154,7 @@
 			<td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
 			<td class="text_center">{{ i.theme }}</td>
 			<td class="text_center">{% with i.players|last as last %} {{ last.item }} {%endwith%}</td>
-			<td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" onerror="this.src=&quot;{% static 'images/'%}searchicon.png&quot; ;" align="center"></span>{%endwith%}</td>
+			<td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" onerror="this.src=&quot;{% static 'images/'%}searchicon.png&quot; ;" align="center" class="weapon"></span>{%endwith%}</td>
 			<td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
 		</tr>
 		{% endfor %}

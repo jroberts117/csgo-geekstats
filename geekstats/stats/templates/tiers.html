@@ -132,7 +132,7 @@
 					style="color:red; font-weight:bold;">
 					{% endif %} 
 					{{i.diffkdr|floatformat:2}}</td>
-				<td><span title="{{i.weapon.weapon__count}} kills with a {{i.weapon.weapon}}"><img src="{% static 'images/'%}{{ i.weapon.weapon}}.png" align="center"></span></td>
+				<td><span title="{{i.weapon.weapon__count}} kills with a {{i.weapon.weapon}}"><img src="{% static 'images/'%}{{ i.weapon.weapon}}.png" align="center" class="weapon"></span></td>
 				<td>{{i.alltime_kdr}}</td>
 				<td>{{i.tier_id}}</td>
 			</tr>

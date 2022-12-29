@@ -530,7 +530,10 @@ a {
 	opacity: 1;
 }
 
-
+/********************************* IMG TAGS *********************************/
+img.weapon {
+	height: 30px;
+}
 
 /********************************* TAB SELECTOR STYLES ***********************************/
 /* Style the buttons inside the tab */
@@ -811,7 +814,6 @@ a {
   .rating-list li:hover ~ li {
 	color: #00ff22;
   }
-  
   
   .rating-list {
 	display: inline-block;
