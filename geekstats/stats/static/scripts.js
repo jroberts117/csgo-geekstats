@@ -26,6 +26,27 @@
         document.getElementById("seasonButton").style['display'] = "none";
     };
 
+    document.getElementById("allTime").onclick = function() {
+        if (document.getElementById("allTime").checked){
+            document.getElementById("start").value = "2018-01-01";
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            today =  yyyy + '-' +  mm + '-' + dd;
+            document.getElementById("end").value = today;
+            document.getElementById("dateDates").submit();
+        }
+    };
+
+    document.getElementById("start").onchange = function() {
+        document.getElementById("allTime").checked = false;     
+    };
+
+    document.getElementById("end").onchange = function() {
+        document.getElementById("allTime").checked = false;     
+    };
+
     function showGraph() {
         document.getElementById("graph").style['display'] = "block";
     };

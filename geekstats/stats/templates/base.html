@@ -92,6 +92,8 @@
 								<input type="date" id="start" name="start_date" value="{{state.start_date}}" min="{{state.event_dates|last}}" max="{{state.event_date|first}}" class="date">
 								- <input type="date" id="end" name="end_date" value="{{state.end_date}}" min="{{state.event_dates|last}}" max="{{state.event_date|first}}" class="date">
 								<input type="submit" class="button-gf"></input>
+								<input type="checkbox" id="allTime" name="allTime" value="allTime" class="allTimeCheckbox">
+								<label for="allTime" class="allTimeLabel"> All Time</label><br>
 							</fieldset>
 						</form>
 
