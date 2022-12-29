@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .geekmodels import Geek
+from .geekmodels import Geek, Maps
 
 
 # class PlayersForm(forms.ModelForm):

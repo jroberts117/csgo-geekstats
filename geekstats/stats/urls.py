@@ -19,4 +19,5 @@ urlpatterns = [
     path('Buys', views.buys, name='buys'),
     path('GFMMXXII', views.event, name='event'),
     path('rating/', apiviews.map_rating, name='map_rating'),
+    path('mapimg/', apiviews.upload_image, name='upload_image'),
 ]

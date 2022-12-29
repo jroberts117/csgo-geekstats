@@ -27,7 +27,7 @@ SECRET_KEY = 'u_dltse0*#unyk7noswy$7meqac)1#qz%fznva3!l+q_$*nl9j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['73.89.143.101', 'localhost', '192.168.0.208', '127.0.0.1','geekfest.duckdns.org','test.geekfestclan.com','stats.geekfestclan.com', 'test.geekfest.live','108.41.247.85']
+ALLOWED_HOSTS = ['73.89.143.101', 'localhost', '192.168.0.208', '127.0.0.1','geekfest.duckdns.org','test.geekfestclan.com','stats.geekfestclan.com', 'test.geekfest.live','108.14.165.92']
 
 
 # Application definition
@@ -198,5 +198,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 INTERNAL_IPS = [
-    '127.0.0.1','192.168.0.207',
+    '127.0.0.1','192.168.0.208','192.168.0.205',
 ]

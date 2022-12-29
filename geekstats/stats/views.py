@@ -425,10 +425,12 @@ def list_builder(data,element):
     dataList = []
     key_func = lambda x: x[element]
     for key, group in groupby(data, key_func):
-        # print(key[:3])
-        if key[:3] != 'BOT' and key != 'n/a':
-            # print(key)
+        try:
+            if key[:3] != 'BOT' and key != 'n/a':
+                dataList.append({'item': key, 'count':len([ele for ele in (list(group)) if isinstance(ele,dict)])})
+        except:
             dataList.append({'item': key, 'count':len([ele for ele in (list(group)) if isinstance(ele,dict)])})
+
     # result = [m for m in fragList if 'de_cbble' in m]
     result = sorted(dataList, key=lambda g: g['count'])
     return(result)
@@ -538,7 +540,7 @@ def maps(request):
 
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
+    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
     if request.user.is_authenticated:
         current_user = request.user
@@ -588,6 +590,7 @@ def map2(request):
     mainmenu.set('Maps')
     template = loader.get_template('mapsummary.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'],request.session['datetype'])
+    mid = request.session['mapid']
     # print(newstate.seasons)    
 
     newstate.compare = 'map'
@@ -595,19 +598,37 @@ def map2(request):
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'ct_wins','t_wins','plays','s_plays','last_play','hero_image')
+    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds') \
+        .filter(idmap=mid)
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
+
+    if request.method == 'POST':
+        map_update = Maps.objects.get(idmap=mid)
+        map_update.hero_image = request.FILES.get('hero') if request.FILES.get('hero') else map_update.hero
+        map_update.image2 = request.FILES.get('image2') if request.FILES.get('image2') else map_update.image2
+        map_update.image3 = request.FILES.get('image3') if request.FILES.get('image3')else map_update.image3
+        map_update.radar = request.FILES.get('radar') if request.FILES.get('radar') else map_update.radar
+        map_update.thumbnail = request.FILES.get('thumb') if request.FILES.get('thumb') else map_update.thumbnail
+        # print(dataMap[0])
+        map_update.save()
+
+    if request.user.is_authenticated:
+        current_user = request.user
+        userid = Geek.objects.values('geek_id').filter(userid=current_user.id)[0]['geek_id']
+        dataRating = MapRating.objects.annotate(count=F('rating'), item=F('map__map')).values('item', 'count').filter(geek__userid=current_user.id)
+        print(dataRating)
+    else:
+        userid = 'none'
     themes = list_builder(dataMap,'theme')
-    # print(themes)
 
     for j in dataMap:
         MapList.append(map_summary(j))
     
     for m in MapList:
-        # print(m.name)
         dataRec = list(filter(lambda dat: dat['map'] == m.name, list(dataFrag)))
         m.players = list_builder(dataRec,'killer')
         m.weapons = list_builder(dataRec,'weapon')
+        m.matches = list_builder(dataRec, 'match_date')
         for w in m.weapons:
             m.kills += w['count']
         m.knives = item_getter(m.weapons,'Knife') + item_getter(m.weapons, 'knife_karambit')+ item_getter(m.weapons, 'knife_butterfly')
@@ -621,12 +642,17 @@ def map2(request):
         if m.plays:
             m.ninja = int(round((m.knives + m.grenades + m.flames + m.tazes) / m.plays,0))
         m.ninja_pct = round(m.ninja / m.kills,2)*100 if m.kills > 0 else 0
+        if request.user.is_authenticated:
+            m.geek_rating = item_getter(dataRating,m.name)
 
-    context = {'title': 'GeekFest Map Summary', 
+    print(MapList[0])
+
+    context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'maps':MapList[0],
                'state':newstate,
-               'maps':MapList,
-               'themes':themes,
+            #    'mapstats':mapGroupData.values,
+               'userid':userid,
             #    'playdata':playData
                }
     return HttpResponse(template.render(context, request))
