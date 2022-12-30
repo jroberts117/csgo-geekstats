@@ -60,6 +60,9 @@ def upload_image(request):
             # map_update.image2 = request.FILES.get('image2') if request.FILES.get('image2') else map_update.image2
             # map_update.thumbnail = request.FILES.get('thumb') if request.FILES.get('thumb') else map_update.thumbnail
             # print(dataMap[0])
-            map_update.save()
+            try:
+                map_update.save()
+            except:
+                print('save failed:'+str(request.FILES.get('image')))
             return Response("map image has been updated", status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

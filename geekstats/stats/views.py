@@ -592,6 +592,14 @@ def map2(request):
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'],request.session['datetype'])
     mid = request.session['mapid']
     # print(newstate.seasons)    
+    # if request.method == 'POST':
+    #     print('running post request')
+    #     mid = request.POST.get('mid')
+    #     map_update = Maps.objects.get(idmap=mid)
+    #     print(map_update)
+    #     map_update.hero_image = request.FILES.get('image') 
+    #     # print(dataMap[0])
+    #     map_update.save()
 
     newstate.compare = 'map'
     #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
@@ -602,21 +610,12 @@ def map2(request):
         .filter(idmap=mid)
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
 
-    if request.method == 'POST':
-        map_update = Maps.objects.get(idmap=mid)
-        map_update.hero_image = request.FILES.get('hero') if request.FILES.get('hero') else map_update.hero
-        map_update.image2 = request.FILES.get('image2') if request.FILES.get('image2') else map_update.image2
-        map_update.image3 = request.FILES.get('image3') if request.FILES.get('image3')else map_update.image3
-        map_update.radar = request.FILES.get('radar') if request.FILES.get('radar') else map_update.radar
-        map_update.thumbnail = request.FILES.get('thumb') if request.FILES.get('thumb') else map_update.thumbnail
-        # print(dataMap[0])
-        map_update.save()
 
     if request.user.is_authenticated:
         current_user = request.user
         userid = Geek.objects.values('geek_id').filter(userid=current_user.id)[0]['geek_id']
         dataRating = MapRating.objects.annotate(count=F('rating'), item=F('map__map')).values('item', 'count').filter(geek__userid=current_user.id)
-        print(dataRating)
+        # print(dataRating)
     else:
         userid = 'none'
     themes = list_builder(dataMap,'theme')
@@ -645,7 +644,7 @@ def map2(request):
         if request.user.is_authenticated:
             m.geek_rating = item_getter(dataRating,m.name)
 
-    print(MapList[0])
+    # print(MapList[0])
 
     context = {'title': 'GeekFest Maps', 
                'stateinfo': zip(mainmenu.menu,mainmenu.state),

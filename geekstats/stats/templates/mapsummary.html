@@ -6,10 +6,6 @@
 {% block content %}
 <link href="{% static 'dragdrop.css' %}" rel="stylesheet" type="text/css">
 
-<FORM style="padding-top:20px;">
-    <INPUT type="button" onClick="history.go(0)" VALUE="Refresh">
-</FORM>
-
 <div style="text-align:center; padding-top: 15px;">
     {% with i=maps %}
    <h1> Map: {{maps.name}} </h1>
@@ -35,7 +31,12 @@
         <img id="thumb" src="/media/{{i.thumb}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
         <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
     </form>
-    <div id="gallery" /></div>
+    <!-- <form action="/Map2" method="post" enctype ="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name='image' accept='image/*'>
+        <input type="hidden" name='mid' value="{{i.id}}">
+        <input type="submit">
+    </form> -->
   </div>
 
     <h2>Map Data</h2>
@@ -330,8 +331,8 @@ function uploadFile(file,field) {
     form.append("image", file);
 
     var settings = {
-        //"url": "http://stats.geekfestclan.com/api/stats/rating/",
-         "url": "http://test.geekfest.live:8000/api/stats/mapimg/",
+        "url": "http://stats.geekfestclan.com/api/stats/mapimg/",
+        // "url": "http://test.geekfest.live:8000/api/stats/mapimg/",
         "method": "POST",
         "timeout": 0,
         // "headers": {
