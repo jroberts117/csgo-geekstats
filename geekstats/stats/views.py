@@ -1082,8 +1082,8 @@ def buys(request):
 
 def event(request):
     ##logic to get event awards and stuff
-    template = loader.get_template('event.html')
+    template = loader.get_template('gf2023awards.html')
     mainmenu = StateInfo()
     mainmenu.set('Event')
-    context = {'title': 'GF 2022', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
+    context = {'title': 'GF 2023', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
     return HttpResponse(template.render(context, request))
