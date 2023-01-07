@@ -16,6 +16,7 @@
 		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 		<link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
 		<link rel="icon" type="image/png" href="{% static 'gf_icon.png' %}">
+		
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="{% static 'sort-table.js' %}"></script>
@@ -31,11 +32,12 @@
 			<div style="text-align: center;"><a href="/" class=""><img src="{% static 'images/gf_header.gif' %}"
                 alt="GeekFest Stats" title="Geekfest Stats" style="height: 75px"><br></a>
 			</div>    
-			<div><ul>
-			{% for i,j in stateinfo %}
-			<li><a class="{{j}}" href="{{ i }}">{{ i }}</a></li>
-			{% endfor %}
-			</ul>
+			<div>
+				<ul>
+				{% for i,j,k in stateinfo %}
+					<li><a class="{{k}}" href="{{ j }}">{{ i }}</a></li>
+				{% endfor %}
+				</ul>
 			<div class="title"> {{state.page}}</div>
 			{% if state.page %}
 				{% if user.is_authenticated %}
@@ -48,9 +50,8 @@
 					<div class="login-text"> LOGIN </div></a></span></div>
 				{% endif %}
 			</div>
-
-			<div class="dateSelector" id="dateselector">
-					{% if state.page and state.page != "Event" and state.page != "Geeks" and state.page != "Event Details"  %}
+			{% if state.page and state.page != "Event" and state.page != "Geeks" and state.page != "Event Details" and state.page != "Map Summary" and state.page != "Map Details"%}
+				<div class="dateSelector" id="dateselector">
 					<div class="label">Showing Data For: </div>
 					<form id="dateSeasons" method=post action="{{state.page}}">
 						{% csrf_token %}
@@ -102,8 +103,9 @@
 							<input type="button" class="button" id="matchButton" value="by match">
 							<input type="button" class="button" id="seasonButton" value="by season">
 						</div>
-					{% endif %}	
+					
 				</div>
+						{% endif %}	
 					{% endif %}
 			{% endif %}
 		</header>

@@ -38,9 +38,10 @@ from itertools import groupby
 
 class StateInfo:
     def __init__(self):
-        self.menu = ['Awards','Tiers','Teams','Maps','Weapons','Geeks']
+        self.menu = ['Awards','Tiers','Seasons','Weapons','Maps','Map Details','Geeks']
+        self.page = ['Awards','Tiers','Teams','Weapons','Maps','MapDetails','Geeks']
 ##        self.menu = ['Tiers','Teams','Maps','Weapons','Geeks']
-        self.state = ['','','','','','','', '']
+        self.state = ['','','','','','','', '', '']
 
     def set(self, value):
         for idx, val in enumerate(self.menu):
@@ -336,7 +337,7 @@ def teams(request):
 #               'players': players, 
 #               'games': games,
                'title': 'GeekFest Teams',
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
             #    'eventdates':request.session['eventdates'],
                'state':newstate,
                }
@@ -361,7 +362,8 @@ def tiers(request):
         request.session['datetype'] = 'season'
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'],request.session['datetype'])
     context['title'] = 'GeekFest Tiers'
-    context['stateinfo'] = zip(mainmenu.menu,mainmenu.state)
+    context['stateinfo'] = zip(mainmenu.menu,mainmenu.page,mainmenu.state)
+    print(mainmenu.menu,mainmenu.page,mainmenu.state)
     context['state'] = newstate
     context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
     context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
@@ -535,12 +537,110 @@ def maps(request):
             if i == k['map']:
                 mapGroupData[i]['plays'] = k['plays']
 
+    context = {'title': 'GeekFest Maps', 
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
+               'state':newstate,
+               'mapstats':mapGroupData.values,
+            #    'playdata':playData
+               }
+    return HttpResponse(template.render(context, request))
+
+# ███╗   ███╗ █████╗ ██████╗ ███████╗    ██████╗ ███████╗████████╗ █████╗ ██╗██╗     ███████╗
+# ████╗ ████║██╔══██╗██╔══██╗██╔════╝    ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██║██║     ██╔════╝
+# ██╔████╔██║███████║██████╔╝███████╗    ██║  ██║█████╗     ██║   ███████║██║██║     ███████╗
+# ██║╚██╔╝██║██╔══██║██╔═══╝ ╚════██║    ██║  ██║██╔══╝     ██║   ██╔══██║██║██║     ╚════██║
+# ██║ ╚═╝ ██║██║  ██║██║     ███████║    ██████╔╝███████╗   ██║   ██║  ██║██║███████╗███████║
+# ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝    ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝
+                                                                                           
+def mapdetails(request):
+    mainmenu.set('Map Details')
+    template = loader.get_template('mapdetails.html')
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Map Details', request.session['selector'],request.session['datetype'])
+    # print(newstate.seasons)    
+
+    newstate.compare = 'map'
+    #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
+    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+    rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+
+    killData = Frag.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id', 'round__match__match_date').annotate(num_frags=Count('frag_id')).order_by('round__match__match_date', '-num_frags')
+    
+    deathData = Death.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('round__match__map')
+    
+    # print(playData)
+    mapGroupData = {}
+
+    for k in killData:
+        if (not k['round__match__map'] in mapGroupData):
+            mapGroupData[k['round__match__map']] = {
+                'map' : k['round__match__map'],
+                'player_info' : {}
+            }
+        mapGroupData[k['round__match__map']]['player_info'][k['geek_id']] = {
+            'player': k['geek__handle'],
+            'id': k['geek_id'],
+            'kills': k['num_frags'],
+            'deaths': 0,
+            'kdr': k['num_frags']
+            }
+
+    for d in deathData:
+        if (not d['round__match__map'] in mapGroupData):
+            continue
+        if (not d['geek_id'] in mapGroupData[d['round__match__map']]['player_info']):
+            mapGroupData[d['round__match__map']]['player_info'][d['geek_id']] = {
+                'player': d['geek__handle'],
+                'id': d['geek_id'],
+                'kills': 0,
+                'deaths': 0,
+                'buys': 0
+            }
+        curPlayer = mapGroupData[d['round__match__map']]['player_info'][d['geek_id']]
+        curPlayer['deaths'] = d['num_deaths']
+        if (d['num_deaths'] > 0):
+            curPlayer['kdr'] = curPlayer['kills']/curPlayer['deaths']
+        curPlayer['kdr'] = round(curPlayer['kdr'], 2)
+
+    ###########  Add the map win % and rating  ###################
+    map_data = (MapData.objects.values('map','win_side','type','theme','votescore').annotate(wins=Count('win_side')))
+    map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
+
+
+    map_data_list = []
+    last_map = ''
+    curr_rec = {}
+    for i in map_data:
+        curr_map = i['map']
+        if i['map'] == last_map:
+            if curr_rec['win_side'] == 'CT' and i['win_side'] == 'TERRORIST':
+                curr_rec['other_side'] = i['wins']
+            else:
+                curr_rec['other_side'] = curr_rec['wins']
+                curr_rec['win_side'] = 'CT'
+                curr_rec['wins'] = i['wins']
+            curr_rec['CT_win_pct'] = (curr_rec['wins'] / (curr_rec['other_side'] + curr_rec['wins']))*100
+        else:
+            if len(curr_rec) > 0:
+                map_data_list.append(curr_rec)
+            curr_rec = i
+        last_map = i['map']
+    map_data_list.append(curr_rec)
+
+    for i in mapGroupData:
+        for j in map_data_list:
+            if i == j['map']:
+                mapGroupData[i]['ct_win_pct'] = j['CT_win_pct']
+                mapGroupData[i]['rating'] = j['votescore']
+        for k in map_plays:
+            if i == k['map']:
+                mapGroupData[i]['plays'] = k['plays']
+
     #####  NEW MAP CONTENT ####
     # NEW API LOGIC:  https://www.agiliq.com/blog/2019/04/drf-polls/
 
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
+    dataMap = Maps.objects.values('idmap','map','description','workshop_link','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
     if request.user.is_authenticated:
         current_user = request.user
@@ -575,7 +675,7 @@ def maps(request):
             m.geek_rating = item_getter(dataRating,m.name)
 
     context = {'title': 'GeekFest Maps', 
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
                'maps':MapList,
                'state':newstate,
                'mapstats':mapGroupData.values,
@@ -586,10 +686,23 @@ def maps(request):
 
 
 
+
+
+
+
+# ███╗   ███╗ █████╗ ██████╗ ███████╗    ███████╗██╗   ██╗███╗   ███╗███╗   ███╗ █████╗ ██████╗ ██╗   ██╗
+# ████╗ ████║██╔══██╗██╔══██╗██╔════╝    ██╔════╝██║   ██║████╗ ████║████╗ ████║██╔══██╗██╔══██╗╚██╗ ██╔╝
+# ██╔████╔██║███████║██████╔╝███████╗    ███████╗██║   ██║██╔████╔██║██╔████╔██║███████║██████╔╝ ╚████╔╝ 
+# ██║╚██╔╝██║██╔══██║██╔═══╝ ╚════██║    ╚════██║██║   ██║██║╚██╔╝██║██║╚██╔╝██║██╔══██║██╔══██╗  ╚██╔╝  
+# ██║ ╚═╝ ██║██║  ██║██║     ███████║    ███████║╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║██║  ██║██║  ██║   ██║   
+# ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝    ╚══════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
+                                                                                                       
+
+
 def map2(request):
     mainmenu.set('Maps')
     template = loader.get_template('mapsummary.html')
-    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Maps', request.session['selector'],request.session['datetype'])
+    newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Map Summary', request.session['selector'],request.session['datetype'])
     mid = request.session['mapid']
     # print(newstate.seasons)    
     # if request.method == 'POST':
@@ -606,7 +719,7 @@ def map2(request):
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds') \
+    dataMap = Maps.objects.values('idmap','map','description','workshop_link','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds') \
         .filter(idmap=mid)
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
 
@@ -647,7 +760,7 @@ def map2(request):
     # print(MapList[0])
 
     context = {'title': 'GeekFest Maps', 
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
                'maps':MapList[0],
                'state':newstate,
             #    'mapstats':mapGroupData.values,
@@ -731,7 +844,7 @@ def weapons(request):
     context = {'weapons': itemGroupedData.values,
                'title': 'GeekFest Weapons',
                'state':newstate,
-               'stateinfo': zip(mainmenu.menu,mainmenu.state), }
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
 #    █████████  ██████████ ██████████ █████   ████  █████████ 
@@ -779,7 +892,7 @@ def geeks(request):
                'awards': award_winners,
                'winners': seasonWinners,
                'state':newstate,
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
                }
     return HttpResponse(template.render(context, request))
 
@@ -889,7 +1002,7 @@ def playerdetails(request):
                'chart': line_chart.render(disable_xml_declaration=True),
                'title': 'GeekFest Geeks',
                'state':newstate,
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
                }
     return HttpResponse(template.render(context, request))
 
@@ -927,7 +1040,7 @@ def details(request):
     context = {'details' : details,
                'title': 'GeekFest Geeks',
                'state':newstate,
-               'stateinfo': zip(mainmenu.menu,mainmenu.state),
+               'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
                }
     return HttpResponse(template.render(context, request))
 
@@ -935,7 +1048,7 @@ def about(request):
     mainmenu = StateInfo()
     mainmenu.set('About')
     template = loader.get_template('about.html')
-    context = {'title': 'About GeekFest', 'stateinfo': zip(mainmenu.menu,mainmenu.state), }
+    context = {'title': 'About GeekFest', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
 
@@ -944,7 +1057,7 @@ def buys(request):
     template = loader.get_template('buys.html')
     mainmenu = StateInfo()
     mainmenu.set('About')
-    context = {'buys': buycount, 'title': 'Buys', 'stateinfo': zip(mainmenu.menu,mainmenu.state), }
+    context = {'buys': buycount, 'title': 'Buys', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
 
@@ -972,5 +1085,5 @@ def event(request):
     template = loader.get_template('event.html')
     mainmenu = StateInfo()
     mainmenu.set('Event')
-    context = {'title': 'GF 2022', 'stateinfo': zip(mainmenu.menu,mainmenu.state), }
+    context = {'title': 'GF 2022', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
     return HttpResponse(template.render(context, request))

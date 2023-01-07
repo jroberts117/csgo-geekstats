@@ -6,11 +6,44 @@
 {% block content %}
 <link href="{% static 'dragdrop.css' %}" rel="stylesheet" type="text/css">
 
-<div style="text-align:center; padding-top: 15px;">
-    {% with i=maps %}
-   <h1> Map: {{maps.name}} </h1>
-   <h4>{{i.description}}</h4>
-   <p>Plays: {{maps.plays}} Season Plays: {{maps.s_plays}}</p>
+{% with i=maps %}
+<div class="container">
+  <div class="box"
+    {% if i.metascore > 75 %}
+      style="background: #6c3;"
+    {% elif i.metascore > 50 %}
+      style="background: #Fc3;"
+    {% elif i.metascore > -1 %}
+      style="background: #f00;"
+    {% else %}
+      style="background: gray;"
+    {% endif %}>
+      <span title="{{i.votes}} votes">{{i.metascore}}</span>
+  </div>
+  <div class="map-title" style="display:inline-block;">{{maps.name}}</div>
+  <div class="" style="display:inline-block;">
+    <div><b>CT Win %:</b>  {% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}{{i.balance|floatformat:1}}% </span> </div>
+    <div><b>Last Played</b> {% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%} days ago</div>
+    <div><b>Played</b> {{maps.plays}} times ({{maps.s_plays}} Season Plays)</div>
+    <div><b>Top Geek:</b> {% with p=i.players|last %}{{p.item}} with {{p.count}} kills {% endwith %}</div>
+    <div><b>Top Weapon:</b>  {% with p=i.weapons|last %}{{p.item}} with {{p.count}} kills {% endwith %}</div>
+  </div>
+</div>
+
+
+</div>
+<hr class="solid">
+{% if i.description %}
+<div style="text-align:center;">{{i.description}}</div>
+{%endif%}
+{% if i.workshop %}
+<div style="text-align:center;"><b>Steam Workshop Link:  </b><a href="{{i.workshop}}">{{i.workshop}}</a></div>
+{%endif%}
+
+<div style="text-align:center; padding-top: 15px;" class="map-summary">
+  <div  class="long-container">
+   
+  
 
   <div id="drop-area">
     <form class="my-form">
@@ -38,108 +71,161 @@
         <input type="submit">
     </form> -->
   </div>
+</div>
+  <div class="long-container">
 
     <h2>Map Data</h2>
-    <table>
-        <tr>
-            <th>CT win %</th>
-            <th>T Wins</th>
-            <th>CT Wins</th>
-            <th>Objective %</th>
-            <th>Theme</th>
-            <th>Last Play</th>
-            <th>Map Type</th>
-            <th>GeekScore</th>
-            <th>Specialties</th>
-        </tr>
-        <tr>
-            <td>{% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}
-                {{i.balance|floatformat:1}}% </span> </td>
-            <td>{{ i.t_wins }}</td>
-            <td>{{i.ct_wins }}</td>
-            <td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
-            <td class="text_center">{{ i.theme }}</td>
-            <td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
-            <td class="text_center">{{ i.type }}</td>
-            <td class="text_center">
-				<div class="hddata info"> &nbsp;
-					<div class="box"
-					{% if i.metascore > 75 %}
-						style="background: #6c3;"
-					{% elif i.metascore > 50 %}
-						style="background: #Fc3;"
-					{% elif i.metascore > -1 %}
-						style="background: #f00;"
-					{% else %}
-						style="background: gray;"
-					{% endif %}
-					><span title="{{i.votes}} votes">{{i.metascore}}</span></div>
-				</div>
-			</td>
-			<td>
-				<div class="">
-					
-					{% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct|floatformat }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
-					{% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct|floatformat }}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
-					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct|floatformat }}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
-					{% if i.success_rounds > 20 %} <span title="{{i.success_rounds|floatformat:0 }}% of rounds played resulted in a bomb explosion win"><img src="{% static 'images/bomb'%}.png" height="25" align="center"></span>  {% endif %}
-			   </div>
-			</td>
-        </tr>
-    </table>
-
-  <table>
-    <tr>
-        <th>Top Player</th>
-        <th>Top Gun</th>
-        <th>kills</th>
-        <th>ninja</th>
-        <th>no objective</th>
-        <th>bomb plant</th>
-        <th>bomb explode</th>
-        <th>defuse</th>
-        <th>total rounds</th>
-        <th>obj %</th>
-    </tr>
-    <tr>
-        <td>{{i.top_player}}</td>
-        <td>{{i.top_gun}}</td>
-        <td>{{i.kills}}</td>
-        <td>{{i.ninja}}</td>
-        <td>{{i.no_obj_rounds}}</td>
-        <td>{{i.bomb_plant_rounds}}</td>
-        <td>{{i.bomb_explode_rounds}}</td>
-        <td>{{i.defuse_rounds}}</td>
-        <td>{{i.total_rounds}}</td>
-        <td>{{i.obj_pct}}</td>
-    </tr>
-    <tr>
-        <th>Knives</th>
-        <th>grenades</th>
-        <th>flames</th>
-        <th>tazes</th>
-        <th>Snipes</th>
-        <th>Snipe %</th>
-        <th>HMG</th>
-        <th>HMG %</th>
-    </tr>
-    <tr>
-        <td>{{i.knives}}</td>
-        <td>{{i.grenades}}</td>
-        <td>{{i.flames}}</td>
-        <td>{{i.tazes}}</td>
-        <td>{{i.snipes}}</td>
-        <td>{{i.snipe_pct}}</td>
-        <td>{{i.hmg}}</td>
-        <td>{{i.hmg_pct}}</td>
-    </tr>
-  </table>
-
-    <table>
-        <tr>
-            <td>
-                <table>
+    <div class="split-container">
+      <div class="table-container">
+        <div class="header">Match Stats</div>
+            <table class="zebra map-stats-table">
+                <tr class="black">
+                    <th>dates</th>
+                    <th>kills</th>
+                </tr>
+                {% for d in i.matches %}
+                <tr>
+                    <td>{{d.item}}</td>
+                    <td>{{d.count}}</td>           
+                </tr>
+                {% endfor %}
+            
+            </table>
+        </div>
+        <div class="table-container">
+          <div class="header">Match Highlights</div>
+              <table class="zebra map-highlights-table">
+                  <tr>
+                    <th>CT win %</th>
+                    <td>{% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}
+                      {{i.balance|floatformat:1}}% </span> </td>
+                  </tr>
+                  <tr>
+                    <th>T Wins</th>
+                    <td>{{ i.t_wins }}</td>
+                  </tr>
+                  <tr>
+                    <th>CT Wins</th>
+                    <td>{{i.ct_wins }}</td>
+                  </tr>
+                  <tr>
+                    <th>Objective %</th>
+                    <td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
+                  </tr>
+                  <tr>
+                    <th>Theme</th>
+                    <td class="text_center">{{ i.theme }}</td>
+                  </tr>
+                  <tr>
+                    <th>Last Play</th>
+                    <td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
+                  </tr>
+                  <tr>
+                    <th>Map Type</th>
+                    <td class="text_center">{{ i.type }}</td>
+                  </tr>
+                  <tr>
+                    <th>GeekScore</th>
+                    <td class="text_center">
+                      <div class="hddata info"> &nbsp;
+                        <div class="box"
+                        {% if i.metascore > 75 %}
+                          style="background: #6c3;"
+                        {% elif i.metascore > 50 %}
+                          style="background: #Fc3;"
+                        {% elif i.metascore > -1 %}
+                          style="background: #f00;"
+                        {% else %}
+                          style="background: gray;"
+                        {% endif %}
+                        ><span title="{{i.votes}} votes">{{i.metascore}}</span></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Specialties</th>
+                    <td>
+                      <div class="">
+                        
+                        {% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct|floatformat }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
+                        {% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct|floatformat }}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
+                        {% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct|floatformat }}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
+                        {% if i.success_rounds > 20 %} <span title="{{i.success_rounds|floatformat:0 }}% of rounds played resulted in a bomb explosion win"><img src="{% static 'images/bomb'%}.png" height="25" align="center"></span>  {% endif %}
+                       </div>
+                    </td>          
+                  </tr>
+              
+              </table>
+          </div>
+    </div>
+    <div class="split-container">
+      <div class="table-container">
+        <div class="header">Weapon Stats</div>
+                <table class="zebra map-stats-table">
+                    <tr class="black">
+                        <th>weapons</th>
+                        <th>kills</th>
+                    </tr>
+                    {% for p in i.weapons %}
                     <tr>
+                        <td>{{p.item}}</td>
+                        <td>{{p.count}}</td>           
+                    </tr>
+                    {% endfor %}
+                </table>
+      </div>
+      <div class="table-container">
+        <div class="header">Weapon Highlights</div>
+        <table class="zebra map-highlights-table">
+          <tr>
+            <th>Top Gun</th>
+            <td>{{i.top_gun}}</td>
+          </tr>
+          <tr>
+            <th>ninja</th>
+            <td>{{i.ninja}}</td>
+          </tr>
+          <tr>
+            <th>Knives</th>
+            <td>{{i.knives}}</td>
+          </tr>
+          <tr>
+            <th>grenades</th>
+            <td>{{i.grenades}}</td>
+          </tr>
+          <tr>
+            <th>flames</th>
+            <td>{{i.flames}}</td>
+          </tr>
+          <tr>
+            <th>tazes</th>
+            <td>{{i.tazes}}</td>
+          </tr>
+          <tr>
+            <th>Snipes</th>
+            <td>{{i.snipes}}</td>
+          </tr>
+          <tr>
+            <th>Snipe %</th>
+            <td>{{i.snipe_pct}}</td>
+          </tr>
+          <tr>
+            <th>LMG</th>
+            <td>{{i.hmg}}</td>
+          </tr>
+          <tr>
+            <th>LMG %</th>
+            <td>{{i.hmg_pct}}</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+    <div class="split-container">
+      <div class="table-container">
+        <div class="header">Player Stats</div>
+                <table class="zebra map-stats-table">
+                    <tr class="black">
                         <th>players</th>
                         <th>kills</th>
                     </tr>
@@ -150,39 +236,60 @@
                     </tr>
                     {% endfor %}
                 </table>
-            </td>
-            <td>
-                <table>
-                    <tr>
-                        <th>players</th>
-                        <th>kills</th>
-                    </tr>
-                    {% for p in i.weapons %}
-                    <tr>
-                        <td>{{p.item}}</td>
-                        <td>{{p.count}}</td>           
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-            <td>
-                <table>
-                    <tr>
-                        <th>dates</th>
-                        <th>kills</th>
-                    </tr>
-                    {% for d in i.matches %}
-                    <tr>
-                        <td>{{d.item}}</td>
-                        <td>{{d.count}}</td>           
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-        </tr>
-    </table>        
+      </div>
+      <div class="table-container">
+        <div class="header">Player Highlights</div>
+        <table class="zebra map-highlights-table">
+          <tr>
+            <th>Top Player</th>
+            <td>{{i.top_player}}</td>
+          </tr>
+        </table>
+        <div class="header">Objective Highlights</div>
+        <table class="zebra map-highlights-table">
+          <tr>
+            <th>kills</th>
+            <td>{{i.kills}}</td>
+          </tr>
+          <tr>
+            <th>no objective</th>
+            <td>{{i.no_obj_rounds}}</td>
+          </tr>
+          <tr>
+            <th>bomb plant</th>
+            <td>{{i.bomb_plant_rounds}}</td>
+          </tr>
+          <tr>
+            <th>bomb explode</th>
+            <td>{{i.bomb_explode_rounds}}</td>
+          </tr>
+          <tr>
+            <th>defuse</th>
+            <td>{{i.defuse_rounds}}</td>
+          </tr>
+          <tr>
+            <th>total rounds</th>
+            <td>{{i.total_rounds}}</td>
+          </tr>
+          <tr>
+            <th>obj %</th>
+            <td>{{i.obj_pct}}</td>
+          </tr>
+        </table>
+      </div>
+        
+      </div>
+    </div>
 
-    Playerlist and kdr
+    
+  </div>        
+
+    
+    
+
+</div>
+<!-- <div>
+  Playerlist and kdr
 
     Weapon Use and kdr
 
@@ -194,9 +301,7 @@
     No Objective %
 
     https://dev.to/thomz/uploading-images-to-django-rest-framework-from-forms-in-react-3jhj
-    
-
-</div>
+</div> -->
 
 {% if user.is_authenticated %}
 <script>

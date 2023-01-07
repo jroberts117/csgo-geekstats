@@ -328,6 +328,7 @@ class map_summary:
         self.id = data['idmap']
         self.name = data['map']
         self.description = data['description']
+        self.workshop = data['workshop_link']
         self.type = data['type']
         self.theme = data['theme']
         self.rating = data['votescore']
