@@ -504,7 +504,7 @@ def maps(request):
         curPlayer['kdr'] = round(curPlayer['kdr'], 2)
 
     ###########  Add the map win % and rating  ###################
-    map_data = (MapData.objects.values('map','win_side','type','theme','votescore').annotate(wins=Count('win_side')))
+    map_data = (MapData.objects.values('map_id','map','win_side','type','theme','votescore').annotate(wins=Count('win_side')))
     map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
 
 
@@ -533,6 +533,7 @@ def maps(request):
             if i == j['map']:
                 mapGroupData[i]['ct_win_pct'] = j['CT_win_pct']
                 mapGroupData[i]['rating'] = j['votescore']
+                mapGroupData[i]['id'] = j['map_id']
         for k in map_plays:
             if i == k['map']:
                 mapGroupData[i]['plays'] = k['plays']
@@ -541,7 +542,6 @@ def maps(request):
                'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),
                'state':newstate,
                'mapstats':mapGroupData.values,
-            #    'playdata':playData
                }
     return HttpResponse(template.render(context, request))
 

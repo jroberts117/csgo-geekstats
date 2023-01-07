@@ -47,7 +47,9 @@
 
   <div id="drop-area">
     <form class="my-form">
+      {% if user.is_authenticated %}
         <p>Replace or add image by dragging and dropping new image onto the dashed region</p>
+      {% endif %}
         <h3>HERO</h3>
         <img id="hero" src="/media/{{i.hero_image}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
         <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">

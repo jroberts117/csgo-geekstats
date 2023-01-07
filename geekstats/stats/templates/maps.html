@@ -12,7 +12,7 @@
 	{% for i in mapstats %}
 	<div class="highlightbox">
 		<div class="header">
-			<div class="hddata hero">{{i.map|upper}} </div>
+			<div class="hddata hero"><a href="Map2?mid={{i.id}}">{{i.map|upper}} </a></div>
 			<div class="hddata info"> &nbsp;
 				<span title="{{i.rating}}">
 					<div class="box"
