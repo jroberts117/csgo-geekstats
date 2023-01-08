@@ -525,6 +525,7 @@ class GeekAuthUser(models.Model):
         db_tablespace = 'geek'
 
 class MapData(models.Model):
+    map_id = models.IntegerField()
     map = models.CharField(max_length=250, blank=True, null=True)
     match_date = models.DateField(blank=True, null=True)
     win_side = models.CharField(max_length=250, blank=True, null=True)

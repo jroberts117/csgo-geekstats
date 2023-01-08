@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+
+<form action="." method="post">{% csrf_token %}</form>
+
+<div id="mapstats"  class="page rowwrap" style="width:100%;">
+	<div style="text-align:center; padding-top: 15px; width:100%;">
+		<input id="myMap" onkeyup="myFunction()" type="text" name="map" placeholder="map name" title="Type in a name">
+	</div>
+
+    <table id="myTable" class="section_center zebra js-sort-table">
+		<tr class="black">
+			<th class="js-sort-number">GeekScore</th>
+			<th class="js-sort-text">Map</th>
+			{% if user.is_authenticated %}
+				<th class="js-sort-input">Your Rating</th>
+			{% endif %}
+			<th class="js-sort-text" style="padding-left:5px;">Plays</th>
+			<th class="js-sort-text">Seasons</th>
+			<th class="js-sort-number">CT Win %</th>
+			<th><span title="% of rounds attempted / % of rounds succeeded">Objective</span></th>
+			<th>Theme</th>
+			<th>Top Geek</th>
+			<th>Top Gun</th>
+			<th class="js-sort-number">Last Play (days)</th>
+		</tr>
+	
+		{% for i in maps %}
+		<tr>
+			<td class="text_center">
+				<div class="hddata info"> &nbsp;
+					<div class="box"
+					{% if i.metascore > 75 %}
+						style="background: #6c3;"
+					{% elif i.metascore > 50 %}
+						style="background: #Fc3;"
+					{% elif i.metascore > -1 %}
+						style="background: #f00;"
+					{% else %}
+						style="background: gray;"
+					{% endif %}
+					><span title="{{i.votes}} votes">{{i.metascore}}</span></div>
+				</div>
+			</td>
+			<td>
+				<div class="hover_img">
+					<a href="/Map2?mid={{i.id}}">{{ i.name }}<span><img src="{% static 'images/'%}{{i.name}}.jpg" loading="lazy" alt="no image on server" height="400" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></span></a>
+					{% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct|floatformat }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
+					{% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct|floatformat }}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
+					{% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct|floatformat }}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
+					{% if i.success_rounds > 20 %} <span title="{{i.success_rounds|floatformat:0 }}% of rounds played resulted in a bomb explosion win"><img src="{% static 'images/bomb'%}.png" height="25" align="center"></span>  {% endif %}
+			   </div>
+			</td>
+			{% if user.is_authenticated %}
+				<td style="min-width: 110px;"><input type="hidden" value="{{i.geek_rating}}">
+					<ul class="list-inline rating-list" style="background-color: transparent; border-right:none;">
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 5)"><i id="star5-{{i.id}}" class="fa fa-star {% if i.geek_rating > 4 %}checked{% endif %}" title="Greatest map EVER!!!"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 4)"><i id="star4-{{i.id}}" class="fa fa-star {% if i.geek_rating > 3 %}checked{% endif %}" title="I like it!"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 3)"><i id="star3-{{i.id}}" class="fa fa-star {% if i.geek_rating > 2 %}checked{% endif %}" title="It's playable"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 2)"><i id="star2-{{i.id}}" class="fa fa-star {% if i.geek_rating > 1 %}checked{% endif %}" title="meh"></i></li>
+						<li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 1)"><i id="star1-{{i.id}}" class="fa fa-star {% if i.geek_rating > 0 %}checked{% endif %}" title="Pure rubbish"></i></li>
+					</ul>
+				</td>
+			{% endif %}
+			<td class="text_center">{{ i.plays }}</td>
+			<td class="text_center">{{ i.s_plays }}</td>
+			<td class="text_center">
+				<div class="hddata info">
+					{% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}
+						{{i.balance|floatformat:1}}% </span> 
+				</div>
+			</td>
+			<td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
+			<td class="text_center">{{ i.theme }}</td>
+			<td class="text_center">{% with i.players|last as last %} {{ last.item }} {%endwith%}</td>
+			<td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" onerror="this.src=&quot;{% static 'images/'%}searchicon.png&quot; ;" align="center" class="weapon"></span>{%endwith%}</td>
+			<td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
+		</tr>
+		{% endfor %}
+	
+	</table>
+	
+	<!-- HIDE COLUMNS ON MOBILE TO ALLOW ALL STARS TO FIT ON ONE LINE -->
+
+	<script>
+
+
+
+		function csrfSafeMethod(method) {
+			// these HTTP methods do not require CSRF protection
+			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+		}
+		function sameOrigin(url) {
+			// test that a given url is a same-origin URL
+			// url could be relative or scheme relative or absolute
+			var host = document.location.host; // host + port
+			var protocol = document.location.protocol;
+			var sr_origin = '//' + host;
+			var origin = protocol + sr_origin;
+			// Allow absolute or scheme relative URLs to same origin
+			return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+				(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+				// or any other URL that isn't scheme relative or absolute i.e relative.
+				!(/^(\/\/|http:|https:).*/.test(url));
+		}
+		$.ajaxSetup({
+			beforeSend: function(xhr, settings) {
+				if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+					// Send the token to same-origin, relative URLs only.
+					// Send the token only if the method warrants CSRF protection
+					// Using the CSRFToken value acquired earlier
+					xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+				}
+			}
+		});
+
+
+		// $.ajaxSetup({
+		// 	beforeSend: function(xhr, settings) {
+		// 	if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+		// 		// Only send the token to relative URLs i.e. locally.
+		// 		xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+		// 	}
+		// 	}
+		// });
+
+
+		function myFunction() {
+		  var input, filter, table, tr, td, i, txtValue;
+		  input = document.getElementById("myMap");
+		  filter = input.value.toUpperCase();
+		  table = document.getElementById("myTable");
+		  tr = table.getElementsByTagName("tr");
+		  for (i = 0; i < tr.length; i++) {
+			td = tr[i].getElementsByTagName("td")[1];
+			if (td) {
+			  txtValue = td.textContent || td.innerText;
+			  if (txtValue.toUpperCase().indexOf(filter) > -1) {
+				tr[i].style.display = "";
+			  } else {
+				tr[i].style.display = "none";
+			  }
+			}       
+		  }
+		}
+
+		function ratingUpdate(map, geek, rating) {
+
+			var form = new FormData();
+			form.append("map_id", map);
+			form.append("user_id", geek);
+			form.append("rating", rating);
+
+			var settings = {
+			"url": "http://stats.geekfestclan.com/api/stats/rating/",
+			// "url": "http://test.geekfest.live:8000/api/stats/rating/",
+			"method": "POST",
+			"timeout": 0,
+			// "headers": {
+			// 	"Cookie": "sessionid=fkcrfqey2igzl8m9alg6qlsihcd0n89j"
+			// },
+			"processData": false,
+			"mimeType": "multipart/form-data",
+			"contentType": false,
+			"data": form
+			};
+
+			$.ajax(settings).done(function (response) {
+			console.log(response);
+			});
+
+			var ele5 = 'star5-' + map, ele4 = 'star4-' + map, ele3 = 'star3-' + map, ele2 = 'star2-' + map, ele1 = 'star1-' + map;
+			document.getElementById(ele5).classList.remove('checked');
+			document.getElementById(ele4).classList.remove('checked');
+			document.getElementById(ele3).classList.remove('checked');
+			document.getElementById(ele2).classList.remove('checked');
+			document.getElementById(ele1).classList.remove('checked');
+
+			if (rating>4) {
+				document.getElementById(ele5).classList.add('checked');
+			} 
+			if (rating>3) {
+				document.getElementById(ele4).classList.add('checked');
+			} 
+			if (rating>2) {
+				document.getElementById(ele3).classList.add('checked');
+			} 
+			if (rating>1) {
+				document.getElementById(ele2).classList.add('checked');
+			} 
+			if (rating>0) {
+				document.getElementById(ele1).classList.add('checked');
+			} 
+		}
+		</script>
+</div>
+
+{% endblock content %}

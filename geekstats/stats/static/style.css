@@ -138,7 +138,24 @@ input[type=submit] {
 	flex: 1 1 auto;
 	align-items: center;
 	max-width: 1440px;
+	display: flex;
+	justify-content: center;
 }
+
+.container .box{
+	display: flex;
+	text-align: center;
+	font-size: 40px;
+	color:white;
+	line-height: 30px;
+	height: 100px;
+	width: 100px;
+	justify-content: center;
+	border-radius: 5px;
+	align-items: center;
+	margin-right: 30px;
+}
+
 
 .summary {
 	max-width: 1440px;
@@ -835,4 +852,78 @@ img.weapon {
   .rating-list {
 	display: inline-block;
 	list-style: none;
+  }
+
+  /********************************* Map Summary Styles  ***********************************/
+
+  .map-summary {
+	display: flex;
+	justify-content: center;
+	flex-direction: row;
+
+  }
+
+  .split-container {
+	display: flex;
+	justify-content: space-between;
+
+  }
+
+  .long-container {
+	display: flex;
+	flex-direction: column;
+	margin: 10px;
+	justify-content: flex-start;
+
+  }
+
+  .map-stats-table{
+	min-width: 200px;
+  }
+
+  .map-highlights-table{
+	min-width: 300px;
+  }
+
+  .table-container{
+	margin: 5px;
+  }
+
+  .map-summary-header{
+	display: flex;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+  }
+
+  .map-summary-header-info{
+	width: 20%;
+  }
+
+  .map-title{
+	font-size: 100px;
+	width: 50%;
+  }
+
+
+  @media (max-width: 1000px) {
+	.map-summary {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+	  }
+	  .split-container {
+		display: flex;
+		justify-content: space-evenly;
+		flex-direction: column;
+		max-width: 75%;
+		margin-left: 12.5%;
+		margin-right: 12.5%;
+	  }
+	  .long-container {
+		display: flex;
+		flex-direction: column;
+		margin: 10px;
+		justify-content: center;
+	  }
   }
