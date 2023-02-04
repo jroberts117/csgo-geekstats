@@ -66,12 +66,9 @@
         <img id="thumb" src="/media/{{i.thumb}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
         <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
     </form>
-    <!-- <form action="/Map2" method="post" enctype ="multipart/form-data">
+    <form action="/Map2" method="post" enctype ="multipart/form-data">
         {% csrf_token %}
-        <input type="file" name='image' accept='image/*'>
-        <input type="hidden" name='mid' value="{{i.id}}">
-        <input type="submit">
-    </form> -->
+    </form>
   </div>
 </div>
   <div class="long-container">
@@ -370,76 +367,57 @@ function highlight(e) {
 }
 
 function unhighlight(e) {
-  dropArea.classList.remove('active')
+  dropArea.classList.remove('highlight')
 }
 
 function handleDrop(e) {
   var dt = e.dataTransfer
   var files = dt.files
-//   console.warn(e)
-  console.warn(e.path[0].id)
-  handleImgFiles(files,e.path[0].id)
+  handleImgFiles(files,e.target.id)
 }
 
-let uploadProgress = []
-let progressBar = document.getElementById('progress-bar')
-
-function initializeProgress(numFiles) {
-  progressBar.value = 0
-  uploadProgress = []
-
-  for(let i = numFiles; i > 0; i--) {
-    uploadProgress.push(0)
-  }
-}
-
-function updateProgress(fileNumber, percent) {
-  uploadProgress[fileNumber] = percent
-  let total = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length
-  progressBar.value = total
-}
-
-function handleFiles(files) {
-  files = [...files]
-  initializeProgress(files.length)
-  files.forEach(uploadFile)
-  files.forEach(previewFile)
-}
 function handleImgFiles(files, field) {
   previewImgFile(files[0], field)
   uploadFile(files[0], field)
 }
 function previewImgFile(file, field) {
   let reader = new FileReader()
-  reader.readAsDataURL(file)
   reader.onloadend = function() {
     let img = document.createElement('img')
     img.src = reader.result
     document.getElementById(field).src = img.src
   }
-}
-
-
-function previewFile(file) {
-  let reader = new FileReader()
-  console.warn(file)
   reader.readAsDataURL(file)
-  reader.onloadend = function() {
-    let img = document.createElement('img')
-    img.src = reader.result
-    document.getElementById('gallery').appendChild(img)
-  }
 }
+// function handleImgFiles(e, field) {
+//     preventDefaults(e)
+//     const files = e.dataTransfer.files;
+//     const file = files[0]
+//     console.warn('e',e)
+//     let reader = new FileReader()
+//     console.warn('reader',reader)
+//     console.warn('file',file)
+//     reader.onload = (e) => {
+//       const img = document.getElementById(field);
+//       console.warn('reader',e.target.result)
+//       img.src = e.target.result;
+//     };
+//     reader.readAsDataURL(file);
+// }
+
 
 function uploadFile(file,field) {
     var form = new FormData();
+    console.warn('field',field)
+    console.warn('file',file)
+
     form.append("mid", {{maps.id}});
     form.append("type", field);
     form.append("image", file);
 
     var settings = {
         "url": "http://stats.geekfestclan.com/api/stats/mapimg/",
-        // "url": "http://test.geekfest.live:8000/api/stats/mapimg/",
+        // "url": "http://192.168.0.208:8000/api/stats/mapimg/",
         "method": "POST",
         "timeout": 0,
         // "headers": {

@@ -532,6 +532,7 @@ class MapData(models.Model):
     type = models.CharField(max_length=250, blank=True, null=True)
     theme = models.CharField(max_length=250, blank=True, null=True)
     votescore = models.DecimalField(max_digits=8, decimal_places=2)
+    thumbnail = models.ImageField(upload_to='maps/', blank=True, null=True)
 
     class Meta:
         managed = False

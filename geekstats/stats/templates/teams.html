@@ -285,10 +285,10 @@ d888888P                                 .d88888b    dP              dP
 {% endif %}
 
 <div style="padding-top: 15px;" class="container">
-	<div style="width:49%; display:inline-block; ">
+	<div style="min-width:49%; display:inline-block; ">
 		<div class="container cgeek">
 			<div style="padding: 5px; display: inline-block; width:70%;" class="fbig fbold">Team: {{gfgames.team1}}</div>
-			<div style="padding: 5px; display: inline-block; margin-top:10px; position:absolute; color:white; background-color: {% if gfgames.team1advantage < 0 %} darkred; {% else %} darkgreen; {%endif%} ">KDR Advantage: {{gfgames.team1advantage}}</div>
+			<div style="padding: 5px; display: inline-block; color:white; background-color: {% if gfgames.team1advantage < 0 %} darkred; {% else %} darkgreen; {%endif%} ">KDR Advantage: {{gfgames.team1advantage}}</div>
 		</div>
 	<table>
 		<tr>
@@ -321,10 +321,10 @@ d888888P                                 .d88888b    dP              dP
 	</table>
 
 	</div>
-	<div style="width:49%; display:inline-block; padding:5px;">
+	<div style="min-width:49%; display:inline-block; padding:5px;">
 		<div class="container cfest">
 			<div style="padding: 5px; display: inline-block; width:70%;" class="fbig fbold">Team: {{gfgames.team2}}</div>
-			<div style="padding: 5px; display: inline-block; margin-top:10px; position:absolute; color:white; background-color: {% if gfgames.team2advantage < 0 %} darkred; {% else %} darkgreen; {%endif%} ">KDR Advantage: {{gfgames.team2advantage}}</div>
+			<div style="padding: 5px; display: inline-block; color:white; background-color: {% if gfgames.team2advantage < 0 %} darkred; {% else %} darkgreen; {%endif%} ">KDR Advantage: {{gfgames.team2advantage}}</div>
 		</div>
 		
 		<table>
@@ -357,6 +357,7 @@ d888888P                                 .d88888b    dP              dP
 
 		</table>
 	</div>
+</div>
 <!-- 	
 d888888P                                  .d888888        dP            oo          oo            dP                       dP   oo                   
    88                                    d8'    88        88                                      88                       88                        
@@ -369,6 +370,7 @@ d888888P                                  .d888888        dP            oo      
 	
 	
 	{% if request.user.is_staff %}
+	<div>
 	<form method="POST" action="Teams">
 		{% csrf_token %}
 		<input type="hidden" name="team1" value="{{gfgames.team1}}">

@@ -275,6 +275,7 @@ td span {
 
 .rowheader {
 	font-size: 14px;
+	padding-top: 5px;
 	margin:auto;
 	background: black;
 	color: white;
