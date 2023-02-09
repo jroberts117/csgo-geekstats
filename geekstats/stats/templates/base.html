@@ -20,7 +20,7 @@
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="{% static 'sort-table.js' %}"></script>
-		<script src="{% static 'scripts.js' %}"></script>
+
 
 
 
@@ -120,6 +120,7 @@
 			{% endblock content %}
 		</article>
 		<footer>Copyright &copy;
+			<script src="{% static 'scripts.js' %}"></script>
 			<script type="text/JavaScript">
 				{% if state.datetype == 'range' %} 
 					document.getElementById("dateSeasons").style['display'] = "none";
