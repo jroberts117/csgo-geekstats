@@ -12,6 +12,7 @@ INSERT INTO geek.award_category(award_category_id, category_name, category_descr
 INSERT INTO geek.award_category(award_category_id, category_name, category_description, category_color) VALUES (5, 'N00b', 'Happens to the best of us', 'rgb(255,114,111)');
 INSERT INTO geek.award_category(award_category_id, category_name, category_description, category_color) VALUES (6, 'Team', 'Team achievements for all', 'rgb(168,212,198)');
 INSERT INTO geek.award_category(award_category_id, category_name, category_description, category_color) VALUES (7, 'New*', 'New awards that have yet to be categorized', 'rgb(146,207,255)');
+INSERT INTO geek.award_category(award_category_id, category_name, category_description, category_color) VALUES (8, 'Damage', 'Journey before destination', 'rgb(3,172,19)');
 
 INSERT INTO geek.geekfest_award(geekfest_award_id, award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
 VALUES (1,'Kills in a row', 'The Mechanic', 'Kills in a row in a single round', '/images/ribbons/4_mostkills.png', 1, 'SELECT {match}, {award}, geek_id, MAX(streak) as streak
@@ -444,6 +445,44 @@ VALUES ('Total Assists', 'Always a Bridesmaid', 'The number of assists', '/image
  WHERE a.is_tk_assist=0 AND mr.match_id={match}
  GROUP BY geek_id', 'sql', 'sum');
 
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Shots to the legs', 'Make Em Dance', 'The number of times player shot an enemy in the legs', '/images/ribbons/1_standaard.png', 7, 
+'SELECT {match}, {award}, geek_id, COUNT(*) AS value
+ FROM geek.damage d
+ 	JOIN geek.match_round mr ON d.round_id=mr.round_id
+ WHERE d.is_team_damage=0 AND mr.match_id={match} AND 
+ 	(d.hitgroup=\'left leg\' OR d.hitgroup=\'right leg\')
+ GROUP BY geek_id', 'sql', 'sum');
 
 
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Nice', 'Nice', 'The number of times player ended a round with 69 health', '/images/ribbons/1_standaard.png', 8, 
+'SELECT {match}, {award}, victim_id, COUNT(*) FROM
+	(SELECT victim_id, round_id, MIN(health_remaining) health_remaining FROM geek.damage GROUP BY victim_id, round_id) grp
+    JOIN geek.match_round mr ON grp.round_id=mr.round_id
+WHERE health_remaining = 69 AND mr.match_id={match}
+GROUP BY victim_id', 'sql', 'sum');
 
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Nonlethal Headshots', 'Dink Master', 'The number of times player hit headshots that were not kills', '/images/ribbons/1_standaard.png', 8, 
+'SELECT {match}, {award}, geek_id, COUNT(*) 
+FROM geek.damage d
+	JOIN geek.match_round mr ON d.round_id=mr.round_id
+WHERE d.is_kill=0 AND d.hitgroup=\'head\' AND mr.match_id={match}
+GROUP BY geek_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Total hits taken', 'Anti-Neo', 'The total number of hits a player receieved', '/images/ribbons/1_standaard.png', 8, 
+'SELECT {match}, {award}, victim_id, COUNT(*)
+FROM geek.damage d
+	JOIN geek.match_round mr ON d.round_id=mr.round_id
+WHERE mr.match_id={match}
+GROUP BY victim_id', 'sql', 'sum');
+
+INSERT INTO geek.geekfest_award(award_name, award_title, award_description, award_image_path, award_category_id, award_query, award_query_type, award_value_type)
+VALUES ('Total damage taken', 'Tank', 'The total damage a player receieved', '/images/ribbons/1_standaard.png', 8, 
+'SELECT {match}, {award}, victim_id, SUM(damage_health)
+FROM geek.damage d
+	JOIN geek.match_round mr ON d.round_id=mr.round_id
+WHERE mr.match_id={match}
+GROUP BY victim_id', 'sql', 'sum');
