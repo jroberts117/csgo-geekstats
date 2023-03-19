@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS geek.geekfest_match_award;
 DROP TABLE IF EXISTS geek.geekfest_award;
 DROP TABLE IF EXISTS geek.award_category;
 DROP TABLE IF EXISTS geek.match_award;
+DROP TABLE IF EXISTS geek.damage;
 DROP TABLE IF EXISTS geek.grenade_toss;
 DROP TABLE IF EXISTS geek.blind;
 DROP TABLE IF EXISTS geek.assist;
@@ -257,6 +258,37 @@ CREATE TABLE geek.match_award(
     , PRIMARY KEY (match_award_id)
     , FOREIGN KEY (match_id) REFERENCES geek.season_match(match_id)
 	, FOREIGN KEY (geek_id) REFERENCES geek.geek(geek_id)
+);
+
+CREATE TABLE geek.damage (
+  damage_id int NOT NULL AUTO_INCREMENT,
+  geek_id int NOT NULL,
+  round_id int NOT NULL,
+  victim_id int NOT NULL,
+  item_id int NOT NULL,
+  pos_x decimal(12,4) NOT NULL,
+  pos_y decimal(12,4) NOT NULL,
+  pos_z decimal(12,4) NOT NULL,
+  pos_victim_x decimal(12,4) NOT NULL,
+  pos_victim_y decimal(12,4) NOT NULL,
+  pos_victim_z decimal(12,4) NOT NULL,
+  distance decimal(12,4) NOT NULL,
+  damage_health int NOT NULL,
+  damage_armor int NOT NULL,
+  health_remaining int NOT NULL,
+  armor_remaining int NOT NULL,
+  hitgroup varchar(45) NOT NULL,
+  is_kill bit(1) NOT NULL,
+  is_team_damage bit(1) NOT NULL,
+  PRIMARY KEY (damage_id),
+  KEY dmg_fk_rnd_idx (round_id),
+  KEY dmg_fk_geek_idx (victim_id),
+  KEY dmg_fk_item_idx (item_id),
+  KEY dmg_fk_victim (geek_id),
+  CONSTRAINT dmg_fk_geek FOREIGN KEY (victim_id) REFERENCES geek (geek_id),
+  CONSTRAINT dmg_fk_item FOREIGN KEY (item_id) REFERENCES item (item_id),
+  CONSTRAINT dmg_fk_rnd FOREIGN KEY (round_id) REFERENCES match_round (round_id),
+  CONSTRAINT dmg_fk_victim FOREIGN KEY (geek_id) REFERENCES geek (geek_id)
 );
 
 CREATE TABLE geek.award_category(
