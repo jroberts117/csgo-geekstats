@@ -6,6 +6,8 @@
 from .geekmodels import Geek, TiersData, TeamGeek, Maps
 from django.db import models
 from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
+from datetime import datetime, timedelta
+
 
 
 ########################################################################
@@ -346,13 +348,21 @@ class map_summary:
             self.t_wins = 0.00
             self.ct_wins = 0.00
             self.balance = 0.00
-        self.last_play = data['last_play']
+        if data['last_play']:
+            self.last_play = data['last_play']
+            self.last_play_date = datetime.today() - timedelta(days=self.last_play)
+        else:
+            self.last_play = 'Never Played'
         self.top_player = 'none'
         self.top_gun = 'none'
         self.kills = 0
         self.ninja = 0
         self.thumb = 'none'
         self.plays = data['plays']
+        self.playslist = []
+        if self.plays:
+            for i in range(int(self.plays)):
+                self.playslist.append('x')
         if data['s_plays']:
             self.s_plays = data['s_plays']
         else:
@@ -370,8 +380,13 @@ class map_summary:
         self.defuse_rounds = data['defuse_rounds']
         self.total_rounds = self.no_obj_rounds + self.bomb_explode_rounds + self.bomb_plant_rounds + self.defuse_rounds
         if self.total_rounds > 0:
-            self.obj_pct = (1-(self.no_obj_rounds/self.total_rounds))*100
-            self.success_rounds = (self.bomb_explode_rounds / self.total_rounds)*100
+            # self.success_rounds = 
+            self.obj_pct = (1-((self.no_obj_rounds+self.defuse_rounds)/self.total_rounds))*100
+            self.explode_pct = (self.bomb_explode_rounds / self.total_rounds)*100
+            self.plant_pct = (self.bomb_plant_rounds / self.total_rounds)*100
+            self.defuse_pct = (self.defuse_rounds / self.total_rounds)*100
+
+
         else:
             self.obj_pct = 0
             self.success_rounds = 0

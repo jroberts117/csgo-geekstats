@@ -1028,18 +1028,26 @@ def details(request):
     xOpp = request.session['opponentid']
     xMap = request.session['mapid']
     xWeapon = request.session['weaponid']
+    playerName = Geek.objects.values('handle').filter(geek_id=pid)[0]['handle']
+    print(playerName)
 
     ### GET THE DETAILS REQUESTED FROM THE FRAGDETAILS VIEW
     if request.session['opponentid'] != '':
         pdetails = FragDetails.objects.values().filter(id=pid,victim=xOpp,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
         details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,killer=xOpp,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime'),all=True).order_by('match_datetime')
+        rType = 'Opponent'
     elif xMap != '':
         pdetails = FragDetails.objects.values().filter(id=pid,map=xMap,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
         details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,map=xMap,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']),all=True).order_by('match_datetime')
+        rType = 'Map'
     elif xWeapon != '':
         pdetails = FragDetails.objects.values().filter(id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']).order_by('match_datetime')
         details = pdetails.union(FragDetails.objects.values().filter(victim_id=pid,weapon=xWeapon,match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date']),all=True).order_by('match_datetime')
+        rType = 'Weapon'
+    
     context = {'details' : details,
+               'rType' : rType,
+               'playerName' : playerName,
                'title': 'GeekFest Geeks',
                'state':newstate,
                'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state),

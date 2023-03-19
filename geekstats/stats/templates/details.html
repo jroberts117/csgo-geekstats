@@ -11,7 +11,18 @@
 <div class="container rowwrap ">
 	<table style="">
 	<TR>
-	<TH style="background:grey;" colspan=6>DETAIL STATS</TH>
+	<TH class="" style="background-color: lightgray;" colspan=6>
+		<h3 style="margin:5px;">DETAIL STATS</h3>
+		{{playerName}}'s stats 
+		{% if rType == 'Map' %}
+			for {{details.0.map}} 
+		{% elif rType == 'Weapon' %}
+			with {{details.0.weapon}} 
+		{% else %}
+			against {{details.0.killer}} 
+		{% endif %}
+		on {{details.0.match_datetime|date:"M-d-Y"}}
+	</TH>
 	</TR><TR style="background:black;color:white;padding:2px;" >
 	<TH style="padding:5px;">Date</TH>
 	<TH style="padding:5px;">Map</TH>

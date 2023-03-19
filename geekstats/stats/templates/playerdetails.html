@@ -6,11 +6,11 @@
 {% block content %}
 <!- Player summary stats box ->
 <section>
+	<hr style="border-top: 2px solid black;">
 	<div id="graph" class="pop-graph">{{chart|safe}}</div>
 	<div class="summary">
-		<span class="rowheader">PLAYER STATS FOR: </span>
 		<div class= "container" style="min-width: 50%; padding:5px;">
-			<div><img src ="/static/images/geeks/{{player.name|lower}}.png" height="150"></div>
+			<div><img src ="/static/images/geeks/{{player.name|lower}}.png" height="175"></div>
 			<div class="highlightbox"> 
 				<div class="fbig">
 	{% if player.name == 'No data' %} 
@@ -61,16 +61,36 @@
 					<td rowspan=4 width="33%" onMouseOver="showGraph();" onMouseOut="hideGraph();">	{{chart|safe}}</td>
 				</tr>
 				<tr height="25px" class="fmed acenter">
-					<td class="floral">{{player.topVictim}}</td>
-					<td class="floral">{{player.nemesis}}</td>
+					<td class="floral">
+						<div class="container">
+							<div class="inline"><img src="/static/images/geeks/{{player.topVictim}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/> </div>
+							<div class="inline">{{player.topVictim}}</div>
+						</div>
+					</td>
+					<td class="floral">
+						<div class="container">
+							<div class="inline"><img src="/static/images/geeks/{{player.nemesis}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>  </div>
+							<div class="inline">{{player.nemesis}}</div>
+						</div>
+					</td>
 				</tr>
 				<tr height="25px" class="header">
 					<td class="">Best Weapon:</td>
 					<td class="">Favorite Map:</td>
 				</tr>
 				<tr height="25px" class="fmed acenter">
-					<td class="floral">{{player.weapons.0.item}}</td>
-					<td class="floral">{{player.maps.0.item}}</td>
+					<td class="floral">
+						<div class="container">
+							<div class="inline"><img src="/static/images/{{player.weapons.0.item}}.png" class="geek-hero" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+							<div class="inline">{{player.weapons.0.item}}</div>
+						</div>
+					</td>
+					<td class="floral">
+						<div class="container">
+							<div class="inline"><img src="url('test.png')" id="topmap" class="geek-thumb" loading="lazy" alt="no image on server" onload="getImage('topmap','{{player.maps.0.item}}')" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+							<div class="inline">{{player.maps.0.item}}</div>
+						</div>
+					</td>
 				</tr>
 
 			</table>
@@ -83,82 +103,138 @@
 <section class="text_center">
 
 	<!- Weapon stats box ->
-	<div class="highlightbox">
-		<div class="header">Weapon Stats</div>
-			<table class="zebra js-sort-table">
-				<tr class="black">
-					<th>Weapon</th>
-					<th class="js-sort-number">K</th>
-					<th class="js-sort-number">D</th>
-				</tr>
-				{% for i in player.weapons %}
-				<tr>
-					<td><a href="Details?pid={{player.id}}&wid={{i.item}}">{{i.item}}</a></td>
-					<td>{{i.kills}}</td>	
-					<td>{{i.deaths}}</div>
-				</tr>
-				{% endfor %}
-			</table>
+	<div style="width:33%;" class="pics-div">
+		<div class="pics-hdr"><h2 style="margin:5px;">WEAPON STATS:</h2></div>
+		<div class="pics-container-scroll">
+			<div style="width:100%; display:flex;">
+				<div class="weapons-hero black" style="min-width:70%">Weapon</div>
+				<div class="weapons-hero black" style="min-width:14%; display:inline-flex;">Kills</div>
+				<div class="weapons-hero black" style="min-width:14% display:inline-flex;">Deaths</div>
+			</div>		  
+		{% for p in player.weapons %}
+		  <div style="width:100%; display:flex; border:3px solid white;">
+			<div class="weapons-hero" style="min-width:30%">
+			  <img src="/static/images/{{p.item}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot;" style="width:auto;"/> 
+			</div>
+		  <div class="pics-col" style="min-width: 40%; text-align:left;  overflow: hidden;">
+			<h3 style="margin:5px;"><a href="Details?pid={{player.id}}&wid={{p.item}}">{{p.item}}</a></h3>
+		  </div>
+		  <div class="pics-col" style="min-width: 14%;">
+			<div><h3>{{p.kills}}</h3></div>
+		  </div>  
+		  <div class="pics-col" style="min-width: 14%;">
+			<div><h3>{{p.deaths}}</h3></div>
+		  </div>  
 		</div>
-	</div>
+		{% endfor %}
+		</div>
+	
+	  </div>
 	
 	 <!- Opponents stats box ->
-	<div class="highlightbox">
-	<div class="header">Opponent Stats</div>
-		<table class="zebra js-sort-table">
-			<tr class="black">
-	
-				<th>Opponent</th>
-				<th class="js-sort-number">K</th>
-				<th class="js-sort-number">D</th>
-				<th class="js-sort-number">KDR</th>
-			</tr>
-			{% for i in player.opponents %}
-			<tr>
-	
-				<td><a href="Details?pid={{player.id}}&oid={{i.item}}">{{i.item}}</a></td>
-				<td>{{i.kills}}</td>	
-				<td>{{i.deaths}}</td>
-				<td>{{i.kdr}}</td>
-			</tr>
-			{% endfor %}
-		</table>
-	</div>
-	 
-	  <!- Maps stats box ->
-	  <div class="highlightbox">
-		<div class="header">Map Stats</div>
-			<table class="zebra js-sort-table">
-				<tr class="black">
-					<th>Map</th>
-					<th class="js-sort-number">K</th>
-					<th class="js-sort-number">D</th>
-					<th class="js-sort-number">A</th>
-					<th class="js-sort-number">KDR</th>
-				</tr>
-				{% for i in player.maps %}
-				<tr>
-					<td><a href="Details?pid={{player.id}}&mid={{i.item}}">{{i.item}}</a></td>
-					<td>{{i.kills}}</td>	
-					<td>{{i.deaths}}</td>
-					<td>{{i.assists}}</td>
-					<td>{{i.kdr}}</td>
-				</tr>
-				{% endfor %}
-			</table>
+
+	 <div style="width:33%;" class="pics-div">
+		<div class="pics-hdr"><h2 style="margin:5px;">OPPONENT STATS:</h2></div>
+		<div class="pics-container-scroll">
+			<div style="width:100%; display:flex;">
+				<div class="weapons-hero black" style="min-width:65%">Opponent</div>
+				<div class="weapons-hero black" style="min-width:10%; display:inline-flex;">K</div>
+				<div class="weapons-hero black" style="min-width:10%; display:inline-flex;">D</div>
+				<div class="weapons-hero black" style="min-width:15%; display:inline-flex;">KDR</div>
+			</div>		  
+		{% for p in player.opponents %}
+		  <div style="width:100%; display:flex; border:3px solid white;">
+			<div class="weapons-hero" style="min-width:25%">
+			  <img src="/static/images/geeks/{{p.item}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot;" style="width:auto; max-height: 100%;"/> 
+			</div>
+		  <div class="pics-col" style="min-width: 40%; text-align:left;  overflow: hidden;">
+			<h3 style="margin:5px;"><a href="Details?pid={{player.id}}&oid={{p.item}}">{{p.item}}</a></h3>
+		  </div>
+		  <div class="pics-col" style="min-width: 10%;">
+			<div><h3>{{p.kills}}</h3></div>
+		  </div>  
+		  <div class="pics-col" style="min-width: 10%;">
+			<div><h3>{{p.deaths}}</h3></div>
+		  </div>  
+		  <div class="pics-col" style="min-width: 15%;">
+			<div><h3>{{p.kdr}}</h3></div>
+		  </div>  
+
 		</div>
-
-	<!-- <table>
-		{% for i in data %}
-		<tr>
-			{% for j in i.values %}
-			<td>{{j}}</td>
-			{% endfor %}
-		</tr>
 		{% endfor %}
-	</table> -->
+		</div>
 	
+	</div>
 
+ 
+	<!- Maps stats box ->
+	<div style="width:33%;" class="pics-div">
+		<div class="pics-hdr"><h2 style="margin:5px;">MAP STATS:</h2></div>
+		<div class="pics-container-scroll">
+			<div style="width:100%; display:flex;">
+				<div class="weapons-hero black" style="min-width:55%">Map</div>
+				<div class="weapons-hero black" style="min-width:10%; display:inline-flex;">K</div>
+				<div class="weapons-hero black" style="min-width:10%; display:inline-flex;">D</div>
+				<div class="weapons-hero black" style="min-width:10%; display:inline-flex;">A</div>
+				<div class="weapons-hero black" style="min-width:15%; display:inline-flex;">KDR</div>
+			</div>		  
+		{% for p in player.maps %}
+		  <div style="width:100%; display:flex; border:3px solid white;">
+			<div class="weapons-hero" style="min-width:25%">
+			  <img src="/media/{{p.item}}.png" class="geek-thumb" name="" loading="lazy" id="img{{forloop.counter}}" alt="no image on server" onload="getImage('img{{forloop.counter}}','{{p.item}}')" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot;" style="width:auto; max-height: 100%;"/> 
+			</div>
+		  <div class="pics-col" style="min-width: 30%; text-align:left;  overflow: hidden;">
+			<h3 style="margin:5px;"><a href="Details?pid={{player.id}}&mid={{p.item}}">{{p.item}}</a></h3>
+		  </div>
+		  <div class="pics-col" style="min-width: 10%;">
+			<div><h3>{{p.kills}}</h3></div>
+		  </div>  
+		  <div class="pics-col" style="min-width: 10%;">
+			<div><h3>{{p.deaths}}</h3></div>
+		  </div>  
+		  <div class="pics-col" style="min-width: 10%;">
+			<div><h3>{{p.assists}}</h3></div>
+		  </div>  
+		  <div class="pics-col" style="min-width: 15%;">
+			<div><h3>{{p.kdr}}</h3></div>
+		  </div>  
+
+		</div>
+		{% endfor %}
+		</div>
+	
+	</div>
+
+<script>
+
+	function getImage(img, reqMap) {
+		if (document.getElementById(img).name == "loaded") {
+			return
+		}
+		var imgID = img
+		console.log(imgID)
+		var map = reqMap
+		// var URL = "http://192.168.0.208:8000/api/stats/getimg?mid=0&map="+map+"&type=thumb"
+		var URL = "http://stats.geekfestclan.com/api/stats/getimg?mid=0&map="+map+"&type=thumb"
+		console.log(URL)
+		fetch(URL, {
+		headers:{
+			'Accept': 'application/json',
+			'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+		},
+		})
+		.then(response => {
+			return response.json() //Convert response to JSON
+		})
+		.then(data => {
+			//Perform actions with the response data from the view
+			console.log(data)
+			document.getElementById(imgID).name = "loaded"
+			document.getElementById(imgID).src = data
+		})
+	}
+
+</script>
 	
 </section>
 

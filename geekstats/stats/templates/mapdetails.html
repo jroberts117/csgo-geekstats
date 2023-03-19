@@ -22,7 +22,7 @@
 			<th class="js-sort-text" style="padding-left:5px;">Plays</th>
 			<th class="js-sort-text">Seasons</th>
 			<th class="js-sort-number">CT Win %</th>
-			<th><span title="% of rounds attempted / % of rounds succeeded">Objective</span></th>
+			<th><span title="% bomb exploded / % bomb planted">Objective</span></th>
 			<th>Theme</th>
 			<th>Top Geek</th>
 			<th>Top Gun</th>
@@ -74,7 +74,7 @@
 						{{i.balance|floatformat:1}}% </span> 
 				</div>
 			</td>
-			<td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
+			<td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.explode_pct|floatformat:0}}% / {{i.plant_pct|floatformat:0}}%{% endif %}</td>
 			<td class="text_center">{{ i.theme }}</td>
 			<td class="text_center">{% with i.players|last as last %} {{ last.item }} {%endwith%}</td>
 			<td class="text_center">{% with i.weapons|last as last %} <span title="{{last.count}} kills with a {{last.item}}"><img src="{% static 'images/'%}{{ last.item }}.png" onerror="this.src=&quot;{% static 'images/'%}searchicon.png&quot; ;" align="center" class="weapon"></span>{%endwith%}</td>
@@ -157,7 +157,7 @@
 
 			var settings = {
 			"url": "http://stats.geekfestclan.com/api/stats/rating/",
-			// "url": "http://test.geekfest.live:8000/api/stats/rating/",
+			// "url": "http://192.168.0.208:8000/api/stats/rating/",
 			"method": "POST",
 			"timeout": 0,
 			// "headers": {

@@ -902,7 +902,7 @@ img.weapon {
   }
 
   .map-title{
-	font-size: 100px;
+	font-size: 75px;
 	width: 50%;
   }
 
@@ -927,4 +927,205 @@ img.weapon {
 		margin: 10px;
 		justify-content: center;
 	  }
+  }
+
+  /******************** Carousel *********************/
+  .pics-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	margin: 1px 0;
+	background-color: rgb(243, 243, 243);
+  }
+
+  .pics-container-scroll {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	align-content: flex-start;
+	margin: 1px 0;
+	height: 425px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align: center;
+	background-color: rgb(243, 243, 243);
+  }
+
+  .stats-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	margin: 1px 0;
+  }
+
+  .floral .container {
+	align-items: center;
+	justify-content: flex-start;
+  }
+
+  .img-hero {
+	max-height:500px;
+    max-width:600px;
+    height:auto;
+    width:auto;
+}
+  .img-thumb {
+	width: 149px;
+	height: 149px;
+	margin: 1px;
+	overflow: hidden;
+  }
+
+  .img-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+  }
+
+  .geek-hero {
+	max-height:150px;
+    max-width:150px;
+    height:auto;
+    width:auto;
+}
+  .geek-thumb {
+	width: 50px;
+	height: 50px;
+	margin: auto;
+	overflow: hidden;
+  }
+  
+  .geek-winner {
+	width: 50%;
+	background-color: rgb(247, 224, 228);
+  }
+  .geek-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	margin: auto;
+  }
+
+  .pics-hdr {
+	padding:10px 0px;
+	background-color: darkred;
+  }
+
+  .pics-hdr h2 {
+	color:white;
+  }
+  .pics-hero, .weapons-hero {
+	align-items: center;
+  }
+
+  .weapons-hero img {
+	max-height:30px;
+  }
+
+  .pics-div {
+	width:24%;
+	display:inline-block; 
+	vertical-align: top;
+	text-align: center;
+  }
+
+  .pics-col {
+	width:40%; 
+	align-items: center;
+	padding-top: 3px;
+  }
+
+  .pics-col h2 {
+	margin:1px;
+  }
+
+  .pics-col h3, .pics-hero h3 {
+	margin:1px;
+  }
+
+	/* For Firefox */
+	progress::-moz-progress-bar {
+	background: rgb(203, 185, 125);
+	}
+
+	/* For Chrome or Safari */
+
+	progress::-webkit-progress-bar {
+		background-color: rgb(203, 185, 125);
+		}
+	progress::-webkit-progress-value {
+		background-color: rgb(88, 115, 138) !important;
+	}
+
+
+	/* For IE10 */
+	progress {
+	background: green;
+	}
+
+.objective-bar {
+	height:20px;
+	width:250px;
+	border:2px solid #000;
+	text-align:center;
+	vertical-align: middle;
+	color:#fff;
+	font-size:16px;
+	background:gray;
+
+   }
+
+.bullet {
+	display:inline-block; 
+	width: 20px; 
+	height: 20px;
+	border-radius: 50%; 
+	margin: 0px 2px;
+	background-color: gray; 
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); 
+	transform: translateY(5px);
+}
+.mapstat_title {
+	width: 125px;
+}
+
+.mapstat_detail {
+	width: 300px;
+	display: flex;
+	align-items: center;
+	margin: 1px 0;
+}
+
+.inline {
+	display: inline-block;
+	vertical-align: bottom;
+	padding: 0px 5px;
+}
+.wide100 {
+	width:125px;
+	text-align: right;
+}
+.break {
+	flex-basis: 100%;
+	height: 0;
+  }
+  
+.block-50 {
+	box-sizing: border-box;
+	flex: 1 1 50%;
+  }
+
+.block-24 {
+	box-sizing: border-box;
+	flex: 1 1 24%;
+	padding: 1px;
+  }
+
+  @media (max-width: 500px) {
+	.block-50, .block-24 {
+	  flex: 1 1 100%;
+	}
   }

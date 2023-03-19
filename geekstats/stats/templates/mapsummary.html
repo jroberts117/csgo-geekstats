@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}{{title}}{% endblock title %}
 
@@ -7,301 +8,241 @@
 <link href="{% static 'dragdrop.css' %}" rel="stylesheet" type="text/css">
 
 {% with i=maps %}
+
 <div class="container">
-  <div class="box"
-    {% if i.metascore > 75 %}
-      style="background: #6c3;"
-    {% elif i.metascore > 50 %}
-      style="background: #Fc3;"
-    {% elif i.metascore > -1 %}
-      style="background: #f00;"
-    {% else %}
-      style="background: gray;"
-    {% endif %}>
-      <span title="{{i.votes}} votes">{{i.metascore}}</span>
+  <div style="display:contents; width:50%;">
+    <div class="box"
+      {% if i.metascore > 75 %}
+        style="background: #6c3;"
+      {% elif i.metascore > 50 %}
+        style="background: #Fc3;"
+      {% elif i.metascore > -1 %}
+        style="background: #f00;"
+      {% else %}
+        style="background: gray;"
+      {% endif %}>
+        <span title="{{i.votes}} votes">{{i.metascore}}</span>
+    </div>
+    <div class="map-title" style="display:inline-block;">{{maps.name}}</div>
   </div>
-  <div class="map-title" style="display:inline-block;">{{maps.name}}</div>
   <div class="" style="display:inline-block;">
-    <div><b>CT Win %:</b>  {% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}{{i.balance|floatformat:1}}% </span> </div>
-    <div><b>Last Played</b> {% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%} days ago</div>
-    <div><b>Played</b> {{maps.plays}} times ({{maps.s_plays}} Season Plays)</div>
-    <div><b>Top Geek:</b> {% with p=i.players|last %}{{p.item}} with {{p.count}} kills {% endwith %}</div>
-    <div><b>Top Weapon:</b>  {% with p=i.weapons|last %}{{p.item}} with {{p.count}} kills {% endwith %}</div>
+    <div class="stats-container">
+      <div class="mapstat_title"><b>Team Win %:</b></div>
+      <div class="mapstat_detail">
+        <div><span title="Counter-Terrorist"><img src="/static/images/CT.png" style="height:25px; width:25px;" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></span></div>
+      <span title="The Win % for CT's is:  {{i.balance}}%"><progress value="{{i.balance}}" max="100" style="width:190px; "></progress></span>
+      <div><span title="Terrorist"><img src="/static/images/T.png" style="height:25px; width:25px;" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></span></div>
+    </div>
+    </div>
+    
+    
+    <div class="stats-container">
+      <div class="mapstat_title"><b>Objectives: </b></div>
+      <div class="mapstat_detail"><span title=""></span>
+        <div class="objective-bar" style="background:linear-gradient(to right, 
+          darkred {% if i.explode_pct %} {{i.explode_pct}}% {% else %} 0% {% endif %}, 
+          rgb(203, 185, 125) {% if i.explode_pct %} {{i.explode_pct}}% {% else %} 0% {% endif %}, 
+          rgb(203, 185, 125) {% if i.plant_pct %} {{i.plant_pct}}% {% else %} 0% {% endif %}, 
+          gray {% if i.explode_pct %} {{i.explode_pct}}% {% else %} 0% {% endif %},
+          gray 100% ,green 0);"> Detonated {{i.explode_pct|floatformat:0}}% - Planted {{i.plant_pct|floatformat:0}}% 
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-container">
+      <div class="mapstat_title"><b>Specialties:</b></div>
+      <div class="mapstat_detail">
+        {% if i.ninja_pct > 2 or i.snipe_pct > 10 or i.hmg_pct > 10 or i.plant_pct > 20 %}
+          {% if i.ninja_pct > 2 %} <span class="inline" title="{{ i.ninja_pct|floatformat }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
+          {% if i.snipe_pct > 10 %} <span class="inline" title="{{i.snipe_pct|floatformat }}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
+          {% if i.hmg_pct > 10 %} <span class="inline" title="{{i.hmg_pct|floatformat }}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
+          {% if i.plant_pct > 20 %} <span class="inline" title="{{i.success_rounds|floatformat:0 }}% of rounds played resulted in a bomb explosion win"><img src="{% static 'images/bomb'%}.png" height="25" align="center"></span>  {% endif %}
+        {% else %}
+          None
+        {% endif %}
+      </div>
+    </div>
+
+</div>
+</div>
+
+<div class="stats-container" style="background-color: none;"">
+
+  <div>
+  <table style="padding:0px 100px;">
+    <tr>
+      <td><b>Your Rating: </b></td>
+      <td style="min-width: 110px;"><input type="hidden" value="{{i.geek_rating}}">
+        <ul class="list-inline rating-list" style="background-color: transparent; border-right:none;">
+          <li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 5)"><i id="star5-{{i.id}}" class="fa fa-star {% if i.geek_rating > 4 %}checked{% endif %}" title="Greatest map EVER!!!"></i></li>
+          <li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 4)"><i id="star4-{{i.id}}" class="fa fa-star {% if i.geek_rating > 3 %}checked{% endif %}" title="I like it!"></i></li>
+          <li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 3)"><i id="star3-{{i.id}}" class="fa fa-star {% if i.geek_rating > 2 %}checked{% endif %}" title="It's playable"></i></li>
+          <li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 2)"><i id="star2-{{i.id}}" class="fa fa-star {% if i.geek_rating > 1 %}checked{% endif %}" title="meh"></i></li>
+          <li style="border-right: none;" onclick="ratingUpdate({{i.id}},{{userid}}, 1)"><i id="star1-{{i.id}}" class="fa fa-star {% if i.geek_rating > 0 %}checked{% endif %}" title="Pure rubbish"></i></li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+<div class="stats-container">
+  <div class=""><b># of plays:</b></div>
+  <div class="" style="padding-left: 10px;">
+    {% for p in i.playslist %}
+      {% if forloop.counter > i.s_plays %}
+        <span title="off season play"><div class="bullet"></div></span>
+      {% else %}
+      <span title="season play"><div class="bullet" style="background-color: darkred;"></div></span>
+      {% endif %}
+    {% endfor %}
   </div>
 </div>
 
+<div class="" style="padding-left: 50px;">
+  <b>Last Played   </b>
+  {% if i.last_play != 'Never Player' %} {{i.last_play_date|timesince}} ago
+  {% endif %}
+</div>
+
+<div class="" style="padding-left: 50px;">
+  <b>Theme: </b>   
+  {{i.theme}}
+</div>
 
 </div>
+
+
 <hr class="solid">
 {% if i.description %}
-<div style="text-align:center;">{{i.description}}</div>
-{%endif%}
-{% if i.workshop %}
-<div style="text-align:center;"><b>Steam Workshop Link:  </b><a href="{{i.workshop}}">{{i.workshop}}</a></div>
+<div style="text-align:center; padding-bottom: 3px;">{{i.description}}</div>
 {%endif%}
 
-<div style="text-align:center; padding-top: 15px;" class="map-summary">
-  <div  class="long-container">
-   
-  
 
+  <div class="container" id="mapDetails" style="flex-wrap: wrap;"> 
+  <!-- Pic Displayer wrapper -->
+  <div class="block-50" style="">
+    <div class="pics-container">
+      <div class="pics-hero"><img src="/media/{{i.hero_image}}" class="img-hero" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>  
+    </div>
+    <div class="pics-container">
+      <div><img src="/media/{{i.image2}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img src="/media/{{i.image3}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img src="/media/{{i.radar}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img src="/media/{{i.thumb}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+    </div>
+    {% if i.workshop %}
+    <div style="text-align:center;"><b>Steam Workshop Link:  </b><a href="{{i.workshop}}">{{i.workshop}}</a></div>
+    {%endif%}
+    
+  </div>
+
+  <!-- Pic Displayer wrapper -->
+
+  <div class="block-24 pics-div">
+    <div class="pics-hdr"><h2>TOP GEEKS:</h2></div>
+    <div class="pics-container-scroll">
+      {% for p in i.players reversed %}
+      <div style="width:100%; display:flex; border:3px solid white;">
+        <div class="" style=" ">
+          <img src="/static/images/geeks/{{p.item}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/> 
+        </div>
+      <div class="pics-col" style="text-align:left;">
+        <h3 style="margin:5px;">{{p.item}}</h3>
+      </div>
+      <div class="pics-col">
+        <div><h3>{{p.count}} Kills</h3></div>
+      </div>  
+    </div>
+    {% endfor %}
+    </div>
+
+  </div>
+
+  <div class="block-24 pics-div">
+    <div class="pics-hdr"><h2>TOP GUNS:</h2></div>
+    <div class="pics-container-scroll">
+      {% for p in i.weapons reversed %}
+      <div style="width:100%; display:flex; border:3px solid white;">
+        <div class="weapons-hero" style="width:50%; ">
+        {{p.item}}
+        <img src="/static/images/{{p.item}}.png" class="geek-hero" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
+      </div>
+      <div class="pics-col">
+        <div><h3>{{p.count}}</h3></div>
+        <div>Kills</div>
+      </div>  
+    </div>
+    {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% if request.user.is_staff %}
+<div class="cfest" style="width:100%; margin:auto; padding:5px; text-align: center;"> 
+  <h3 style="margin: 2px;">Staff Admin: <input type="button" id="adminbtn" class="adminbtn" value="Edit Details"></h3>
+</div>
+{% endif %}
+
+<div id="mapEdit" style="display:none; margin: auto; width:900px;">
+  <div style="background-color: lightgray; padding:5px;border-radius: 10px;">
+  <h2 style="text-align: center;">Map Data</h2>
+  <div style="text-align:left; display: flex;">
+    <div style="display: flex; padding-bottom: 10px;">
+      <div>
+        <div class="inline wide100"> Theme: </div><div class="inline"> <input type="text" name="theme" id="theme" size="25" maxlength="45" value="{{i.theme}}"></div>
+      </div>
+      <div>
+        <div class="inline wide100"> Workshop Link: </div><div class="inline"> <input type="text" name="workshop_link" id="workshop" size="50" maxlength="150" value="{{i.workshop}}"></div>
+      </div>
+    </div>
+    </div>
+    <div class="container" style="padding:0px; justify-content: left;"><div class="inline wide100"> Description: </div><div class="inline"> <textarea name="description" id="desc" rows="2" cols="95" maxlength="500" value="{{i.description}}"></textarea></div>
+  </div>        
+  </div>
+
+
+  <div style="text-align:center; padding-top: 15px;" class="map-summary">
+  <div class="">
+
+  <div  class="">
   <div id="drop-area">
     <form class="my-form">
       {% if user.is_authenticated %}
         <p>Replace or add image by dragging and dropping new image onto the dashed region</p>
       {% endif %}
-        <h3>HERO</h3>
-        <img id="hero" src="/media/{{i.hero_image}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
-        <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
-        <h3>RADAR</h3>
-        <img id="radar" src="/media/{{i.radar}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
-        <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'radar')">
-        <h3>IMAGE 2</h3>
-        <img id="image2" src="/media/{{i.image2}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
-        <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
-        <h3>IMAGE 3</h3>
-        <img id="image3" src="/media/{{i.image3}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
-        <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
-        <h3>THUMBNAIL</h3>
-        <img id="thumb" src="/media/{{i.thumb}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
-        <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
+        <div class="image-wrap">
+          <h3>HERO</h3>
+          <img id="hero" src="/media/{{i.hero_image}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
+          <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
+        </div>
+        <div class="image-wrap">
+          <h3>RADAR</h3>
+          <img id="radar" src="/media/{{i.radar}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
+          <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'radar')">
+        </div>
+        <div class="image-wrap">
+          <h3>IMAGE 2</h3>
+          <img id="image2" src="/media/{{i.image2}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
+          <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
+        </div>
+        <div class="image-wrap">
+          <h3>IMAGE 3</h3>
+          <img id="image3" src="/media/{{i.image3}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
+          <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
+        </div>
+        <div class="image-wrap">
+          <h3>THUMBNAIL</h3>
+          <img id="thumb" src="/media/{{i.thumb}}" loading="lazy" alt="no image on server" height="200" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>
+          <input type="file" id="fileElem" accept="image/*" onchange="handleImgFiles(this.files, 'imghero')">
+        </div>
     </form>
     <form action="/Map2" method="post" enctype ="multipart/form-data">
         {% csrf_token %}
     </form>
   </div>
 </div>
-  <div class="long-container">
-
-    <h2>Map Data</h2>
-    <div class="split-container">
-      <div class="table-container">
-        <div class="header">Match Stats</div>
-            <table class="zebra map-stats-table">
-                <tr class="black">
-                    <th>dates</th>
-                    <th>kills</th>
-                </tr>
-                {% for d in i.matches %}
-                <tr>
-                    <td>{{d.item}}</td>
-                    <td>{{d.count}}</td>           
-                </tr>
-                {% endfor %}
-            
-            </table>
-        </div>
-        <div class="table-container">
-          <div class="header">Match Highlights</div>
-              <table class="zebra map-highlights-table">
-                  <tr>
-                    <th>CT win %</th>
-                    <td>{% if i.balance > 60 or i.balance < 40 %} <span style="font-weight: 400; color: red;"> {% else %} <span style="font-weight: 400; color: green;"> {% endif %}
-                      {{i.balance|floatformat:1}}% </span> </td>
-                  </tr>
-                  <tr>
-                    <th>T Wins</th>
-                    <td>{{ i.t_wins }}</td>
-                  </tr>
-                  <tr>
-                    <th>CT Wins</th>
-                    <td>{{i.ct_wins }}</td>
-                  </tr>
-                  <tr>
-                    <th>Objective %</th>
-                    <td class="text_center">{% if i.obj_pct == 0 %}No Data{% else %}{{i.obj_pct|floatformat:0}}% / {{i.success_rounds|floatformat:0}}%{% endif %}</td>
-                  </tr>
-                  <tr>
-                    <th>Theme</th>
-                    <td class="text_center">{{ i.theme }}</td>
-                  </tr>
-                  <tr>
-                    <th>Last Play</th>
-                    <td class="text_center">{% if i.last_play %}{{i.last_play}}{%else%}9999{%endif%}</td>
-                  </tr>
-                  <tr>
-                    <th>Map Type</th>
-                    <td class="text_center">{{ i.type }}</td>
-                  </tr>
-                  <tr>
-                    <th>GeekScore</th>
-                    <td class="text_center">
-                      <div class="hddata info"> &nbsp;
-                        <div class="box"
-                        {% if i.metascore > 75 %}
-                          style="background: #6c3;"
-                        {% elif i.metascore > 50 %}
-                          style="background: #Fc3;"
-                        {% elif i.metascore > -1 %}
-                          style="background: #f00;"
-                        {% else %}
-                          style="background: gray;"
-                        {% endif %}
-                        ><span title="{{i.votes}} votes">{{i.metascore}}</span></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Specialties</th>
-                    <td>
-                      <div class="">
-                        
-                        {% if i.ninja_pct > 2 %} <span title="{{ i.ninja_pct|floatformat }}% of kills including: {{i.tazes}} tazes, {{i.flames}} flames, {{i.grenades}} grenades, and {{i.knives}} stabs"><img src="{% static 'images/ninja_icon1'%}.png" height="20" align="center"> </span>{% endif %}
-                        {% if i.snipe_pct > 10 %} <span title="{{i.snipe_pct|floatformat }}% of kills were from snipers"><img src="{% static 'images/sniper'%}.png" height="25" align="center"></span>{% endif %}
-                        {% if i.hmg_pct > 10 %} <span title="{{i.hmg_pct|floatformat }}% of kills were from LMG mow downs"><img src="{% static 'images/hmg3'%}.png" height="25" align="center"></span>  {% endif %}
-                        {% if i.success_rounds > 20 %} <span title="{{i.success_rounds|floatformat:0 }}% of rounds played resulted in a bomb explosion win"><img src="{% static 'images/bomb'%}.png" height="25" align="center"></span>  {% endif %}
-                       </div>
-                    </td>          
-                  </tr>
-              
-              </table>
-          </div>
-    </div>
-    <div class="split-container">
-      <div class="table-container">
-        <div class="header">Weapon Stats</div>
-                <table class="zebra map-stats-table">
-                    <tr class="black">
-                        <th>weapons</th>
-                        <th>kills</th>
-                    </tr>
-                    {% for p in i.weapons %}
-                    <tr>
-                        <td>{{p.item}}</td>
-                        <td>{{p.count}}</td>           
-                    </tr>
-                    {% endfor %}
-                </table>
-      </div>
-      <div class="table-container">
-        <div class="header">Weapon Highlights</div>
-        <table class="zebra map-highlights-table">
-          <tr>
-            <th>Top Gun</th>
-            <td>{{i.top_gun}}</td>
-          </tr>
-          <tr>
-            <th>ninja</th>
-            <td>{{i.ninja}}</td>
-          </tr>
-          <tr>
-            <th>Knives</th>
-            <td>{{i.knives}}</td>
-          </tr>
-          <tr>
-            <th>grenades</th>
-            <td>{{i.grenades}}</td>
-          </tr>
-          <tr>
-            <th>flames</th>
-            <td>{{i.flames}}</td>
-          </tr>
-          <tr>
-            <th>tazes</th>
-            <td>{{i.tazes}}</td>
-          </tr>
-          <tr>
-            <th>Snipes</th>
-            <td>{{i.snipes}}</td>
-          </tr>
-          <tr>
-            <th>Snipe %</th>
-            <td>{{i.snipe_pct}}</td>
-          </tr>
-          <tr>
-            <th>LMG</th>
-            <td>{{i.hmg}}</td>
-          </tr>
-          <tr>
-            <th>LMG %</th>
-            <td>{{i.hmg_pct}}</td>
-          </tr>
-        </table>
-
-      </div>
-    </div>
-    <div class="split-container">
-      <div class="table-container">
-        <div class="header">Player Stats</div>
-                <table class="zebra map-stats-table">
-                    <tr class="black">
-                        <th>players</th>
-                        <th>kills</th>
-                    </tr>
-                    {% for p in i.players %}
-                    <tr>
-                        <td>{{p.item}}</td>
-                        <td>{{p.count}}</td>           
-                    </tr>
-                    {% endfor %}
-                </table>
-      </div>
-      <div class="table-container">
-        <div class="header">Player Highlights</div>
-        <table class="zebra map-highlights-table">
-          <tr>
-            <th>Top Player</th>
-            <td>{{i.top_player}}</td>
-          </tr>
-        </table>
-        <div class="header">Objective Highlights</div>
-        <table class="zebra map-highlights-table">
-          <tr>
-            <th>kills</th>
-            <td>{{i.kills}}</td>
-          </tr>
-          <tr>
-            <th>no objective</th>
-            <td>{{i.no_obj_rounds}}</td>
-          </tr>
-          <tr>
-            <th>bomb plant</th>
-            <td>{{i.bomb_plant_rounds}}</td>
-          </tr>
-          <tr>
-            <th>bomb explode</th>
-            <td>{{i.bomb_explode_rounds}}</td>
-          </tr>
-          <tr>
-            <th>defuse</th>
-            <td>{{i.defuse_rounds}}</td>
-          </tr>
-          <tr>
-            <th>total rounds</th>
-            <td>{{i.total_rounds}}</td>
-          </tr>
-          <tr>
-            <th>obj %</th>
-            <td>{{i.obj_pct}}</td>
-          </tr>
-        </table>
-      </div>
-        
-      </div>
-    </div>
-
-    
-  </div>        
-
-    
-    
-
 </div>
-<!-- <div>
-  Playerlist and kdr
-
-    Weapon Use and kdr
-
-    Play History and details:
-
-    Successful Bomb Plant %
-    Defusals
-    Bomb Plants
-    No Objective %
-
-    https://dev.to/thomz/uploading-images-to-django-rest-framework-from-forms-in-react-3jhj
-</div> -->
-
 {% if user.is_authenticated %}
 <script>
 
@@ -352,8 +293,11 @@ let dropArea = document.getElementById("drop-area")
   dropArea.addEventListener(eventName, unhighlight, false)
 })
 
-// Handle dropped files
+// Handle dropped files and updated fields
 dropArea.addEventListener('drop', handleDrop, false)
+theme.addEventListener('change', handleUpdate)
+desc.addEventListener('change', handleUpdate)
+workshop.addEventListener('change', handleUpdate)
 
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -389,22 +333,47 @@ function previewImgFile(file, field) {
   }
   reader.readAsDataURL(file)
 }
-// function handleImgFiles(e, field) {
-//     preventDefaults(e)
-//     const files = e.dataTransfer.files;
-//     const file = files[0]
-//     console.warn('e',e)
-//     let reader = new FileReader()
-//     console.warn('reader',reader)
-//     console.warn('file',file)
-//     reader.onload = (e) => {
-//       const img = document.getElementById(field);
-//       console.warn('reader',e.target.result)
-//       img.src = e.target.result;
-//     };
-//     reader.readAsDataURL(file);
-// }
 
+function handleUpdate(e) {
+  var data = e
+  console.warn(e)
+  var id = e.srcElement.id
+  var name = e.srcElement.name
+  var data = document.getElementById(id).value
+  console.warn(id, name, data)
+  updateData(id, name, data)
+}
+
+function updateData(id, name, value) {
+    var form = new FormData();
+    var user = "{{request.user}}"
+    console.warn('field',name)
+    console.warn('value',value)
+    console.warn('user',user)
+
+    form.append("did", {{maps.id}});
+    form.append("field", name);
+    form.append("value", value);
+    form.append("uid", "{{request.user}}");
+
+    var settings = {
+        "url": "http://stats.geekfestclan.com/api/stats/dataupdate",
+        // "url": "http://192.168.0.208:8000/api/stats/dataupdate/",
+        "method": "POST",
+        "timeout": 0,
+        // "headers": {
+        // 	"Cookie": "sessionid=fkcrfqey2igzl8m9alg6qlsihcd0n89j"
+        // },
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": form
+    };
+
+    $.ajax(settings).done(function (response) {
+    console.log(response);
+    });
+}
 
 function uploadFile(file,field) {
     var form = new FormData();
@@ -434,32 +403,68 @@ function uploadFile(file,field) {
     });
 }
 
-// function uploadFile(file, i) {
-//   var url = 'https://api.cloudinary.com/v1_1/joezimim007/image/upload'
-//   var xhr = new XMLHttpRequest()
-//   var formData = new FormData()
-//   xhr.open('POST', url, true)
-//   xhr.setRequestHeader("X-CSRFToken", csrftoken); 
-//   xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+document.getElementById("adminbtn").onclick = function() {
+  if (document.getElementById("adminbtn").value == "Close") {
+    document.getElementById("mapDetails").style['display'] = "inline-block";
+    document.getElementById("mapEdit").style['display'] = "none" 
+    document.getElementById("adminbtn").value = "Edit Details"  
+  }
+  else {
+  document.getElementById("mapEdit").style['display'] = "block";
+  document.getElementById("mapDetails").style['display'] = "none" 
+  document.getElementById("adminbtn").value = "Close"
+  }
+};
 
-//   // Update progress (can be used to show progress indicator)
-//   xhr.upload.addEventListener("progress", function(e) {
-//     updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
-//   })
+function ratingUpdate(map, geek, rating) {
 
-//   xhr.addEventListener('readystatechange', function(e) {
-//     if (xhr.readyState == 4 && xhr.status == 200) {
-//       updateProgress(i, 100) // <- Add this
-//     }
-//     else if (xhr.readyState == 4 && xhr.status != 200) {
-//       // Error. Inform the user
-//     }
-//   })
+			var form = new FormData();
+			form.append("map_id", map);
+			form.append("user_id", geek);
+			form.append("rating", rating);
 
-//   formData.append('upload_preset', 'ujpu6gyk')
-//   formData.append('file', file)
-//   xhr.send(formData)
-// }
+			var settings = {
+			"url": "http://stats.geekfestclan.com/api/stats/rating/",
+      // "url": "http://192.168.0.208:8000/api/stats/rating/",
+			"method": "POST",
+			"timeout": 0,
+			// "headers": {
+			// 	"Cookie": "sessionid=fkcrfqey2igzl8m9alg6qlsihcd0n89j"
+			// },
+			"processData": false,
+			"mimeType": "multipart/form-data",
+			"contentType": false,
+			"data": form
+			};
+
+			$.ajax(settings).done(function (response) {
+			console.log(response);
+			});
+
+			var ele5 = 'star5-' + map, ele4 = 'star4-' + map, ele3 = 'star3-' + map, ele2 = 'star2-' + map, ele1 = 'star1-' + map;
+			document.getElementById(ele5).classList.remove('checked');
+			document.getElementById(ele4).classList.remove('checked');
+			document.getElementById(ele3).classList.remove('checked');
+			document.getElementById(ele2).classList.remove('checked');
+			document.getElementById(ele1).classList.remove('checked');
+
+			if (rating>4) {
+				document.getElementById(ele5).classList.add('checked');
+			} 
+			if (rating>3) {
+				document.getElementById(ele4).classList.add('checked');
+			} 
+			if (rating>2) {
+				document.getElementById(ele3).classList.add('checked');
+			} 
+			if (rating>1) {
+				document.getElementById(ele2).classList.add('checked');
+			} 
+			if (rating>0) {
+				document.getElementById(ele1).classList.add('checked');
+			} 
+		}
+
 </script>
 {% endif %}
 {% endwith %}

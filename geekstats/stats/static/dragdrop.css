@@ -9,7 +9,7 @@
   #drop-area {
     border: 2px dashed #ccc;
     border-radius: 20px;
-    width: 480px;
+    width: 900px;
     padding: 20px;
     margin: 0px;
     align-self: center;
@@ -31,4 +31,7 @@
   }
   #fileElem {
     display: none;
+  }
+  .image-wrap {
+    display: inline-block;
   }

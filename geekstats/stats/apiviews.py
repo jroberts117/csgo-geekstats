@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 
 from .geekmodels import Maps, MapRating, Geek
-from .serializers import MapSerializer, MapImageSerializer
+from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer
 
 @api_view(['GET','POST'])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
@@ -65,4 +65,47 @@ def upload_image(request):
             except:
                 print('save failed:'+str(request.FILES.get('image')))
             return Response("map image has been updated", status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET','POST'])
+def update_data(request):
+    if request.method == 'GET':
+        return HttpResponse("Not Implemented")
+    elif request.method == 'POST':
+        serializer = DataSerializer(data=request.data)
+        if serializer.is_valid():
+            field = serializer.data['field']
+            value = serializer.data['value']
+            curr_user = serializer.data['uid']
+            if field =='theme' or  field =='description' or field =='workshop_link':
+                edit_map = Maps.objects.get(idmap=serializer.data['did'])
+                setattr(edit_map, field, value)
+                # edit_map[field] = value
+                try:
+                    edit_map.save()
+                    return Response("Map updated", status=status.HTTP_200_OK)
+                except:
+                    print('update failed: '+serializer.data[field]+' = '+serializer.data[value])
+                    return Response("invalid update", status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET','POST'])
+def get_image(request):
+    if request.method == 'POST':
+        return HttpResponse("Not Implemented")
+    elif request.method == 'GET':
+        print("data",request.query_params)
+        serializer = MapRequestSerializer(data=request.query_params)
+        if serializer.is_valid():
+            mid = serializer.data['mid']
+            map_name = serializer.data['map']
+            if serializer.data['type'] == 'thumb':
+                print('map is:'+map_name)
+                print('field is:'+serializer.data['type'])
+                map_image = Maps.objects.get(map=map_name)
+                if map_image.thumbnail:
+                    return Response(map_image.thumbnail.url, status=status.HTTP_200_OK)
+                else :
+                    return Response("No Map Image", status=status.HTTP_200_OK)
+            else :
+                return Response("Not Implemented", status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
