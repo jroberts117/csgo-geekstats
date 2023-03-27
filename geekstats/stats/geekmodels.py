@@ -553,5 +553,29 @@ class SeasonWins(models.Model):
         db_table = 'season_wins'
         db_tablespace = 'geek' 
 
+class Damage(models.Model):
+    damage_id = models.AutoField(primary_key=True)
+    geek = models.ForeignKey('Geek', models.DO_NOTHING)
+    round = models.ForeignKey('MatchRound', models.DO_NOTHING)
+    victim = models.ForeignKey('Geek', models.DO_NOTHING, related_name="d_victim")
+    item = models.ForeignKey('Item', models.DO_NOTHING)
+    pos_x = models.DecimalField(max_digits=12, decimal_places=4)
+    pos_y = models.DecimalField(max_digits=12, decimal_places=4)
+    pos_z = models.DecimalField(max_digits=12, decimal_places=4)
+    pos_victim_x = models.DecimalField(max_digits=12, decimal_places=4)
+    pos_victim_y = models.DecimalField(max_digits=12, decimal_places=4)
+    pos_victim_z = models.DecimalField(max_digits=12, decimal_places=4)
+    distance = models.DecimalField(max_digits=12, decimal_places=4)
+    damage_armor = models.IntegerField()
+    damage_health = models.IntegerField()
+    armor_remaining = models.IntegerField()
+    health_remaining = models.IntegerField()
+    hitgroup = models.CharField(max_length=45)
+    is_kill = models.IntegerField()
+    is_team_damage = models.IntegerField()
 
+    class Meta:
+        managed = False
+        db_table = 'damage'
+        db_tablespace = 'geek'
     

@@ -238,5 +238,21 @@
 	
 </section>
 
+<section class="text_center">
+	<div style="width:33%;" class="pics-div">
+		<div class="pics-hdr"><h2 style="margin:5px;">HIT STATS:</h2></div>
+		<div style="position: relative; font-size: 0.8rem; width: 400px; height: 400px; background-image: URL('/static/images/csgotpose.jpg'); background-size: contain; margin:0 auto">
+			<!--<img src="/static/images/csgotpose.jpg" style="object-fit: contain;"/>-->
+			<span style="position: absolute; font-size: 1em; top:5%; left: 0; right:0">HEAD: {{player.hitgroups.head}}%</span>
+			<span style="position: absolute; font-size: 1em; top:17%; left: 5%;">LEFT ARM: {{player.hitgroups.leftarm}}%</span>
+			<span style="position: absolute; font-size: 1em; top:17%; right: 5%;">RIGHT ARM: {{player.hitgroups.rightarm}}%</span>
+			<span style="position: absolute; font-size: 1em; top:32%; left: 62%;">CHEST: {{player.hitgroups.chest}}%</span>
+			<span style="position: absolute; font-size: 1em; top:42%; right: 60%;">STOMACH: {{player.hitgroups.stomach}}%</span>
+			<span style="position: absolute; font-size: 1em; top:70%; right: 60%;">LEFT LEG: {{player.hitgroups.leftleg}}%</span>
+			<span style="position: absolute; font-size: 1em; top:70%; left: 60%;">RIGHT LEG: {{player.hitgroups.rightleg}}%</span>
+		</div>
+	  </div>
+</section>
+
  
 {% endblock content %}

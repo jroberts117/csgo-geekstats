@@ -6,7 +6,7 @@ from django.template import loader
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
-from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData, SeasonWins, TeamGeek, Tier, Team, Maps, MapRating
+from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData, SeasonWins, TeamGeek, Tier, Team, Maps, MapRating, Damage
 from .geekclasses import season, player, map_summary
 import stats.functions as func
 from .forms import CustomUserCreationForm, GeeksForm
@@ -957,12 +957,26 @@ def playerdetails(request):
         pdata = (FragDetails.objects.values('id','match_date','killer','victim','victim_id','map','weapon','type')
                      .filter(Q (id=pid) | Q(victim_id=pid),match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'])
                      .order_by('id','type'))
+        
+        endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+        ddata = (Damage.objects.select_related('round', 'geek', 'round__match', 'item')
+                 .filter(geek_id=pid,round__match__match_date__gte=request.session['start_date'], round__match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+                .values('geek__handle', 'damage_armor', 'damage_health', 'armor_remaining', 'health_remaining', 'hitgroup', 'item__name', 'is_team_damage', 'is_kill')
+                .order_by('hitgroup'))
 
         # lst = list(pdata.all())
         kdata = list(filter(lambda p: p['type'] == 'kill', list(pdata)))
         laplayer = list(filter(lambda p: p['type'] == 'assist', list(pdata)))
         lkplayer = list(filter(lambda w: str(w['id']) == pid, list(kdata)))
         lvplayer = list(filter(lambda w: str(w['victim_id']) == pid, list(kdata)))
+
+        headData = list(filter(lambda p: p['hitgroup'] == 'head', list(ddata)))
+        chestData = list(filter(lambda p: p['hitgroup'] == 'chest', list(ddata)))
+        hitdata = {}
+        
+        for hitgroup, hits in groupby(list(ddata), lambda dm: dm['hitgroup']):
+            hitdata[hitgroup] = list(hits)
+        
 
         playerData.addWeapons('killer','weapon',listbuilder(lkplayer,'weapon'))
         playerData.addWeapons('victim','weapon',listbuilder(lvplayer,'weapon'))
@@ -974,8 +988,9 @@ def playerdetails(request):
         playerData.avatar = (Geek.objects.values('avatar').filter(geek_id=playerData.id)[0]['avatar'])
         print(playerData.avatar)
 
-
+        playerData.calcHitgroups(hitdata)
         playerData.calcStats()
+        
 
     kdr_history = GeekKDRHistory.objects.values('handle','history_date','alltime_kdr','year_kdr','last90_kdr').filter(geek_id=pid).order_by('-history_date')[:10]
     kdr_history = reversed(kdr_history)

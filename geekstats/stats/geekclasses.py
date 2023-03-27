@@ -7,6 +7,7 @@ from .geekmodels import Geek, TiersData, TeamGeek, Maps
 from django.db import models
 from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 
 
@@ -241,6 +242,15 @@ class player:
         self.weapons = []
         self.opponents = []
         self.maps = []
+        self.hitgroups = {
+            'head': 0,
+            'leftarm': 0,
+            'rightarm': 0,
+            'chest': 0,
+            'stomach': 0,
+            'leftleg': 0,
+            'rightleg': 0
+        }
         self.avatar = ''
 
     def addWeapons(self,mType,field,data):
@@ -308,6 +318,20 @@ class player:
             
         mapTotKill = sum(row.kills for row in self.maps)
         mapTotDeath = sum(row.deaths for row in self.maps)
+
+    def calcHitgroups(self, hitgroupData):
+        total = 0
+        #default hit groups
+        self.hitgroups
+        for hitgroup in hitgroupData:
+            if (hitgroup != 'generic'):
+                hits = hitgroupData[hitgroup]
+                total += len(hits)
+        
+        for hitgroup in hitgroupData:
+            if (hitgroup != 'generic'):
+                hitgroupspaceless = hitgroup.replace(" ", "")
+                self.hitgroups[hitgroupspaceless] = round(Decimal(len(hitgroupData[hitgroup])) / Decimal(total) * 100,2)
 
 ########################################################################
 ### MAP Details
