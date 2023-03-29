@@ -29,6 +29,8 @@ class EventData(object):
         return(None)
         
     def __call__(self, request):
+        if not request.session.get('page',False):  
+            request.session['page'] = 'None'
         if request.method == 'POST' and 'dateType' in request.POST and 'datetype' in request.session:                                            # If a date or season was picked or range
             if request.POST['dateType'] == 'season':
                 season_dates = (Season.objects.values('name','start_date','end_date').filter(name=request.POST['dateList']))
@@ -60,7 +62,8 @@ class EventData(object):
             if request.GET.get('pid') != None:
                 request.session['playerid'] = request.GET.get('pid')    #  Capture the playerid
             else:
-                request.session['playerid'] = ''
+                if request.session['page'] != 'PlayerDetails':
+                    request.session['playerid'] = ''
             if request.GET.get('wid') != None:
                 request.session['weaponid'] = request.GET.get('wid')    # Capture the weaponid
             else:

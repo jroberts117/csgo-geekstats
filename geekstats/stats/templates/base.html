@@ -58,6 +58,7 @@
 						{% csrf_token %}
 						<fieldset class="dateSeasons">
 							<input type="hidden" name="dateType" value="season">
+							<input type="hidden" name="pageName" value="{{state.page}}">
 							<select  name="dateList">
 							{% for i in state.seasons %}
 								<option value="{{ i.name }}"
@@ -140,7 +141,7 @@
 					document.getElementById("rangeButton").style['display'] = "block";
 					document.getElementById("matchButton").style['display'] = "none";
 					document.getElementById("seasonButton").style['display'] = "block";
-				{% else %} 
+				{% elif state.datetype == 'season' %} 
 					document.getElementById("dateSeasons").style['display'] = "inline-block";
 					document.getElementById("dateMatches").style['display'] = "none";
 					document.getElementById("dateDates").style['display'] = "none";

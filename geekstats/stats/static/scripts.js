@@ -1,52 +1,53 @@
                 
-    document.getElementById("rangeButton").onclick = function() {
-        document.getElementById("dateSeasons").style['display'] = "none";
-        document.getElementById("dateMatches").style['display'] = "none";
-        document.getElementById("dateDates").style['display'] = "inline-block";
-        document.getElementById("rangeButton").style['display'] = "none";
-        document.getElementById("matchButton").style['display'] = "block";
-        document.getElementById("seasonButton").style['display'] = "block";
-    };
+    if(document.body.contains(document.getElementById("dateSeasons"))){
+        document.getElementById("rangeButton").onclick = function() {
+            document.getElementById("dateSeasons").style['display'] = "none";
+            document.getElementById("dateMatches").style['display'] = "none";
+            document.getElementById("dateDates").style['display'] = "inline-block";
+            document.getElementById("rangeButton").style['display'] = "none";
+            document.getElementById("matchButton").style['display'] = "block";
+            document.getElementById("seasonButton").style['display'] = "block";
+        };
 
-    document.getElementById("matchButton").onclick = function() {
-        document.getElementById("dateSeasons").style['display'] = "none";
-        document.getElementById("dateMatches").style['display'] = "inline-block";
-        document.getElementById("dateDates").style['display'] = "none";
-        document.getElementById("rangeButton").style['display'] = "block";
-        document.getElementById("matchButton").style['display'] = "none";
-        document.getElementById("seasonButton").style['display'] = "block";
-    };
+        document.getElementById("matchButton").onclick = function() {
+            document.getElementById("dateSeasons").style['display'] = "none";
+            document.getElementById("dateMatches").style['display'] = "inline-block";
+            document.getElementById("dateDates").style['display'] = "none";
+            document.getElementById("rangeButton").style['display'] = "block";
+            document.getElementById("matchButton").style['display'] = "none";
+            document.getElementById("seasonButton").style['display'] = "block";
+        };
 
-    document.getElementById("seasonButton").onclick = function() {
-        document.getElementById("dateSeasons").style['display'] = "inline-block";
-        document.getElementById("dateMatches").style['display'] = "none";
-        document.getElementById("dateDates").style['display'] = "none";
-        document.getElementById("rangeButton").style['display'] = "block";
-        document.getElementById("matchButton").style['display'] = "block";
-        document.getElementById("seasonButton").style['display'] = "none";
-    };
+        document.getElementById("seasonButton").onclick = function() {
+            document.getElementById("dateSeasons").style['display'] = "inline-block";
+            document.getElementById("dateMatches").style['display'] = "none";
+            document.getElementById("dateDates").style['display'] = "none";
+            document.getElementById("rangeButton").style['display'] = "block";
+            document.getElementById("matchButton").style['display'] = "block";
+            document.getElementById("seasonButton").style['display'] = "none";
+        };
 
-    document.getElementById("allTime").onclick = function() {
-        if (document.getElementById("allTime").checked){
-            document.getElementById("start").value = "2018-01-01";
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0');
-            var yyyy = today.getFullYear();
-            today =  yyyy + '-' +  mm + '-' + dd;
-            document.getElementById("end").value = today;
-            document.getElementById("dateDates").submit();
-        }
-    };
+        document.getElementById("allTime").onclick = function() {
+            if (document.getElementById("allTime").checked){
+                document.getElementById("start").value = "2018-01-01";
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+                var yyyy = today.getFullYear();
+                today =  yyyy + '-' +  mm + '-' + dd;
+                document.getElementById("end").value = today;
+                document.getElementById("dateDates").submit();
+            }
+        };
 
-    document.getElementById("start").onchange = function() {
-        document.getElementById("allTime").checked = false;     
-    };
+        document.getElementById("start").onchange = function() {
+            document.getElementById("allTime").checked = false;     
+        };
 
-    document.getElementById("end").onchange = function() {
-        document.getElementById("allTime").checked = false;     
-    };
-
+        document.getElementById("end").onchange = function() {
+            document.getElementById("allTime").checked = false;     
+        };
+    }
     function showGraph() {
         document.getElementById("graph").style['display'] = "block";
     };
@@ -72,31 +73,5 @@
         return cookieValue;
         }
 
-    let slideIndex = 1;
-    showSlides(slideIndex);
 
-    // Next/previous controls
-    function plusSlides(n) {
-    showSlides(slideIndex += n);
-    }
 
-    // Thumbnail image controls
-    function currentSlide(n) {
-    showSlides(slideIndex = n);
-    }
-
-    function showSlides(n) {
-    let i;
-    let slides = document.getElementsByClassName("mySlides");
-    let dots = document.getElementsByClassName("dot");
-    if (n > slides.length) {slideIndex = 1}
-    if (n < 1) {slideIndex = slides.length}
-    for (i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none";
-    }
-    for (i = 0; i < dots.length; i++) {
-        dots[i].className = dots[i].className.replace(" active", "");
-    }
-    slides[slideIndex-1].style.display = "block";
-    dots[slideIndex-1].className += " active";
-    }

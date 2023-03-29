@@ -144,7 +144,7 @@
       {% for p in i.players reversed %}
       <div style="width:100%; display:flex; border:3px solid white;">
         <div class="" style=" ">
-          <img src="/static/images/geeks/{{p.item}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/> 
+          <img src="/static/images/geeks/{{p.item|lower}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/> 
         </div>
       <div class="pics-col" style="text-align:left;">
         <h3 style="margin:5px;">{{p.item}}</h3>
@@ -336,20 +336,16 @@ function previewImgFile(file, field) {
 
 function handleUpdate(e) {
   var data = e
-  console.warn(e)
   var id = e.srcElement.id
   var name = e.srcElement.name
   var data = document.getElementById(id).value
-  console.warn(id, name, data)
+  console.warn('data',data)
   updateData(id, name, data)
 }
 
 function updateData(id, name, value) {
     var form = new FormData();
     var user = "{{request.user}}"
-    console.warn('field',name)
-    console.warn('value',value)
-    console.warn('user',user)
 
     form.append("did", {{maps.id}});
     form.append("field", name);
@@ -357,7 +353,7 @@ function updateData(id, name, value) {
     form.append("uid", "{{request.user}}");
 
     var settings = {
-        "url": "http://stats.geekfestclan.com/api/stats/dataupdate",
+        "url": "http://stats.geekfestclan.com/api/stats/dataupdate/",
         // "url": "http://192.168.0.208:8000/api/stats/dataupdate/",
         "method": "POST",
         "timeout": 0,
@@ -369,7 +365,7 @@ function updateData(id, name, value) {
         "contentType": false,
         "data": form
     };
-
+    console.warn('settings',settings)
     $.ajax(settings).done(function (response) {
     console.log(response);
     });

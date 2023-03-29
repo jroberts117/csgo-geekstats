@@ -916,12 +916,16 @@ def playerdetails(request):
     mainmenu.set('Geeks')
     template = loader.get_template('playerdetails.html')
     pid = request.session['playerid']
-
+    
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'],request.session['datetype'])
+    request.session['page'] = newstate.page
+
 
     ### SETUP VALIDATION LOGIC FOR REGISTERED PLAYERS
-    geek = GeekAuthUser.objects.values('geek_id','handle','valid_sent_date','validated','username','first_name','email','member_since').filter(geek_id=pid) 
-    lst = list(geek)
+    try:
+        geek = GeekAuthUser.objects.values('geek_id','handle','valid_sent_date','validated','username','first_name','email','member_since').filter(geek_id=pid) 
+    except:
+        print('player not logged')
     if request.GET.get('claim'):
         claim = request.GET.get('claim')
         if claim == 'claim' or claim == 'resend':

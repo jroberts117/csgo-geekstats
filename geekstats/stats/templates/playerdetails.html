@@ -63,13 +63,13 @@
 				<tr height="25px" class="fmed acenter">
 					<td class="floral">
 						<div class="container">
-							<div class="inline"><img src="/static/images/geeks/{{player.topVictim}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/> </div>
+							<div class="inline"><img src="/static/images/geeks/{{player.topVictim|lower}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/> </div>
 							<div class="inline">{{player.topVictim}}</div>
 						</div>
 					</td>
 					<td class="floral">
 						<div class="container">
-							<div class="inline"><img src="/static/images/geeks/{{player.nemesis}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>  </div>
+							<div class="inline"><img src="/static/images/geeks/{{player.nemesis|lower}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/>  </div>
 							<div class="inline">{{player.nemesis}}</div>
 						</div>
 					</td>
@@ -145,7 +145,7 @@
 		{% for p in player.opponents %}
 		  <div style="width:100%; display:flex; border:3px solid white;">
 			<div class="weapons-hero" style="min-width:25%">
-			  <img src="/static/images/geeks/{{p.item}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot;" style="width:auto; max-height: 100%;"/> 
+			  <img src="/static/images/geeks/{{p.item|lower}}.png" class="geek-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot;" style="width:auto; max-height: 100%;"/> 
 			</div>
 		  <div class="pics-col" style="min-width: 40%; text-align:left;  overflow: hidden;">
 			<h3 style="margin:5px;"><a href="Details?pid={{player.id}}&oid={{p.item}}">{{p.item}}</a></h3>
