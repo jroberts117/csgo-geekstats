@@ -25,7 +25,7 @@
 				</div>
 				<div class="player">{{tier0.0.player}}</div>
 				<div class="statinfo">master and commander </div>
-				<div class="statinfo">{{tier0.0.kdr__avg|floatformat:2}} K/D</div>
+				<div class="statinfo">{{tier0.0.new_kdr|floatformat:2}} K/D</div>
 			</div>
 		</div>
 		<div class="award gold">
@@ -45,7 +45,7 @@
 				</div>
 				<div class="player">{{tier1.0.player}}</div>
 				<div class="statinfo">all that glitters </div>
-				<div class="statinfo">{{tier1.0.kdr__avg|floatformat:2}} K/D</div>
+				<div class="statinfo">{{tier1.0.new_kdr|floatformat:2}} K/D</div>
 			</div>
 		</div>
 		<div class="award silver">
@@ -65,7 +65,7 @@
 				</div>
 				<div class="player">{{tier2.0.player}}</div>
 				<div class="statinfo">more than a silver lining</div>
-				<div class="statinfo">{{tier2.0.kdr__avg|floatformat:2}} K/D</div>
+				<div class="statinfo">{{tier2.0.new_kdr|floatformat:2}} K/D</div>
 			</div>
 		</div>
 		<div class="award bronze">
@@ -85,7 +85,7 @@
 				</div>
 				<div class="player">{{tier3.0.player}}</div>
 				<div class="statinfo">&nbsp;harder than hard</div>
-				<div class="statinfo">{{tier3.0.kdr__avg|floatformat:2}} K/D</div>
+				<div class="statinfo">{{tier3.0.new_kdr|floatformat:2}} K/D</div>
 			</div>
 		</div>
 	</div>
@@ -124,7 +124,8 @@
 				<td class="">{{i.kills__sum}}</td>
 				<td class="">{{i.deaths__sum}}</td>
 				<td class="">{{i.assists__sum}}</td>
-				<td class="">{{i.kdr__avg|floatformat:2}}</td>
+				<!-- <td class="">{{i.kdr__avg|floatformat:2}}</td> -->
+				<td class="">{{i.new_kdr|floatformat:2}}</td>
 				<td class="">{{i.akdr__avg|floatformat:2}}</td>
 				<td {% if i.diffkdr > 0 %}
 					style="color:green; font-weight:bold;">+ 

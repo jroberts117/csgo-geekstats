@@ -378,6 +378,10 @@ def tiers(request):
             geek['diffkdr'] = geek['kdr__avg'] - geek['year_kdr']
         except:
             geek['diffkdr'] = 'n/a'
+        try:
+            geek['new_kdr'] = geek['kills__sum'] / geek['deaths__sum']
+        except:
+            geek['new_kdr'] = 'n/a'
         high = 0
         for item in weapons_list:
             if item['killer'] == geek['player']:
@@ -916,10 +920,9 @@ def playerdetails(request):
     mainmenu.set('Geeks')
     template = loader.get_template('playerdetails.html')
     pid = request.session['playerid']
-    
+
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',request.session['playerid'],'PlayerDetails', request.session['selector'],request.session['datetype'])
     request.session['page'] = newstate.page
-
 
     ### SETUP VALIDATION LOGIC FOR REGISTERED PLAYERS
     try:
@@ -990,7 +993,6 @@ def playerdetails(request):
         playerData.addOpps('killer','victim',listbuilder(lkplayer,'victim'))
         playerData.addOpps('victim','killer',listbuilder(lvplayer,'killer'))
         playerData.avatar = (Geek.objects.values('avatar').filter(geek_id=playerData.id)[0]['avatar'])
-        print(playerData.avatar)
 
         playerData.calcHitgroups(hitdata)
         playerData.calcStats()
