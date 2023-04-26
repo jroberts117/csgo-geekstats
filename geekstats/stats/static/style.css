@@ -776,6 +776,10 @@ img.weapon {
 	  font-stretch: expanded;
 	  padding: 0.1rem;
   }
+
+  .tierrestrict {
+	padding: 0px 25px;
+  }
   .img {
   width: 7rem;
   height: 8rem;
