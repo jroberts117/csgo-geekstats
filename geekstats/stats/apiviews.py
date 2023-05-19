@@ -1,13 +1,16 @@
 
 from django.http import HttpResponse
+from django.core import serializers
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 
-from .geekmodels import Maps, MapRating, Geek
-from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer
+from .geekmodels import Maps, MapRating, Geek, TiersData, Season
+from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer
+
+import os, openai
 
 @api_view(['GET','POST'])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
@@ -109,3 +112,48 @@ def get_image(request):
             else :
                 return Response("Not Implemented", status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET','POST'])
+def ai_request(request):
+    # Write me an api that processes input for an api call to openai
+    if request.method == 'GET':
+        return HttpResponse("Not Implemented")
+    elif request.method == 'POST':
+        ai_response = 'Unknown error'
+        Task = 'Recap the following "DataSet" data as a sportscaster. '
+        Tone = 'Be very sacrcastic.  Use an accent like a New Yorker.  '
+        Instructions = 'Call the "West1: Master" tier "Master" tier.  '
+        if request.data['type'] == 'recap':
+            serializer = AIRequestSerializer(data=request.data)
+            Season_data = Season.objects.get(name=request.data['season_name'])
+            dataset = serializers.serialize('json', TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(matchdate__gte=Season_data.start_date,matchdate__lte=Season_data.end_date))
+            print(dataset)
+            aiPrompt = []
+            if serializer.is_valid():
+                aiPrompt = [{"prompt": Task + Tone + Instructions + serializer.data['spec_inst'] + "\nDataSet: \n"}]
+                aiPrompt.append(dataset)
+                print('AI Prompt: ',aiPrompt)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("No valid action requested", status=status.HTTP_400_BAD_REQUEST)
+            
+        openai.api_key = os.getenv("OPEN_AI_KEY")
+        ai_response = openai.Completion.create(
+        # model="text-davinci-001", # Best ,most expensive model
+        #   model="text-curie-001",  # Good, reasonably priced model
+            model="text-babbage-001", # Stupid but cheap
+            # model="text-ada-001", # Stupid and fast but the cheapest model
+            prompt=aiPrompt,
+            temperature=0.7,
+            max_tokens=300,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        print('AI Response: ',ai_response)
+    else:
+        ai_response = 'unknown post error'
+    return Response(ai_response, status=status.HTTP_200_OK)
+        
+

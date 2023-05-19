@@ -122,13 +122,13 @@
   <!-- Pic Displayer wrapper -->
   <div class="block-50" style="">
     <div class="pics-container">
-      <div class="pics-hero"><img src="/media/{{i.hero_image}}" class="img-hero" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>  
+      <div class="pics-hero"><img data-enlargeable width="100" style="cursor: zoom-in" src="/media/{{i.hero_image}}" class="img-hero" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>  
     </div>
     <div class="pics-container">
-      <div><img src="/media/{{i.image2}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
-      <div><img src="/media/{{i.image3}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
-      <div><img src="/media/{{i.radar}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
-      <div><img src="/media/{{i.thumb}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img data-enlargeable width="100" style="cursor: zoom-in" src="/media/{{i.image2}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img data-enlargeable width="100" style="cursor: zoom-in" src="/media/{{i.image3}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img data-enlargeable width="100" style="cursor: zoom-in" src="/media/{{i.radar}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
+      <div><img data-enlargeable width="100" style="cursor: zoom-in" src="/media/{{i.thumb}}" class="img-thumb" loading="lazy" alt="no image on server" onerror="this.src=&quot;{% static 'images/'%}map_not_found.jpg&quot; ;"/></div>
     </div>
     {% if i.workshop %}
     <div style="text-align:center;"><b>Steam Workshop Link:  </b><a href="{{i.workshop}}">{{i.workshop}}</a></div>
@@ -243,6 +243,37 @@
   </div>
 </div>
 </div>
+<script>
+  $('img[data-enlargeable]').addClass('img-enlargeable').click(function() {
+  var src = $(this).attr('src');
+  var modal;
+
+  function removeModal() {
+    modal.remove();
+    $('body').off('keyup.modal-close');
+  }
+  modal = $('<div>').css({
+    background: 'RGBA(0,0,0,.5) url(' + src + ') no-repeat center',
+    backgroundSize: 'contain',
+    width: '100%',
+    height: '100%',
+    position: 'fixed',
+    zIndex: '10000',
+    top: '0',
+    left: '0',
+    cursor: 'zoom-out'
+  }).click(function() {
+    removeModal();
+  }).appendTo('body');
+  //handling ESC
+  $('body').on('keyup.modal-close', function(e) {
+    if (e.key === 'Escape') {
+      removeModal();
+    }
+  });
+  });
+
+</script>
 {% if user.is_authenticated %}
 <script>
 
@@ -461,7 +492,10 @@ function ratingUpdate(map, geek, rating) {
 			} 
 		}
 
+
 </script>
+
+
 {% endif %}
 {% endwith %}
 {% endblock content %}
