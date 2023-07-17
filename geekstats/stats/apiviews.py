@@ -1,5 +1,5 @@
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,9 +8,11 @@ from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 
 from .geekmodels import Maps, MapRating, Geek, TiersData, Season
-from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer
+from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer, StatRequestSerializer
+from datetime import date
+from decimal import Decimal
 
-import os, openai
+import os, openai, json
 
 @api_view(['GET','POST'])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
@@ -155,5 +157,33 @@ def ai_request(request):
     else:
         ai_response = 'unknown post error'
     return Response(ai_response, status=status.HTTP_200_OK)
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        elif isinstance(obj, date):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
+
+
+@api_view(['GET','POST'])
+def get_player_stats(request):
+    if request.method == 'POST':
+        return HttpResponse("Not Implemented")
+    elif request.method == 'GET':
+        serializer = StatRequestSerializer(data=request.query_params)
+        if serializer.is_valid():
+            player = serializer.data['player']
+            start_date = serializer.data['start_date']
+            end_date = serializer.data['end_date']
+            player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
+            print(player_stats)
+            player_stats_d = list(player_stats)
+            j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
+            print(j_stats)
+            return JsonResponse(j_stats, safe=False)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 

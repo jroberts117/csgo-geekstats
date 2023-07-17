@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{title}}{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<section>
+	<input type="text" id="player" placeholder="geek name" title="Type in a name">
+	<input type="date" id="start_date" placeholder="start date" title="Type in a start date">
+	<input type="date" id="end_date" placeholder="end date" title="Type in an end date">
+	<input type="button" id="search" value="Lookup API" onclick="get_data()">
+
+	<div id="results">
+		<table class="section_center zebra">
+			<thead>
+			<tr class="black">
+				<th>Handle</th>
+				<th class="js-sort-number text_center">Kills</th>
+				<th class="js-sort-number">Deaths</th>
+				<th class="js-sort-number">KDR</th>
+				<th class="js-sort-number">aKDR</th>
+				<th class="js-sort-number">1yr KDR</th>
+				<th class="js-sort-number">last 90 KDR</th>
+			</tr>
+			</thead>
+			<tbody id="table-body">
+			</tbody>
+		</table>
+				
+	</div>
+	
+	
+</section>
+
+<script>
+	function get_data() {
+		var player = document.getElementById("player").value;
+		var start_date = document.getElementById("start_date").value;
+		var end_date = document.getElementById("end_date").value;
+		var url = "http://192.168.0.209:8000/api/stats/playerstats?player=" + player + "&start_date=" + start_date + "&end_date=" + end_date;
+		console.log(url);
+		$.ajax({
+			url: url,
+			type: "GET",
+			dataType: "json",
+			success: function(data) {
+				console.log(typeof data);
+				var data2 = JSON.parse(data);
+				var player_stats = data2[0];
+				console.log(data2[0]);
+				var tableBody = document.getElementById("table-body");
+				for (var key in data2) {
+					var row = document.createElement("tr");
+					var playerCell = document.createElement("td");
+					playerCell.innerHTML = data2[key].player;
+					row.appendChild(playerCell);
+					var killsCell = document.createElement("td");
+					killsCell.innerHTML = data2[key].kills;
+					row.appendChild(killsCell);
+					var deathsCell = document.createElement("td");
+					deathsCell.innerHTML = data2[key].deaths;
+					row.appendChild(deathsCell);
+					var kdrCell = document.createElement("td");
+					kdrCell.innerHTML = data2[key].kdr;
+					row.appendChild(kdrCell);
+					var alltimeKdrCell = document.createElement("td");
+					alltimeKdrCell.innerHTML = data2[key].alltime_kdr;
+					row.appendChild(alltimeKdrCell);
+					tableBody.appendChild(row);
+				}
+			},
+			error: function(data) {
+				console.log(data);
+			}
+
+// New code
+	// 	var imgID = img
+	// 	console.log(imgID)
+	// 	var map = reqMap
+	// 	var URL = "http://192.168.0.208:8000/api/stats/getimg?mid=0&map="+map+"&type=thumb"
+	// 	// var URL = "http://stats.geekfestclan.com/api/stats/getimg?mid=0&map="+map+"&type=thumb"
+	// 	console.log(URL)
+	// 	fetch(URL, {
+	// 	headers:{
+	// 		'Accept': 'application/json',
+	// 		'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+	// 	},
+	// 	})
+	// 	.then(response => {
+	// 		return response.json() //Convert response to JSON
+	// 	})
+	// 	.then(data => {
+	// 		//Perform actions with the response data from the view
+	// 		console.log(data)
+	// 		document.getElementById(imgID).name = "loaded"
+	// 		document.getElementById(imgID).src = data
+	// 	})
+	// }
+
+// End New Code
+
+			
+		});
+	}
+</script>
+{% endblock content %}

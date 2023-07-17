@@ -14,6 +14,7 @@ urlpatterns = [
     path('MapDetails', views.mapdetails, name='map detail'),
     path('Map2', views.map2, name='map2'),
     path('About', views.about, name='about'),
+    path('api', views.api, name='api'),
     path('PlayerDetails', views.playerdetails, name='playerdetails'),
     path('Details', views.details, name='details'),
     # path('Event', views.gfxx, name='gfxx'),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('mapimg/', apiviews.upload_image, name='upload_image'),
     path('getimg/', apiviews.get_image, name='get_image'),
     path('dataupdate/', apiviews.update_data, name='update_data'),
+    path('playerstats/', apiviews.get_player_stats, name='get_player_stats'),
     path('ai/', apiviews.ai_request, name='ai_request'),
 
 ]

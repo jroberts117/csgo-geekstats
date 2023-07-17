@@ -20,3 +20,13 @@ class MapRequestSerializer(serializers.Serializer):
     mid = serializers.IntegerField()
     map = serializers.CharField()
     type = serializers.CharField()
+
+class AIRequestSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    season_name = serializers.CharField()
+    spec_inst = serializers.CharField()
+
+class StatRequestSerializer(serializers.Serializer):
+    player = serializers.CharField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()

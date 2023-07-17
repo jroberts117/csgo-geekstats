@@ -1091,7 +1091,12 @@ def buys(request):
     context = {'buys': buycount, 'title': 'Buys', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
     return HttpResponse(template.render(context, request))
 
-
+def api(request):
+    template = loader.get_template('api_test.html')
+    mainmenu = StateInfo()
+    mainmenu.set('API')
+    context = {'title': 'API', 'stateinfo': zip(mainmenu.menu,mainmenu.page,mainmenu.state), }
+    return HttpResponse(template.render(context, request))
 
 
 
