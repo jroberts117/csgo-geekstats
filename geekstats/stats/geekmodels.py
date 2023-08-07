@@ -156,6 +156,7 @@ class Geek(models.Model):
     geek_code = models.CharField(max_length=250, blank=True, null=True)
     last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)
     avatar = models.ImageField(upload_to='stats/avatars', blank=True)
+    discord = models.CharField(max_length=250, blank=True, null=True)
     
     class Meta:
         managed = False

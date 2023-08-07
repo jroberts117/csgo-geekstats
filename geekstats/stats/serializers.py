@@ -5,6 +5,12 @@ class MapSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
     rating = serializers.IntegerField()
 
+class BotMapSerializer(serializers.Serializer):
+    map = serializers.CharField()
+    user = serializers.CharField()
+    rating = serializers.IntegerField()
+    key = serializers.CharField(default="none")
+
 class MapImageSerializer(serializers.Serializer):
     mid = serializers.IntegerField()
     type = serializers.CharField()

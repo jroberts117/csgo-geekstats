@@ -1,6 +1,7 @@
 
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
+from django.db.models import F, Count, Sum
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
@@ -8,11 +9,11 @@ from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 
 from .geekmodels import Maps, MapRating, Geek, TiersData, Season
-from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer, StatRequestSerializer
+from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer, StatRequestSerializer, BotMapSerializer
 from datetime import date
 from decimal import Decimal
 
-import os, openai, json
+import os, json
 
 @api_view(['GET','POST'])
 # @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
@@ -38,7 +39,58 @@ def map_rating(request):
                 MapRating.objects.create(map=map_id, geek=user_id, rating=map_rating)
                 return Response("Map created", status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET','POST'])
+# @renderer_classes((TemplateHTMLRenderer, JSONRenderer))
 
+def bot_map_rating(request):
+    if request.method == 'GET':
+        return HttpResponse("Not Implemented")
+    elif request.method == 'POST':
+        serializer = BotMapSerializer(data=request.data)
+        if serializer.is_valid():
+            map_rating = serializer.data['rating']
+            print(serializer.data['map'], serializer.data['user'], map_rating)
+            if map_rating == -1:                                                                # TO LOOKUP MAPS BY PARTIAL NAME
+                map_id = Maps.objects.filter(map__contains=serializer.data['map']).order_by('last_play')[:5]
+                print(map_id.values('map','idmap'))
+                return Response(map_id.values('idmap','map','thumbnail','description',), status=status.HTTP_200_OK)
+            elif map_rating == -2:                                                    # TO SEE THIS WEEK's MAPS
+                map_id = Maps.objects.order_by('last_play')[:3]
+                return Response(map_id.values('idmap','map','thumbnail','description',), status=status.HTTP_200_OK)
+            elif map_rating == -3:                                                    # TO SEE THE MAP VOTES
+                map_id = Maps.objects.filter(map=serializer.data['map']).order_by('map')[:1]
+                map_rating = MapRating.objects.annotate(map_name=F('map_id__map')).values('map_name').filter(map_id=map_id).annotate(
+                    vote_count= Count('geek_id'),
+                    vote_sum = Sum('rating')
+                    )
+                print(map_rating)
+                return Response(map_rating.values('map', 'vote_count', 'vote_sum'), status=status.HTTP_200_OK)
+            elif map_rating > 0 and map_rating < 6:                                                    # PROCESS THE VOTE
+                map_id = Maps.objects.filter(map=serializer.data['map']).first()
+                if map_id is None:
+                    return Response('Map does not exist', status=status.HTTP_400_BAD_REQUEST)
+                user_id = Geek.objects.filter(discord=serializer.data['user']).first()
+                print(user_id)
+                if user_id is None:
+                    return Response('Geek does not exist', status=status.HTTP_400_BAD_REQUEST)
+                api_key = os.getenv("VOTE_API_KEY")
+                if serializer.data['key'] == api_key:
+                    try:
+                        check_rating = MapRating.objects.get(map_id=map_id, geek_id=user_id)
+                        check_rating.rating = map_rating
+                        check_rating.save()
+                        return Response("Map has been updated", status=status.HTTP_201_CREATED)
+                    except:
+                        MapRating.objects.create(map=map_id, geek=user_id, rating=map_rating)
+                        return Response("Map created", status=status.HTTP_201_CREATED)
+                else:
+                    return Response('You are not authorized to update this data', status=status.HTTP_400_BAD_REQUEST)
+                
+            else:
+                return Response('Invalid rating', status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
 @api_view(['GET','POST'])
 def upload_image(request):
     if request.method == 'GET':
@@ -120,43 +172,43 @@ def ai_request(request):
     # Write me an api that processes input for an api call to openai
     if request.method == 'GET':
         return HttpResponse("Not Implemented")
-    elif request.method == 'POST':
-        ai_response = 'Unknown error'
-        Task = 'Recap the following "DataSet" data as a sportscaster. '
-        Tone = 'Be very sacrcastic.  Use an accent like a New Yorker.  '
-        Instructions = 'Call the "West1: Master" tier "Master" tier.  '
-        if request.data['type'] == 'recap':
-            serializer = AIRequestSerializer(data=request.data)
-            Season_data = Season.objects.get(name=request.data['season_name'])
-            dataset = serializers.serialize('json', TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(matchdate__gte=Season_data.start_date,matchdate__lte=Season_data.end_date))
-            print(dataset)
-            aiPrompt = []
-            if serializer.is_valid():
-                aiPrompt = [{"prompt": Task + Tone + Instructions + serializer.data['spec_inst'] + "\nDataSet: \n"}]
-                aiPrompt.append(dataset)
-                print('AI Prompt: ',aiPrompt)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response("No valid action requested", status=status.HTTP_400_BAD_REQUEST)
+#     elif request.method == 'POST':
+#         ai_response = 'Unknown error'
+#         Task = 'Recap the following "DataSet" data as a sportscaster. '
+#         Tone = 'Be very sacrcastic.  Use an accent like a New Yorker.  '
+#         Instructions = 'Call the "West1: Master" tier "Master" tier.  '
+#         if request.data['type'] == 'recap':
+#             serializer = AIRequestSerializer(data=request.data)
+#             Season_data = Season.objects.get(name=request.data['season_name'])
+#             dataset = serializers.serialize('json', TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(matchdate__gte=Season_data.start_date,matchdate__lte=Season_data.end_date))
+#             print(dataset)
+#             aiPrompt = []
+#             if serializer.is_valid():
+#                 aiPrompt = [{"prompt": Task + Tone + Instructions + serializer.data['spec_inst'] + "\nDataSet: \n"}]
+#                 aiPrompt.append(dataset)
+#                 print('AI Prompt: ',aiPrompt)
+#             else:
+#                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         else:
+#             return Response("No valid action requested", status=status.HTTP_400_BAD_REQUEST)
             
-        openai.api_key = os.getenv("OPEN_AI_KEY")
-        ai_response = openai.Completion.create(
-        # model="text-davinci-001", # Best ,most expensive model
-        #   model="text-curie-001",  # Good, reasonably priced model
-            model="text-babbage-001", # Stupid but cheap
-            # model="text-ada-001", # Stupid and fast but the cheapest model
-            prompt=aiPrompt,
-            temperature=0.7,
-            max_tokens=300,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
-        print('AI Response: ',ai_response)
-    else:
-        ai_response = 'unknown post error'
-    return Response(ai_response, status=status.HTTP_200_OK)
+#         openai.api_key = os.getenv("OPEN_AI_KEY")
+#         ai_response = openai.Completion.create(
+#         # model="text-davinci-001", # Best ,most expensive model
+#         #   model="text-curie-001",  # Good, reasonably priced model
+#             model="text-babbage-001", # Stupid but cheap
+#             # model="text-ada-001", # Stupid and fast but the cheapest model
+#             prompt=aiPrompt,
+#             temperature=0.7,
+#             max_tokens=300,
+#             top_p=1,
+#             frequency_penalty=0,
+#             presence_penalty=0
+#         )
+#         print('AI Response: ',ai_response)
+#     else:
+#         ai_response = 'unknown post error'
+#     return Response(ai_response, status=status.HTTP_200_OK)
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):

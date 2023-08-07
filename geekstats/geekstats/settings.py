@@ -27,7 +27,8 @@ if os.path.isfile(dotenv_file):
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'u_dltse0*#unyk7noswy$7meqac)1#qz%fznva3!l+q_$*nl9j'
+SECRET_KEY = os.getenv("SECRET_KEY")
+# SECRET_KEY = 'u_dltse0*#unyk7noswy$7meqac)1#qz%fznva3!l+q_$*nl9j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -90,7 +91,7 @@ WSGI_APPLICATION = 'geekstats.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
+gf_password = os.getenv("GF_DB_PASSWORD")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -99,7 +100,7 @@ DATABASES = {
         "PORT": "3306",
         "NAME": "geekfest",
         "USER": "geekfest",
-        "PASSWORD": "g33k",
+        "PASSWORD": gf_password,
         "AUTOCOMMIT": True,
         "OPTIONS": {
 #            "driver": "MySQL ODBC 5.3 ANSI Driver",
@@ -114,7 +115,7 @@ DATABASES = {
         "PORT": "3306",
         "NAME": "geek",
         "USER": "geekfest",
-        "PASSWORD": "g33k",
+        "PASSWORD": gf_password,
         "AUTOCOMMIT": True,
         "OPTIONS": {
 #            "driver": "MySQL ODBC 5.3 ANSI Driver",
@@ -127,28 +128,6 @@ DATABASES = {
 DATABASE_ROUTERS = ["geekstats.routers.GeekRouter"]
 pymysql.version_info = (1, 4, 2, "final", 0)
 pymysql.install_as_MySQLdb()
-
-# LOGGING = {
-#     'version': 1,
-#     'filters': {
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#         }
-#     },
-#     'loggers': {
-#         'django.db.backends': {
-#             'level': 'DEBUG',
-#             'handlers': ['console'],
-#         }
-#     }
-# }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
