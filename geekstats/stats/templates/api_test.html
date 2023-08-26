@@ -6,10 +6,32 @@
 {% block content %}
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <section>
-	<input type="text" id="player" placeholder="geek name" title="Type in a name">
-	<input type="date" id="start_date" placeholder="start date" title="Type in a start date">
-	<input type="date" id="end_date" placeholder="end date" title="Type in an end date">
-	<input type="button" id="search" value="Lookup API" onclick="get_data()">
+	<h1>API TEST PAGE</h1>
+	<label>
+		<input id="server" type="radio" name="server" value="test" checked>Test
+	</label>
+	<label>
+		<input  id="server" type="radio" name="server" value="production">Production
+	</label>
+
+	<hr>
+	<h3 style="margin-top: 5px; margin-bottom: 1px;"">Bot Map Vote Test [POST]</h3>
+	<h5 style="margin:1px;">http://<i style="color:red">server</i>/api/stats/botrating</h5>
+	<p style="color: blue; margin-top:1px; margin-bottom:5px;">processes map vote update when map and user are valid and vote is between 1 and 5.  If vote = -1 it will return a list of maps matching the map name.  If vote = -2 it will return the last 3 maps played.</p>
+	<input type="text" id="map" placeholder="map" title="Type in a map name">
+	<input type="text" id="handle" placeholder="user" title="Type in their Discord handle">
+	<input type="text" id="vote" placeholder="rating" title="What is the map rating?">
+	<input type="hidden" id="key" value="OWtejHpUlTmeTbK7fjyxZo30hGbDao7r">
+	<input type="button" id="search" value="Vote" onclick="test_data('vote')">
+
+	<hr>
+	<h3 style="margin-top: 5px; margin-bottom: 1px;"">Player Performance Data [GET]</h3>
+	<h5 style="margin:1px;">http://<i style="color:red">server</i>/api/stats/playerstats</h5>
+	<p style="color: blue; margin-top:1px; margin-bottom:5px;">Looks up player data for the given date range and returns a data list of results.</p>
+	<input type="text" id="player" placeholder="player" title="Type in a name">
+	<input type="date" id="start_date" placeholder="start_date" title="Type in a start date">
+	<input type="date" id="end_date" placeholder="end_date" title="Type in an end date">
+	<input type="button" id="search" value="Lookup API" onclick="test_data('player')">
 
 	<div id="results">
 		<table class="section_center zebra">
@@ -34,74 +56,127 @@
 </section>
 
 <script>
-	function get_data() {
-		var player = document.getElementById("player").value;
-		var start_date = document.getElementById("start_date").value;
-		var end_date = document.getElementById("end_date").value;
-		var url = "http://192.168.0.209:8000/api/stats/playerstats?player=" + player + "&start_date=" + start_date + "&end_date=" + end_date;
-		console.log(url);
-		$.ajax({
-			url: url,
-			type: "GET",
-			dataType: "json",
-			success: function(data) {
-				console.log(typeof data);
-				var data2 = JSON.parse(data);
-				var player_stats = data2[0];
-				console.log(data2[0]);
-				var tableBody = document.getElementById("table-body");
-				for (var key in data2) {
-					var row = document.createElement("tr");
-					var playerCell = document.createElement("td");
-					playerCell.innerHTML = data2[key].player;
-					row.appendChild(playerCell);
-					var killsCell = document.createElement("td");
-					killsCell.innerHTML = data2[key].kills;
-					row.appendChild(killsCell);
-					var deathsCell = document.createElement("td");
-					deathsCell.innerHTML = data2[key].deaths;
-					row.appendChild(deathsCell);
-					var kdrCell = document.createElement("td");
-					kdrCell.innerHTML = data2[key].kdr;
-					row.appendChild(kdrCell);
-					var alltimeKdrCell = document.createElement("td");
-					alltimeKdrCell.innerHTML = data2[key].alltime_kdr;
-					row.appendChild(alltimeKdrCell);
-					tableBody.appendChild(row);
-				}
-			},
-			error: function(data) {
-				console.log(data);
+	function csrfSafeMethod(method) {
+		// these HTTP methods do not require CSRF protection
+		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+	}
+	function sameOrigin(url) {
+		// test that a given url is a same-origin URL
+		// url could be relative or scheme relative or absolute
+		var host = document.location.host; // host + port
+		var protocol = document.location.protocol;
+		var sr_origin = '//' + host;
+		var origin = protocol + sr_origin;
+		// Allow absolute or scheme relative URLs to same origin
+		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+			// or any other URL that isn't scheme relative or absolute i.e relative.
+			!(/^(\/\/|http:|https:).*/.test(url));
+	}
+	$.ajaxSetup({
+		beforeSend: function(xhr, settings) {
+			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+				// Send the token to same-origin, relative URLs only.
+				// Send the token only if the method warrants CSRF protection
+				// Using the CSRFToken value acquired earlier
+				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 			}
+		}
+	});
 
-// New code
-	// 	var imgID = img
-	// 	console.log(imgID)
-	// 	var map = reqMap
-	// 	var URL = "http://192.168.0.208:8000/api/stats/getimg?mid=0&map="+map+"&type=thumb"
-	// 	// var URL = "http://stats.geekfestclan.com/api/stats/getimg?mid=0&map="+map+"&type=thumb"
-	// 	console.log(URL)
-	// 	fetch(URL, {
-	// 	headers:{
-	// 		'Accept': 'application/json',
-	// 		'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
-	// 	},
-	// 	})
-	// 	.then(response => {
-	// 		return response.json() //Convert response to JSON
-	// 	})
-	// 	.then(data => {
-	// 		//Perform actions with the response data from the view
-	// 		console.log(data)
-	// 		document.getElementById(imgID).name = "loaded"
-	// 		document.getElementById(imgID).src = data
-	// 	})
-	// }
+	function test_data(api) {
+		var api = api;
+		var server = document.querySelector('input[name="server"]:checked').value;
+		console.log('server',server, 'api', api);
+		if (server == "production") {
+			var url = "http://stats.geekfestclan.com"
+		} else {
+			var url = "http://192.168.0.209:8000"
+		}	
+		if (api == 'player') {
+			var player = document.getElementById("player").value;
+			var start_date = document.getElementById("start_date").value;
+			var end_date = document.getElementById("end_date").value;
+			var url = url + "/api/stats/playerstats?player=" + player + "&start_date=" + start_date + "&end_date=" + end_date;
+			console.log(url);
+			$.ajax({
+				url: url,
+				type: "GET",
+				dataType: "json",
+				success: function(data) {
+					console.log(typeof data);
+					var data2 = JSON.parse(data);
+					var player_stats = data2[0];
+					console.log(data2[0]);
+					var tableBody = document.getElementById("table-body");
+					while (tableBody.rows.length > 0) {
+						console.log(tableBody.rows.length)
+						tableBody.deleteRow(0);
+					}
+					for (var key in data2) {
+						var row = document.createElement("tr");
+						var playerCell = document.createElement("td");
+						playerCell.innerHTML = data2[key].player;
+						row.appendChild(playerCell);
+						var killsCell = document.createElement("td");
+						killsCell.innerHTML = data2[key].kills;
+						row.appendChild(killsCell);
+						var deathsCell = document.createElement("td");
+						deathsCell.innerHTML = data2[key].deaths;
+						row.appendChild(deathsCell);
+						var kdrCell = document.createElement("td");
+						kdrCell.innerHTML = data2[key].kdr;
+						row.appendChild(kdrCell);
+						var aKdrCell = document.createElement("td");
+						aKdrCell.innerHTML = data2[key].akdr;
+						row.appendChild(aKdrCell);
+						var oneyrCell = document.createElement("td");
+						oneyrCell.innerHTML = data2[key].year_kdr;
+						row.appendChild(oneyrCell);
+						var last90Cell = document.createElement("td");
+						last90Cell.innerHTML = data2[key].last90_kdr;
+						row.appendChild(last90Cell);
 
-// End New Code
+						tableBody.appendChild(row);
+					}
+				},
+				error: function(data) {
+					console.log(data);
+				}
+		
+			});
 
 			
-		});
+		} else if (api == 'vote') {
+			var map = document.getElementById("map").value;
+			var handle = document.getElementById("handle").value;
+			var vote = document.getElementById("vote").value;
+			var key = document.getElementById("key").value;
+			console.log(url);
+			
+			var form = new FormData();
+			form.append("map", map);
+			form.append("user", handle);
+			form.append("rating", vote);
+			form.append("key", key);
+			console.log("Form data:");
+			for (var pair of form.entries()) {
+			console.log(pair[0] + ': ' + pair[1]);
+			}
+			var settings = {
+				"url": url + "/api/stats/botrating/",
+				"method": "POST",
+				"timeout": 0,
+				"processData": false,
+				"mimeType": "multipart/form-data",
+				"contentType": false,
+				"data": form
+			};
+			console.log(settings);
+			$.ajax(settings).done(function (response) {
+			console.log(response);
+			});
+		}
 	}
 </script>
 {% endblock content %}

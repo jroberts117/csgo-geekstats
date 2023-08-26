@@ -59,13 +59,13 @@ def bot_map_rating(request):
                 map_id = Maps.objects.order_by('last_play')[:3]
                 return Response(map_id.values('idmap','map','thumbnail','description',), status=status.HTTP_200_OK)
             elif map_rating == -3:                                                    # TO SEE THE MAP VOTES
-                map_id = Maps.objects.filter(map=serializer.data['map']).order_by('map')[:1]
+                map_id = Maps.objects.filter(map__contains=serializer.data['map']).order_by('map')[:1]
                 map_rating = MapRating.objects.annotate(map_name=F('map_id__map')).values('map_name').filter(map_id=map_id).annotate(
                     vote_count= Count('geek_id'),
                     vote_sum = Sum('rating')
                     )
                 print(map_rating)
-                return Response(map_rating.values('map', 'vote_count', 'vote_sum'), status=status.HTTP_200_OK)
+                return Response(map_rating.values('map_name', 'vote_count', 'vote_sum'), status=status.HTTP_200_OK)
             elif map_rating > 0 and map_rating < 6:                                                    # PROCESS THE VOTE
                 map_id = Maps.objects.filter(map=serializer.data['map']).first()
                 if map_id is None:
@@ -229,7 +229,21 @@ def get_player_stats(request):
             player = serializer.data['player']
             start_date = serializer.data['start_date']
             end_date = serializer.data['end_date']
-            player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
+            if player == 'none':
+                from django.db.models import Avg, Sum, Min
+                player_stats = TiersData.objects.filter(matchdate__gte=start_date, matchdate__lte=end_date).values('player').annotate(
+                    tier=Min('tier'),
+                    alltime_kdr=Min('alltime_kdr'),
+                    last90_kdr=Min('last90_kdr'),
+                    year_kdr=Min('year_kdr'),
+                    kills=Sum('kills'),
+                    deaths=Sum('deaths'),
+                    assists=Sum('assists'),
+                    kdr=Avg('kdr'),
+                    akdr=Avg('akdr')
+                )
+            else:
+                player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
             print(player_stats)
             player_stats_d = list(player_stats)
             j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
@@ -238,4 +252,3 @@ def get_player_stats(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-

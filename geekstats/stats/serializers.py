@@ -33,6 +33,6 @@ class AIRequestSerializer(serializers.Serializer):
     spec_inst = serializers.CharField()
 
 class StatRequestSerializer(serializers.Serializer):
-    player = serializers.CharField()
+    player = serializers.CharField(default="none")
     start_date = serializers.DateField()
     end_date = serializers.DateField()
