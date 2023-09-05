@@ -1,17 +1,19 @@
 
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-from django.db.models import F, Count, Sum
+from django.db.models import F, Count, Sum, Q
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 
-from .geekmodels import Maps, MapRating, Geek, TiersData, Season
+from .geekmodels import Maps, MapRating, Geek, TiersData, Season, Team
 from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer, StatRequestSerializer, BotMapSerializer
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
+from django.utils import timezone
+
 
 import os, json
 
@@ -167,48 +169,6 @@ def get_image(request):
                 return Response("Not Implemented", status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET','POST'])
-def ai_request(request):
-    # Write me an api that processes input for an api call to openai
-    if request.method == 'GET':
-        return HttpResponse("Not Implemented")
-#     elif request.method == 'POST':
-#         ai_response = 'Unknown error'
-#         Task = 'Recap the following "DataSet" data as a sportscaster. '
-#         Tone = 'Be very sacrcastic.  Use an accent like a New Yorker.  '
-#         Instructions = 'Call the "West1: Master" tier "Master" tier.  '
-#         if request.data['type'] == 'recap':
-#             serializer = AIRequestSerializer(data=request.data)
-#             Season_data = Season.objects.get(name=request.data['season_name'])
-#             dataset = serializers.serialize('json', TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(matchdate__gte=Season_data.start_date,matchdate__lte=Season_data.end_date))
-#             print(dataset)
-#             aiPrompt = []
-#             if serializer.is_valid():
-#                 aiPrompt = [{"prompt": Task + Tone + Instructions + serializer.data['spec_inst'] + "\nDataSet: \n"}]
-#                 aiPrompt.append(dataset)
-#                 print('AI Prompt: ',aiPrompt)
-#             else:
-#                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             return Response("No valid action requested", status=status.HTTP_400_BAD_REQUEST)
-            
-#         openai.api_key = os.getenv("OPEN_AI_KEY")
-#         ai_response = openai.Completion.create(
-#         # model="text-davinci-001", # Best ,most expensive model
-#         #   model="text-curie-001",  # Good, reasonably priced model
-#             model="text-babbage-001", # Stupid but cheap
-#             # model="text-ada-001", # Stupid and fast but the cheapest model
-#             prompt=aiPrompt,
-#             temperature=0.7,
-#             max_tokens=300,
-#             top_p=1,
-#             frequency_penalty=0,
-#             presence_penalty=0
-#         )
-#         print('AI Response: ',ai_response)
-#     else:
-#         ai_response = 'unknown post error'
-#     return Response(ai_response, status=status.HTTP_200_OK)
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -242,13 +202,68 @@ def get_player_stats(request):
                     kdr=Avg('kdr'),
                     akdr=Avg('akdr')
                 )
+                print(player_stats.query)
             else:
                 player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
-            print(player_stats)
             player_stats_d = list(player_stats)
             j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
-            print(j_stats)
             return JsonResponse(j_stats, safe=False)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+# write and API that will take two captains and a season name and write the captains into the season table
+
+@api_view(['GET','POST'])
+
+
+def pick_teams(request):
+    if request.method == 'POST':
+        return HttpResponse("Not Implemented")
+    elif request.method == 'GET':
+        serializer = StatRequestSerializer(data=request.query_params)
+        if serializer.is_valid():
+            captain1 = serializer.data['cap1']
+            captain2 = serializer.data['cap2']
+            today_plus_seven = timezone.now().date() + timedelta(days=7)
+            seasons = Season.objects.filter(start_date__lte=today_plus_seven, end_date__gte=today_plus_seven)
+            
+            if seasons.exists() and seasons.count() == 1:
+                cap1 = Geek.objects.filter(Q(handle=captain1) | Q(discord=captain1))
+                print('cap1', captain1, cap1)
+                cap2 = Geek.objects.filter(Q(handle=captain2) | Q(discord=captain2))
+                print('cap2', captain2, cap2)
+                if cap1.exists() and cap2.exists():
+                    cap1 = cap1.first()
+                    cap2 = cap2.first()
+                else:
+                    print('One or both of the captains do not exist')
+                    return Response("One or both of the captains do not exist", status=status.HTTP_400_BAD_REQUEST)
+                for season in seasons:
+                    teams = Team.objects.filter(season=season)
+                    if teams.count() == 2:
+                        team1, team2 = teams
+                        team1.captain = cap1
+                        team1.save()
+                        team2.captain = cap2
+                        team2.save()
+                    else:
+                        return Response("The teams have not been created for this season", status=status.HTTP_400_BAD_REQUEST)
+            # Create a dictionary with the csgo_id of the captains
+                captains = {
+                    'captain1_csgo': cap1.csgo_id,
+                    'captain1': cap1.handle,
+                    'captain2_csgo': cap2.csgo_id, 
+                    'captain2': cap2.handle,
+                    'status': 'Captains updated',
+                }                
+                # Convert the dictionary to a JSON string
+                captains_json = json.dumps(captains)
+                
+                # Return the JSON string
+                return JsonResponse(captains_json, safe=False)
+                # return Response("Captains updated", status=status.HTTP_200_OK)
+            else:
+                return Response("There is no season created in the range of today's date.", status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         

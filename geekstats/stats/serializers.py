@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from datetime import date
+from django.utils import timezone
 
 class MapSerializer(serializers.Serializer):
     map_id = serializers.IntegerField()
@@ -32,7 +34,17 @@ class AIRequestSerializer(serializers.Serializer):
     season_name = serializers.CharField()
     spec_inst = serializers.CharField()
 
+def get_current_date():
+    return timezone.now().date()
+
 class StatRequestSerializer(serializers.Serializer):
+    current_date = timezone.now().date()
     player = serializers.CharField(default="none")
-    start_date = serializers.DateField()
-    end_date = serializers.DateField()
+    start_date = serializers.DateField(default=current_date)
+    end_date = serializers.DateField(default=current_date)
+    season = serializers.CharField(default="none")
+    cap1 = serializers.CharField(default="none")
+    cap2 = serializers.CharField(default="none")
+    type = serializers.CharField(default="none")
+
+

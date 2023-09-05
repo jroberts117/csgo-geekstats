@@ -27,6 +27,7 @@ urlpatterns = [
     path('getimg/', apiviews.get_image, name='get_image'),
     path('dataupdate/', apiviews.update_data, name='update_data'),
     path('playerstats/', apiviews.get_player_stats, name='get_player_stats'),
-    path('ai/', apiviews.ai_request, name='ai_request'),
+    path('pick_teams', apiviews.pick_teams, name='pick_teams'),
+    # path('ai/', apiviews.ai_request, name='ai_request'),
 
 ]
