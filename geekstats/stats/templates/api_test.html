@@ -40,6 +40,12 @@
 	<input type="text" id="type" placeholder="request Type" title="Type in Type">
 	<input type="text" id="cap1" placeholder="Captain 1" title="Type in Team 1 Captain">
 	<input type="text" id="cap2" placeholder="Captain 2" title="Type in Team 2 Captain">
+	<label>
+		<input id="type" type="radio" name="type" value="GET" checked>GET
+	</label>
+	<label>
+		<input  id="type" type="radio" name="type" value="POST">POST
+	</label>
 	<input type="button" id="search" value="Run" onclick="pick_teams('player')">
 	<div id="results">Results</div>
 		
@@ -206,29 +212,62 @@
 		var cap1 = document.getElementById("cap1").value;
 		var cap2 = document.getElementById("cap2").value;
 		console.log(url)
-		url = url + "/api/stats/pick_teams?cap1=" + cap1 + "&cap2=" + cap2;
-		console.log(url);
-		var results = document.getElementById("results");
-		results.innerHTML = "";  // Clear the "results" div
-		$.ajax({
-			url: url,
-			type: "GET",
-			dataType: "json",
-			success: function(data) {
-				console.log(data);
+		var doctype = document.querySelector('input[name="type"]:checked').value;
+		console.log('type',doctype);
+		if (doctype == "GET") {
+			url = url + "/api/stats/pick_teams?cap1=" + cap1 + "&cap2=" + cap2;
+			console.log(url);
+			var results = document.getElementById("results");
+			results.innerHTML = "";  // Clear the "results" div
+			$.ajax({
+				url: url,
+				type: "GET",
+				dataType: "json",
+				success: function(data) {
+					console.log(data);
+					var newElement = document.createElement("p");
+					newElement.innerHTML = data;
+					results.appendChild(newElement);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR.responseText);
+					console.log("HTTP status code: " + jqXHR.status);
+					console.log("Error message: " + errorThrown);
+					var newElement = document.createElement("p");
+					newElement.innerHTML = jqXHR.responseText;
+					results.appendChild(newElement);
+				}
+			});
+
+		} else {
+			var results = document.getElementById("results");
+			results.innerHTML = ""; 
+			
+			var form = new FormData();
+			form.append("cap1", cap1);
+			form.append("cap2", cap2);
+			// var data = {
+			// 	"cap1": cap1,
+			// 	"cap2": cap2		
+			// };
+			var settings = {
+				"url": url + "/api/stats/pick_teams",
+				"method": "POST",
+				"timeout": 0,
+				"processData": false,
+				"mimeType": "multipart/form-data",
+				"contentType": false,
+				"data": form
+			};
+			console.log(settings);
+			$.ajax(settings).done(function (response) {
+				console.log(response);
 				var newElement = document.createElement("p");
 				newElement.innerHTML = data;
 				results.appendChild(newElement);
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR.responseText);
-				console.log("HTTP status code: " + jqXHR.status);
-				console.log("Error message: " + errorThrown);
-				var newElement = document.createElement("p");
-				newElement.innerHTML = jqXHR.responseText;
-				results.appendChild(newElement);
-			}
-		});
+			});
+
+		}
 }
 </script>
 {% endblock content %}

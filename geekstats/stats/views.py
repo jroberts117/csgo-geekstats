@@ -365,7 +365,12 @@ def tiers(request):
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.page,mainmenu.state)
     print(mainmenu.menu,mainmenu.page,mainmenu.state)
     context['state'] = newstate
-    context['players'] = TiersData.objects.values('geekid','player','tier','tier_id','year_kdr','alltime_kdr').filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'))
+    context['players'] = (
+        TiersData.objects
+        .values('geekid','player','tier','tier_id','year_kdr','alltime_kdr')
+        .filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
+        .order_by('-kdr__avg')
+        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'), Sum('ADR')))
     context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
     context['tier1'] = list(filter(lambda tiers: tiers['tier_id'] == 2, list(context['players'])))
     context['tier2'] = list(filter(lambda tiers: tiers['tier_id'] == 3, list(context['players'])))
@@ -388,10 +393,6 @@ def tiers(request):
                 if item['weapon__count'] > high:
                     geek['weapon'] = item
                     high = item['weapon__count']
-
-        # geek['weapon'] = FragDetails.objects.values('weapon').filter(killer=geek['player'],match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count')[0]
-        # print(FragDetails.objects.values('weapon').filter(killer=geek['player'],match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'], type='kill').annotate(Count('weapon')).order_by('-weapon__count').query)
-
 
     return render(request, template, context)
 

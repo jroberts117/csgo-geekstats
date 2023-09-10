@@ -441,6 +441,7 @@ class TiersData(models.Model):
     assists = models.IntegerField()
     kdr = models.DecimalField(max_digits=8, decimal_places=2)
     akdr = models.DecimalField(max_digits=8, decimal_places=2)
+    ADR = models.DecimalField(max_digits=8, decimal_places=2)
     alltime_kdr = models.DecimalField(max_digits=8, decimal_places=2)
     year_kdr = models.DecimalField(max_digits=8, decimal_places=2)
     last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)

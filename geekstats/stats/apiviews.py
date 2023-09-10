@@ -218,23 +218,37 @@ def get_player_stats(request):
 
 def pick_teams(request):
     if request.method == 'POST':
-        return HttpResponse("Not Implemented")
+        # data = JSONParser().parse(request)
+        print(request.data)
+        serializer = StatRequestSerializer(data=request.data)
     elif request.method == 'GET':
         serializer = StatRequestSerializer(data=request.query_params)
-        if serializer.is_valid():
-            captain1 = serializer.data['cap1']
-            captain2 = serializer.data['cap2']
-            today_plus_seven = timezone.now().date() + timedelta(days=7)
-            seasons = Season.objects.filter(start_date__lte=today_plus_seven, end_date__gte=today_plus_seven)
-            
-            if seasons.exists() and seasons.count() == 1:
-                cap1 = Geek.objects.filter(Q(handle=captain1) | Q(discord=captain1))
+    else:
+        return HttpResponse("Not Implemented")
+    if serializer.is_valid():
+        print(serializer.data['players'][0])
+        captain1 = serializer.data['cap1']
+        captain2 = serializer.data['cap2']
+        today_plus_seven = timezone.now().date() + timedelta(days=7)
+        seasons = Season.objects.filter(start_date__lte=today_plus_seven, end_date__gte=today_plus_seven)
+        captains = {}
+        if seasons.exists() and seasons.count() == 1:
+            if captain1 != 'none' and captain2 != 'none':
+                cap1 = Geek.objects.filter(Q(handle=captain1) | Q(discord=captain1), is_member=1)
                 print('cap1', captain1, cap1)
-                cap2 = Geek.objects.filter(Q(handle=captain2) | Q(discord=captain2))
+                cap2 = Geek.objects.filter(Q(handle=captain2) | Q(discord=captain2), is_member=1)
                 print('cap2', captain2, cap2)
                 if cap1.exists() and cap2.exists():
                     cap1 = cap1.first()
                     cap2 = cap2.first()
+                    captains = {
+                        'captain1_csgo': cap1.csgo_id,
+                        'captain1': cap1.handle,
+                        'captain2_csgo': cap2.csgo_id, 
+                        'captain2': cap2.handle,
+                        'status': 'Captains updated',
+            }        
+
                 else:
                     print('One or both of the captains do not exist')
                     return Response("One or both of the captains do not exist", status=status.HTTP_400_BAD_REQUEST)
@@ -248,22 +262,24 @@ def pick_teams(request):
                         team2.save()
                     else:
                         return Response("The teams have not been created for this season", status=status.HTTP_400_BAD_REQUEST)
-            # Create a dictionary with the csgo_id of the captains
-                captains = {
-                    'captain1_csgo': cap1.csgo_id,
-                    'captain1': cap1.handle,
-                    'captain2_csgo': cap2.csgo_id, 
-                    'captain2': cap2.handle,
-                    'status': 'Captains updated',
-                }                
-                # Convert the dictionary to a JSON string
-                captains_json = json.dumps(captains)
-                
-                # Return the JSON string
-                return JsonResponse(captains_json, safe=False)
-                # return Response("Captains updated", status=status.HTTP_200_OK)
-            else:
-                return Response("There is no season created in the range of today's date.", status=status.HTTP_404_NOT_FOUND)
+            players = serializer.data['players']
+            print('players:', players, type(players))
+            player_list = Geek.objects.filter(discord__in=players)
+            print(player_list.query, player_list)
+        # Create a dictionary with the csgo_id of the captains
+            data = {
+                'captains': captains,
+                'players': list(player_list.values('csgo_id', 'handle'))
+            }        
+            # Convert the dictionary to a JSON string
+            # captains_json = json.dumps(captains)
+            
+            # Return the JSON string
+            print(data)
+            return JsonResponse(data, safe=False)
+            # return Response("Captains updated", status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response("There is no season created in the range of today's date.", status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
