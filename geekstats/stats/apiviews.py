@@ -209,6 +209,7 @@ def get_player_stats(request):
             j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
             return JsonResponse(j_stats, safe=False)
         else:
+            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 # write and API that will take two captains and a season name and write the captains into the season table
@@ -226,7 +227,7 @@ def pick_teams(request):
     else:
         return HttpResponse("Not Implemented")
     if serializer.is_valid():
-        print(serializer.data['players'][0])
+        # print(serializer.data['players'][0])
         captain1 = serializer.data['cap1']
         captain2 = serializer.data['cap2']
         today_plus_seven = timezone.now().date() + timedelta(days=7)

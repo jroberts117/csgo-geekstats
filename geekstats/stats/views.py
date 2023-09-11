@@ -363,14 +363,14 @@ def tiers(request):
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Tiers', request.session['selector'],request.session['datetype'])
     context['title'] = 'GeekFest Tiers'
     context['stateinfo'] = zip(mainmenu.menu,mainmenu.page,mainmenu.state)
-    print(mainmenu.menu,mainmenu.page,mainmenu.state)
+    # print(mainmenu.menu,mainmenu.page,mainmenu.state)
     context['state'] = newstate
     context['players'] = (
         TiersData.objects
         .values('geekid','player','tier','tier_id','year_kdr','alltime_kdr')
         .filter(matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date'])
         .order_by('-kdr__avg')
-        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'), Sum('ADR')))
+        .annotate(Avg('kdr'),Sum('kills'),Sum('deaths'),Sum('assists'),Avg('akdr'), Avg('ADR')))
     context['tier0'] = list(filter(lambda tiers: tiers['tier_id'] == 1, list(context['players'])))
     context['tier1'] = list(filter(lambda tiers: tiers['tier_id'] == 2, list(context['players'])))
     context['tier2'] = list(filter(lambda tiers: tiers['tier_id'] == 3, list(context['players'])))

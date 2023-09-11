@@ -46,6 +46,6 @@ class StatRequestSerializer(serializers.Serializer):
     cap1 = serializers.CharField(default="none")
     cap2 = serializers.CharField(default="none")
     type = serializers.CharField(default="none")
-    players = serializers.ListField()
+    players = serializers.ListField(default=[])
 
 

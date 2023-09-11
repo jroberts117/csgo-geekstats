@@ -21,7 +21,7 @@ VIEW `tiers_data` AS
             999,
             ROUND(((SUM(`tot`.`kills`) + (SUM(`tot`.`assists`) * 0.25)) / SUM(`tot`.`deaths`)),
                     2)) AS `aKDR`,
-        `ga`.`ADR` AS `ADR`,
+        AVG(`ga`.`ADR`) AS `ADR`,
         `g`.`alltime_kdr` AS `alltime_kdr`,
         `g`.`year_kdr` AS `year_kdr`,
         `g`.`last90_kdr` AS `last90_kdr`
@@ -56,7 +56,8 @@ VIEW `tiers_data` AS
             (`a`.`is_tk_assist` = 0)) `tot`
         JOIN `geek` `g` ON ((`g`.`geek_id` = `tot`.`geek_id`)))
         JOIN `tier` `t` ON ((`g`.`tier_id` = `t`.`tier_id`)))
-        JOIN `geek_adr` `ga` ON ((`g`.`geek_id` = `ga`.`geek_id`)))
         JOIN `match_round` `mr` ON ((`tot`.`round_id` = `mr`.`round_id`)))
         JOIN `season_match` `sm` ON ((`mr`.`match_id` = `sm`.`match_id`)))
-    GROUP BY `tot`.`geek_id` , `g`.`handle` , `t`.`tier_name` , `g`.`generation_id` , CAST(`sm`.`match_date` AS DATE) , `g`.`alltime_kdr` , `g`.`year_kdr` , `g`.`last90_kdr` , `ga`.`ADR`
+        LEFT JOIN `geek_adr` `ga` ON (((`g`.`geek_id` = `ga`.`geek_id`)
+            AND (CAST(`sm`.`match_date` AS DATE) = CAST(`ga`.`match_date` AS DATE)))))
+    GROUP BY `tot`.`geek_id` , `g`.`handle` , `t`.`tier_name` , `g`.`generation_id` , CAST(`sm`.`match_date` AS DATE) , `g`.`alltime_kdr` , `g`.`year_kdr` , `g`.`last90_kdr`

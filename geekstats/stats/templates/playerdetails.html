@@ -53,6 +53,7 @@
 					{% endif %}
 
 				</div>
+				<div>discord:  <img src="/static/images/discord.png" height="20">{{player.discord}}</div>
 			</div>
 			<table>
 				<tr height="25px" class="header">
@@ -214,8 +215,8 @@
 		var imgID = img
 		console.log(imgID)
 		var map = reqMap
-		// var URL = "http://192.168.0.208:8000/api/stats/getimg?mid=0&map="+map+"&type=thumb"
-		var URL = "http://stats.geekfestclan.com/api/stats/getimg?mid=0&map="+map+"&type=thumb"
+		var URL = "http://192.168.0.208:8000/api/stats/getimg?mid=0&map="+map+"&type=thumb"
+		// var URL = "http://stats.geekfestclan.com/api/stats/getimg?mid=0&map="+map+"&type=thumb"
 		console.log(URL)
 		fetch(URL, {
 		headers:{
