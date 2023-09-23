@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.parsers import JSONParser
 
-
-from .geekmodels import Maps, MapRating, Geek, TiersData, Season, Team
+from .geekmodels import Maps, MapRating, Geek, TiersData, Season, Team, TeamGeek
 from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, TeamSetSerializer, StatRequestSerializer, BotMapSerializer
 from datetime import date, timedelta
 from decimal import Decimal
@@ -292,7 +292,7 @@ def pick_teams(request):
 def save_teams(request):
     # test_data = {'team_a': {'players': [{'player_name': 'Cloner', 'player_score': 2.2507}, {'player_name': 'Duckhead', 'player_score': 0.8698}, {'player_name': 'Toze', 'player_score': 1.1778}, {'player_name': 'Yakobay', 'player_score': 0.9579}, {'player_name': 'Ogre', 'player_score': 0.6471}], 'team_name': 'Alpha', 'team_num_players': 5, 'team_score': 5.9032627425, 'captain': 'Yakobay'}, 'team_b': {'players': [{'player_name': 'Dream', 'player_score': 1.9214}, {'player_name': 'Edge', 'player_score': 1.2822}, {'player_name': 'Mailboxhead', 'player_score': 1.0127}, {'player_name': 'Unthink', 'player_score': 1.5904}], 'team_name': 'Bravo', 'team_num_players': 4, 'team_score': 5.8066908706, 'captain': 'Mailboxhead'}}
     if request.method == 'POST':
-        # print(request.data)
+        print(request.data)
         # data = JSONParser().parse(request)
         serializer = TeamSetSerializer(data=request.data)
     else:
@@ -307,27 +307,53 @@ def save_teams(request):
         captain2 = serializer.validated_data['cap2']
         team1 = serializer.validated_data['team1']
         team2 = serializer.validated_data['team2']
+        players1 = serializer.validated_data['players1']
+        players2 = serializer.validated_data['players2']
+        players1_list = players1[0].strip('[]').replace('"', '').split(', ')
+        players2_list = players2[0].strip('[]').replace('"', '').split(', ')
+        
+        print(players1_list, players2_list)
+        print(players1_list[1])
 
 # GET THE TEAMS FOR THE CURRENT SEASON
         teams = Team.objects.filter(season=season)
         team_a = teams.first()
         team_b = teams.last()
-        print('DATA:',  captain1, captain2, team1, team2)
+        print('DATA:',  captain1, captain2, team1, team2, players1, players2)
 
 # CHECK THAT THE CAPTAINS ARE VALID AND THAT THEY ARE THE CAPTAINS FOR THE CURRENT SEASON
         cap1 = Geek.objects.values('discord','handle').filter(Q(handle=captain1) | Q(discord=captain1), is_member=1)
         cap2 = Geek.objects.values('discord','handle').filter(Q(handle=captain2) | Q(discord=captain2), is_member=1)
-        print('CAPTAINS:', cap1, cap2)
-        print('TEAMS:', teams, team1, team2)
+        # print('CAPTAINS:', cap1, cap2)
+        # print('TEAMS:', teams, team1, team2)
         
         if cap1.exists() and cap2.exists() and cap1[0]['handle'] == captain1 and cap2[0]['handle'] == captain2:
-            for geek in team1[0]['players']:
-                player = Geek.objects.filter(geek['discord'], is_member=1)
+            for geek in players1_list:
+                player = Geek.objects.filter(Q(handle=geek) | Q(discord=geek), is_member=1)
                 if player.exists():
-                    teamGeek = TeamGeek.objects.create(team=teams.first(), geek_id=player.first(), tier_id = player.first().tier_id)
-                    teamGeek.save()
+                    teamGeekCheck = TeamGeek.objects.filter(team=teams.first(), geek_id=player.first().geek_id)
+                    if teamGeekCheck.exists():
+                        print(geek + " already exists in the team: "+ team_a.name)
+                        continue
+                    else:
+                        teamGeek = TeamGeek.objects.create(team=team_a, geek_id=player.first().geek_id, tier_id = player.first().tier_id)
+                        teamGeek.save()
                 else:
-                    return Response("One or more of the players do not exist", status=status.HTTP_400_BAD_REQUEST)
+                    return Response(geek + " does not exist in our database", status=status.HTTP_400_BAD_REQUEST)
+            for geek in players2_list:
+                player = Geek.objects.filter(Q(handle=geek) | Q(discord=geek), is_member=1)
+                if player.exists():
+                    teamGeekCheck = TeamGeek.objects.filter(team=team_b, geek_id=player.first().geek_id)
+                    if teamGeekCheck.exists():
+                        print(geek + " already exists in the team: "+ team_b.name)
+                        continue
+                    else:
+                        teamGeek = TeamGeek.objects.create(team=teams.last(), geek_id=player.first().geek_id, tier_id = player.first().tier_id)
+                        teamGeek.save()
+                else:
+                    return Response(geek + " does not exist in our database", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Team has been created", status=status.HTTP_200_OK)
+
         else:
             return Response("One or both of the captains do not exist or these are not the right team captains for the current season teams", status=status.HTTP_400_BAD_REQUEST)
     else:

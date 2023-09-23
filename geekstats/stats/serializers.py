@@ -48,10 +48,20 @@ class StatRequestSerializer(serializers.Serializer):
     type = serializers.CharField(default="none")
     players = serializers.ListField(default=[])
 
+class PlayerSerializer(serializers.Serializer):
+    player_name = serializers.CharField()
+    player_score = serializers.FloatField()
+    discord = serializers.CharField()
+    steam_id = serializers.CharField()
+    captain = serializers.BooleanField()
+
 class TeamSetSerializer(serializers.Serializer):
     cap1 = serializers.CharField()
-    team1 = serializers.ListField(child=serializers.ListField())
+    team1 = serializers.ListField()
+    players1 = serializers.ListField(child=serializers.CharField())
     cap2 = serializers.CharField()
-    team2 = serializers.ListField()
+    team2 = serializers.DictField()
+    players2 = serializers.ListField(child=serializers.CharField())
+
 
 
