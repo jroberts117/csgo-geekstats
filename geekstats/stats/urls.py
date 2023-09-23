@@ -28,6 +28,7 @@ urlpatterns = [
     path('dataupdate/', apiviews.update_data, name='update_data'),
     path('playerstats/', apiviews.get_player_stats, name='get_player_stats'),
     path('pick_teams/', apiviews.pick_teams, name='pick_teams'),
+    path('save_teams/', apiviews.save_teams, name='save_teams'),
     # path('ai/', apiviews.ai_request, name='ai_request'),
 
 ]

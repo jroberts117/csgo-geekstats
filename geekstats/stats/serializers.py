@@ -48,4 +48,10 @@ class StatRequestSerializer(serializers.Serializer):
     type = serializers.CharField(default="none")
     players = serializers.ListField(default=[])
 
+class TeamSetSerializer(serializers.Serializer):
+    cap1 = serializers.CharField()
+    team1 = serializers.ListField(child=serializers.ListField())
+    cap2 = serializers.CharField()
+    team2 = serializers.ListField()
+
 

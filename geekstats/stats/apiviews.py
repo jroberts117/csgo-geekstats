@@ -9,7 +9,7 @@ from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 
 from .geekmodels import Maps, MapRating, Geek, TiersData, Season, Team
-from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, AIRequestSerializer, StatRequestSerializer, BotMapSerializer
+from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, TeamSetSerializer, StatRequestSerializer, BotMapSerializer
 from datetime import date, timedelta
 from decimal import Decimal
 from django.utils import timezone
@@ -235,9 +235,9 @@ def pick_teams(request):
         captains = {}
         if seasons.exists() and seasons.count() == 1:
             if captain1 != 'none' and captain2 != 'none':
-                cap1 = Geek.objects.filter(Q(handle=captain1) | Q(discord=captain1), is_member=1)
+                cap1 = Geek.objects.filter(Q(handle__iexact=captain1) | Q(discord__iexact=captain1), is_member=1)
                 print('cap1', captain1, cap1)
-                cap2 = Geek.objects.filter(Q(handle=captain2) | Q(discord=captain2), is_member=1)
+                cap2 = Geek.objects.filter(Q(handle__iexact=captain2) | Q(discord__iexact=captain2), is_member=1)
                 print('cap2', captain2, cap2)
                 if cap1.exists() and cap2.exists():
                     cap1 = cap1.first()
@@ -265,12 +265,16 @@ def pick_teams(request):
                         return Response("The teams have not been created for this season", status=status.HTTP_400_BAD_REQUEST)
             players = serializer.data['players']
             print('players:', players, type(players))
-            player_list = Geek.objects.filter(discord__in=players)
+            if players == []:
+                return Response("No players have been submitted", status=status.HTTP_400_BAD_REQUEST)
+            # player_list = Geek.objects.filter(discord__in=players)
+            player_list = Geek.objects.filter(discord__in=players).annotate(steam_id=F('csgo_id'))
             print(player_list.query, player_list)
         # Create a dictionary with the csgo_id of the captains
             data = {
                 'captains': captains,
-                'players': list(player_list.values('csgo_id', 'handle'))
+                'players': list(player_list.values('steam_id', 'discord', 'handle')),
+                'season': seasons.first().name
             }        
             # Convert the dictionary to a JSON string
             # captains_json = json.dumps(captains)
@@ -284,3 +288,53 @@ def pick_teams(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(['GET','POST'])
+def save_teams(request):
+    # test_data = {'team_a': {'players': [{'player_name': 'Cloner', 'player_score': 2.2507}, {'player_name': 'Duckhead', 'player_score': 0.8698}, {'player_name': 'Toze', 'player_score': 1.1778}, {'player_name': 'Yakobay', 'player_score': 0.9579}, {'player_name': 'Ogre', 'player_score': 0.6471}], 'team_name': 'Alpha', 'team_num_players': 5, 'team_score': 5.9032627425, 'captain': 'Yakobay'}, 'team_b': {'players': [{'player_name': 'Dream', 'player_score': 1.9214}, {'player_name': 'Edge', 'player_score': 1.2822}, {'player_name': 'Mailboxhead', 'player_score': 1.0127}, {'player_name': 'Unthink', 'player_score': 1.5904}], 'team_name': 'Bravo', 'team_num_players': 4, 'team_score': 5.8066908706, 'captain': 'Mailboxhead'}}
+    if request.method == 'POST':
+        # print(request.data)
+        # data = JSONParser().parse(request)
+        serializer = TeamSetSerializer(data=request.data)
+    else:
+        return HttpResponse("Not Implemented")
+    if serializer.is_valid():
+        today_plus_seven = timezone.now().date() + timedelta(days=7)
+        season = Season.objects.filter(start_date__lte=today_plus_seven, end_date__gte=today_plus_seven).first()
+        if season is None:
+            return Response("There is no season created in the range of today's date.", status=status.HTTP_404_NOT_FOUND)
+# INITIALIZE POST DATA
+        captain1 = serializer.validated_data['cap1']
+        captain2 = serializer.validated_data['cap2']
+        team1 = serializer.validated_data['team1']
+        team2 = serializer.validated_data['team2']
+
+# GET THE TEAMS FOR THE CURRENT SEASON
+        teams = Team.objects.filter(season=season)
+        team_a = teams.first()
+        team_b = teams.last()
+        print('DATA:',  captain1, captain2, team1, team2)
+
+# CHECK THAT THE CAPTAINS ARE VALID AND THAT THEY ARE THE CAPTAINS FOR THE CURRENT SEASON
+        cap1 = Geek.objects.values('discord','handle').filter(Q(handle=captain1) | Q(discord=captain1), is_member=1)
+        cap2 = Geek.objects.values('discord','handle').filter(Q(handle=captain2) | Q(discord=captain2), is_member=1)
+        print('CAPTAINS:', cap1, cap2)
+        print('TEAMS:', teams, team1, team2)
+        
+        if cap1.exists() and cap2.exists() and cap1[0]['handle'] == captain1 and cap2[0]['handle'] == captain2:
+            for geek in team1[0]['players']:
+                player = Geek.objects.filter(geek['discord'], is_member=1)
+                if player.exists():
+                    teamGeek = TeamGeek.objects.create(team=teams.first(), geek_id=player.first(), tier_id = player.first().tier_id)
+                    teamGeek.save()
+                else:
+                    return Response("One or more of the players do not exist", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("One or both of the captains do not exist or these are not the right team captains for the current season teams", status=status.HTTP_400_BAD_REQUEST)
+    else:
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
