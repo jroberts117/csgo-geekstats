@@ -200,11 +200,12 @@ def get_player_stats(request):
                     deaths=Sum('deaths'),
                     assists=Sum('assists'),
                     kdr=Avg('kdr'),
-                    akdr=Avg('akdr')
+                    akdr=Avg('akdr'),
+                    adr=Avg('ADR')
                 )
                 print(player_stats.query)
             else:
-                player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
+                player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr','adr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
             player_stats_d = list(player_stats)
             j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
             return JsonResponse(j_stats, safe=False)
