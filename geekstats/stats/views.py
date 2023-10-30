@@ -988,12 +988,12 @@ def playerdetails(request):
         playerData.nemesis = 'There is no player data for this date.  Please select a date when this player played.'
     else:
         pdata = (FragDetails.objects.values('id','match_date','killer','victim','victim_id','map','weapon','type')
-                     .filter(Q (id=pid) | Q(victim_id=pid),match_date__gte=request.session['start_date'], match_date__lte=request.session['end_date'])
+                     .filter(Q (id=pid) | Q(victim_id=pid),match_date__gte=newstate.tz_start_date, match_date__lte=newstate.tz_end_date)
                      .order_by('id','type'))
         
-        endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+        # endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
         ddata = (Damage.objects.select_related('round', 'geek', 'round__match', 'item')
-                 .filter(geek_id=pid,round__match__match_date__gte=request.session['start_date'], round__match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+                 .filter(geek_id=pid,round__match__match_date__gte=newstate.tz_start_date, round__match__match_date__lte=newstate.tz_end_date)
                 .values('geek__handle', 'damage_armor', 'damage_health', 'armor_remaining', 'health_remaining', 'hitgroup', 'item__name', 'is_team_damage', 'is_kill')
                 .order_by('hitgroup'))
 
