@@ -77,6 +77,8 @@ class state:
     def setsession(self,start,end,compare,value,page, selector, datetype):
         self.start_date = start
         self.end_date = end
+        self.tz_start_date = timezone.make_aware(datetime.datetime.strptime(start, '%Y-%m-%d'), timezone=pytz.timezone('UTC'))
+        self.tz_end_date = timezone.make_aware(datetime.datetime.strptime(end, '%Y-%m-%d') + datetime.timedelta(hours=26), timezone=pytz.timezone('UTC'))
         self.compare = compare
         self.value = value
         self.page = page
@@ -130,13 +132,14 @@ def awards(request):
             newstate.value = 0
 
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
-    raw_award_data = GeekfestMatchAward.objects.select_related('match', 'geefest_award', 'geekfest_award__award_category', 'geek').filter(
-        match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S')).values(
-            'geek__handle', 'geekfest_award__award_name', 'geekfest_award__award_title', 'geekfest_award__award_category__category_name',
-            'geekfest_award__award_image_path', 'geekfest_award__award_description', 'geekfest_award__award_value_type',
-            'geekfest_award__award_category__category_color','geekfest_award__award_category__award_category_id').annotate(
-                max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value')).order_by(
-                    "geekfest_award__award_category__award_category_id", "geekfest_award__award_name")
+    raw_award_data = (GeekfestMatchAward.objects.select_related('match', 'geefest_award', 'geekfest_award__award_category', 'geek')
+                      .filter(match__match_date__gte=newstate.tz_start_date, 
+                              match__match_date__lte=newstate.tz_end_date)
+                      .values('geek__handle', 'geekfest_award__award_name', 'geekfest_award__award_title', 'geekfest_award__award_category__category_name',
+                              'geekfest_award__award_image_path', 'geekfest_award__award_description', 'geekfest_award__award_value_type',
+                              'geekfest_award__award_category__category_color','geekfest_award__award_category__award_category_id')
+                      .annotate(max_points=Max('award_value'), sum_points=Sum('award_value'), min_points=Min('award_value'))
+                      .order_by("geekfest_award__award_category__award_category_id", "geekfest_award__award_name"))
 
     award_data_by_award = defaultdict(list)
     for award_data in raw_award_data:
@@ -470,15 +473,15 @@ def maps(request):
 
     newstate.compare = 'map'
     #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
-    tz = pytz.timezone('UTC')
-    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(hours=26)
-    tz_endDate = timezone.make_aware(endDate, timezone=tz)
-    startDate = datetime.datetime.strptime(request.session['start_date'], '%Y-%m-%d')
-    tz_startDate = timezone.make_aware(startDate, timezone=tz)
-    # print(request.session['start_date'], tz_endDate.strftime('%Y-%m-%d %H:%M:%S'), tz_startDate.strftime('%Y-%m-%d %H:%M:%S'))
+    # tz = pytz.timezone('UTC')
+    # endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(hours=26)
+    # tz_endDate = timezone.make_aware(endDate, timezone=tz)
+    # startDate = datetime.datetime.strptime(request.session['start_date'], '%Y-%m-%d')
+    # tz_startDate = timezone.make_aware(startDate, timezone=tz)
+    # # print(request.session['start_date'], tz_endDate.strftime('%Y-%m-%d %H:%M:%S'), tz_startDate.strftime('%Y-%m-%d %H:%M:%S'))
     rounds = MatchRound.objects.prefetch_related('match').filter(
-            match__match_date__gte=tz_startDate, 
-            match__match_date__lte=tz_endDate)
+            match__match_date__gte=newstate.tz_start_date, 
+            match__match_date__lte=newstate.tz_end_date)
 
     killData = Frag.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id', 'round__match__match_date').annotate(num_frags=Count('frag_id')).order_by('round__match__match_date', '-num_frags')
     
@@ -519,7 +522,7 @@ def maps(request):
         curPlayer['kdr'] = round(curPlayer['kdr'], 2)
 
     ###########  Add the map win % and rating  ###################
-    map_data = (MapData.objects.values('map_id','map','win_side','type','theme','votescore','thumbnail').annotate(wins=Count('win_side')).filter(match_date__gte=request.session['start_date'], match_date__lte=endDate.strftime('%Y-%m-%d')))
+    map_data = (MapData.objects.values('map_id','map','win_side','type','theme','votescore','thumbnail').annotate(wins=Count('win_side')).filter(match_date__gte=newstate.tz_start_date, match_date__lte=newstate.tz_end_date))
     map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
 
     map_data_list = []
@@ -802,12 +805,26 @@ def weapons(request):
     template = loader.get_template('weapons.html')
     newstate.setsession(request.session['start_date'],request.session['end_date'],'',0,'Weapons', request.session['selector'],request.session['datetype'])
 
-    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
-    rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+    # endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
+    rounds = (MatchRound.objects.prefetch_related('match')
+              .filter(match__match_date__gte=newstate.tz_start_date, 
+                      match__match_date__lte=newstate.tz_end_date))
 
-    killData = Frag.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_frags=Count('frag_id')).order_by('item__decscription', '-num_frags')
-    deathData = Death.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds, is_teamkill=False,  geek__is_member=True).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('item__decscription')
-    buyData = Buy.objects.prefetch_related('geek').prefetch_related('item').filter(round__in=rounds).values('item__name', 'geek__handle', 'item__decscription', 'geek_id').annotate(num_buys=Count('buy_id')).order_by('item__decscription')
+    killData = (Frag.objects.prefetch_related('geek').prefetch_related('item')
+                .filter(round__in=rounds, is_teamkill=False, geek__is_member=True)
+                .values('item__name', 'geek__handle', 'item__decscription', 'geek_id')
+                .annotate(num_frags=Count('frag_id'))
+                .order_by('item__decscription', '-num_frags'))
+    deathData = (Death.objects.prefetch_related('geek')
+                 .prefetch_related('item')
+                 .filter(round__in=rounds, is_teamkill=False,  geek__is_member=True)
+                 .values('item__name', 'geek__handle', 'item__decscription', 'geek_id')
+                 .annotate(num_deaths=Count('death_id')).order_by('item__decscription'))
+    buyData = (Buy.objects.prefetch_related('geek')
+               .prefetch_related('item')
+               .filter(round__in=rounds)
+               .values('item__name', 'geek__handle', 'item__decscription', 'geek_id')
+               .annotate(num_buys=Count('buy_id')).order_by('item__decscription'))
 
     itemGroupedData = {}
 
