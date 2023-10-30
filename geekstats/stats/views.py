@@ -3,17 +3,20 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.urls import reverse
 from django.template import loader
+from django.utils import timezone
 from django.contrib.auth import login
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
+from django.db import models
+from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
 from .geekmodels import Buy, Geek, GeekKDRHistory, TeamWins, TiersData, Frag, MatchRound, Death, SeasonMatch, GeekInfo, FragDetails, GeekfestMatchAward, AwardCategory, Season, GeekAuthUser, MapData, SeasonWins, TeamGeek, Tier, Team, Maps, MapRating, Damage
 from .geekclasses import season, player, map_summary
 import stats.functions as func
 from .forms import CustomUserCreationForm, GeeksForm
 import logging
 import operator, sys
-from django.db import models
-from django.db.models import Count, Sum, Avg, Min, Max, Q, F, ExpressionWrapper, Value
+import pytz
+
 import datetime
 import uuid
 import pygal
@@ -467,14 +470,21 @@ def maps(request):
 
     newstate.compare = 'map'
     #TiersData.objects.values('player').filter(tier="Gold", matchdate__gte=request.session['start_date'], matchdate__lte=request.session['end_date']).order_by('-kdr__avg').annotate(Avg('kdr')) 
-    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
-    rounds = MatchRound.objects.prefetch_related('match').filter(match__match_date__gte=request.session['start_date'], match__match_date__lte=endDate.strftime('%Y-%m-%d %H:%M:%S'))
+    tz = pytz.timezone('UTC')
+    endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(hours=26)
+    tz_endDate = timezone.make_aware(endDate, timezone=tz)
+    startDate = datetime.datetime.strptime(request.session['start_date'], '%Y-%m-%d')
+    tz_startDate = timezone.make_aware(startDate, timezone=tz)
+    # print(request.session['start_date'], tz_endDate.strftime('%Y-%m-%d %H:%M:%S'), tz_startDate.strftime('%Y-%m-%d %H:%M:%S'))
+    rounds = MatchRound.objects.prefetch_related('match').filter(
+            match__match_date__gte=tz_startDate, 
+            match__match_date__lte=tz_endDate)
 
     killData = Frag.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id', 'round__match__match_date').annotate(num_frags=Count('frag_id')).order_by('round__match__match_date', '-num_frags')
     
     deathData = Death.objects.prefetch_related('geek').prefetch_related('round__match').filter(round__in=rounds, is_teamkill=False, geek__is_member=True).values('round__match__map', 'geek__handle', 'geek_id').annotate(num_deaths=Count('death_id')).order_by('round__match__map')
     
-    # print(playData)
+    # print(rounds.query, "\n", killData.query, "\n",  deathData.query)
     mapGroupData = {}
 
     for k in killData:
@@ -512,7 +522,6 @@ def maps(request):
     map_data = (MapData.objects.values('map_id','map','win_side','type','theme','votescore','thumbnail').annotate(wins=Count('win_side')).filter(match_date__gte=request.session['start_date'], match_date__lte=endDate.strftime('%Y-%m-%d')))
     map_plays = (SeasonMatch.objects.values('map').annotate(plays=Count('match_id')))
 
-
     map_data_list = []
     last_map = ''
     curr_rec = {}
@@ -532,7 +541,6 @@ def maps(request):
             curr_rec = i
         last_map = i['map']
     map_data_list.append(curr_rec)
-    print(map_data_list)
 
     for i in mapGroupData:
         for j in map_data_list:
