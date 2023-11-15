@@ -450,7 +450,29 @@ class TiersData(models.Model):
         managed = False
         db_table = 'tiers_data'
         db_tablespace = 'geek'
-    
+
+class TiersDataFast(models.Model):
+    geekid = models.IntegerField()
+    player = models.CharField(max_length=250)
+    discord = models.CharField(max_length=250)
+    tier = models.CharField(max_length=250)
+    tier_id = models.IntegerField()
+    generation = models.IntegerField()
+    matchdate = models.DateField()
+    kills = models.IntegerField()
+    deaths = models.IntegerField() 
+    assists = models.IntegerField()
+    kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    akdr = models.DecimalField(max_digits=8, decimal_places=2)
+    alltime_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    year_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+    last90_kdr = models.DecimalField(max_digits=8, decimal_places=2)
+
+    class Meta:
+        managed = False
+        db_table = 'tiers_data_fast'
+        db_tablespace = 'geek'
+
 class TeamWins(models.Model):
     match_date = models.DateField()
     map = models.CharField(max_length=250)

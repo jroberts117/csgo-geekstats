@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.parsers import JSONParser
 
-from .geekmodels import Maps, MapRating, Geek, TiersData, Season, Team, TeamGeek
+from .geekmodels import Maps, MapRating, Geek, TiersData, Season, Team, TeamGeek, TiersDataFast
 from .serializers import MapSerializer, MapImageSerializer, DataSerializer, MapRequestSerializer, TeamSetSerializer, StatRequestSerializer, BotMapSerializer
 from datetime import date, timedelta
 from decimal import Decimal
@@ -205,7 +205,8 @@ def get_player_stats(request):
                 )
                 print(player_stats.query)
             else:
-                player_stats = TiersData.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr','adr').filter(player=player,matchdate__gte=start_date,matchdate__lte=end_date)
+                player_stats = (TiersDataFast.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr','adr')
+                                .filter(Q(player__iexact=player) | Q(discord__iexact=player),matchdate__gte=start_date,matchdate__lte=end_date)
             player_stats_d = list(player_stats)
             j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
             return JsonResponse(j_stats, safe=False)
