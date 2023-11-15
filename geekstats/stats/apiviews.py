@@ -205,8 +205,8 @@ def get_player_stats(request):
                 )
                 print(player_stats.query)
             else:
-                player_stats = (TiersDataFast.objects.values('player','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr','adr')
-                                .filter(Q(player__iexact=player) | Q(discord__iexact=player),matchdate__gte=start_date,matchdate__lte=end_date)
+                player_stats = (TiersDataFast.objects.values('player','discord','tier','matchdate','kills','deaths','assists','kdr','alltime_kdr')
+                                .filter(Q(player__iexact=player) | Q(discord__iexact=player),matchdate__gte=start_date,matchdate__lte=end_date))
             player_stats_d = list(player_stats)
             j_stats = json.dumps(player_stats_d, cls=CustomEncoder)
             return JsonResponse(j_stats, safe=False)
