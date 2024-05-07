@@ -737,7 +737,7 @@ def map2(request):
     endDate = datetime.datetime.strptime(request.session['end_date'], '%Y-%m-%d') + datetime.timedelta(days=1)
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','workshop_link','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds') \
+    dataMap = Maps.objects.values('idmap','map','description','workshop_link','workshop_map_nbr','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds') \
         .filter(idmap=mid)
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
 
@@ -753,8 +753,12 @@ def map2(request):
 
     for j in dataMap:
         MapList.append(map_summary(j))
+        print(map_summary(j))
+
+    # print(MapList[0])
     
     for m in MapList:
+        print(m)
         dataRec = list(filter(lambda dat: dat['map'] == m.name, list(dataFrag)))
         m.players = list_builder(dataRec,'killer')
         m.weapons = list_builder(dataRec,'weapon')

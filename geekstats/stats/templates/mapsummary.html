@@ -193,9 +193,14 @@
         <div class="inline wide100"> Theme: </div><div class="inline"> <input type="text" name="theme" id="theme" size="25" maxlength="45" value="{{i.theme}}"></div>
       </div>
       <div>
-        <div class="inline wide100"> Workshop Link: </div><div class="inline"> <input type="text" name="workshop_link" id="workshop" size="50" maxlength="150" value="{{i.workshop}}"></div>
+        <div class="inline wide100"> Workshop #: </div><div class="inline"> <input type="text" name="workshop_map_nbr" id="map_nbr" size="25" maxlength="45" value="{{i.workshop_map_nbr}}"></div>
       </div>
     </div>
+  </div>
+    <div style="display: flex; padding-bottom: 10px;">
+      <div>
+        <div class="inline wide100"> Workshop Link: </div><div class="inline"> <input type="text" name="workshop_link" id="workshop" size="95" maxlength="150" value="{{i.workshop}}"></div>
+      </div>
     </div>
     <div class="container" style="padding:0px; justify-content: left;"><div class="inline wide100"> Description: </div><div class="inline"> <textarea name="description" id="desc" rows="2" cols="95" maxlength="500" value="{{i.description}}"></textarea></div>
   </div>        
@@ -327,6 +332,7 @@ let dropArea = document.getElementById("drop-area")
 // Handle dropped files and updated fields
 dropArea.addEventListener('drop', handleDrop, false)
 theme.addEventListener('change', handleUpdate)
+map_nbr.addEventListener('change', handleUpdate)
 desc.addEventListener('change', handleUpdate)
 workshop.addEventListener('change', handleUpdate)
 

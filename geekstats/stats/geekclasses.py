@@ -355,6 +355,7 @@ class map_summary:
         self.name = data['map']
         self.description = data['description']
         self.workshop = data['workshop_link']
+        self.workshop_map_nbr = data['workshop_map_nbr']
         self.type = data['type']
         self.theme = data['theme']
         self.rating = data['votescore']

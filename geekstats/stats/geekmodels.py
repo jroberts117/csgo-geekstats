@@ -270,6 +270,7 @@ class Maps(models.Model):
     type = models.CharField(max_length=1000)
     theme = models.CharField(max_length=1000)
     workshop_link = models.CharField(max_length=1000)
+    workshop_map_nbr = models.CharField(max_length=15)
     votescore = models.DecimalField(max_digits=12, decimal_places=4, blank=True, null=True)
     balance = models.CharField(max_length=1000)
     ct_wins = models.IntegerField(blank=True, null=True)
