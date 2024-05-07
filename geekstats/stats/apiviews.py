@@ -55,7 +55,7 @@ def bot_map_rating(request):
             print(serializer.data['map'], serializer.data['user'], map_rating)
             if map_rating == -1:                                                                # TO LOOKUP MAPS BY PARTIAL NAME
                 map_id = Maps.objects.filter(map__contains=serializer.data['map']).order_by('last_play')[:5]
-                print(map_id.values('map','idmap'))
+                # print(map_id.values('map','idmap'))
                 return Response(map_id.values('idmap','map','thumbnail','description',), status=status.HTTP_200_OK)
             elif map_rating == -2:                                                    # TO SEE THIS WEEK's MAPS
                 map_id = Maps.objects.order_by('last_play')[:3]
@@ -68,6 +68,11 @@ def bot_map_rating(request):
                     )
                 print(map_rating)
                 return Response(map_rating.values('map_name', 'vote_count', 'vote_sum'), status=status.HTTP_200_OK)
+            elif map_rating == -4:                                                    # FOR MAP LOADER NUMBER 
+                map_id = Maps.objects.filter(map__contains=serializer.data['map']).order_by('last_play')[:5]
+                # print(map_id.values('map','idmap'))
+                return Response(map_id.values('idmap','map','workshop_map_nbr',), status=status.HTTP_200_OK)
+
             elif map_rating > 0 and map_rating < 6:                                                    # PROCESS THE VOTE
                 map_id = Maps.objects.filter(map=serializer.data['map']).first()
                 if map_id is None:
@@ -136,7 +141,7 @@ def update_data(request):
             field = serializer.data['field']
             value = serializer.data['value']
             curr_user = serializer.data['uid']
-            if field =='theme' or  field =='description' or field =='workshop_link':
+            if field =='theme' or  field =='description' or field =='workshop_map_nbr' or field =='workshop_link': 
                 edit_map = Maps.objects.get(idmap=serializer.data['did'])
                 setattr(edit_map, field, value)
                 # edit_map[field] = value

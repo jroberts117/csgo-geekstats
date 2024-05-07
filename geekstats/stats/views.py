@@ -658,13 +658,12 @@ def mapdetails(request):
 
     MapList = []
 
-    dataMap = Maps.objects.values('idmap','map','description','workshop_link','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
+    dataMap = Maps.objects.values('idmap','map','description','workshop_link','workshop_map_nbr','type','theme','votescore', 'metascore','votes','ct_wins','t_wins','plays','s_plays','last_play','hero_image','radar','thumbnail','image2','image3','no_obj_rounds', 'bomb_plant_rounds', 'bomb_explode_rounds', 'defuse_rounds')
     dataFrag = FragDetails.objects.values('match_date','killer','victim','map','weapon','type').filter(type='kill')
     if request.user.is_authenticated:
         current_user = request.user
         userid = Geek.objects.values('geek_id').filter(userid=current_user.id)[0]['geek_id']
         dataRating = MapRating.objects.annotate(count=F('rating'), item=F('map__map')).values('item', 'count').filter(geek__userid=current_user.id)
-        print(dataRating)
     else:
         userid = 'none'
     themes = list_builder(dataMap,'theme')
@@ -750,15 +749,13 @@ def map2(request):
     else:
         userid = 'none'
     themes = list_builder(dataMap,'theme')
-
     for j in dataMap:
         MapList.append(map_summary(j))
-        print(map_summary(j))
+        
 
     # print(MapList[0])
     
     for m in MapList:
-        print(m)
         dataRec = list(filter(lambda dat: dat['map'] == m.name, list(dataFrag)))
         m.players = list_builder(dataRec,'killer')
         m.weapons = list_builder(dataRec,'weapon')
