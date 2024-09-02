@@ -133,6 +133,10 @@ CREATE TABLE geek.frag(
     , is_penetration	BOOL			NOT NULL DEFAULT false
     , is_teamkill		bool			NOT NULL DEFAULT false
     , item_id			INT				NOT NULL
+    , is_noscope        BOOL            NOT NULL DEFAULT false
+    , is_midair         BOOL            NOT NULL DEFAULT false
+    , is_throughsmoke   BOOL            NOT NULL DEFAULT false
+    , is_blinded        BOOL            NOT NULL DEFAULT false
     , PRIMARY KEY (frag_id)
     , FOREIGN KEY (round_id) REFERENCES geek.match_round(round_id) ON DELETE CASCADE
     , FOREIGN KEY (geek_id) REFERENCES geek.geek(geek_id)
@@ -156,6 +160,10 @@ CREATE TABLE geek.death(
     , is_penetration	BOOL			NOT NULL DEFAULT false
     , is_teamkill		bool			NOT NULL DEFAULT false
     , item_id			INT				NOT NULL
+    , is_noscope        BOOL            NOT NULL DEFAULT false
+    , is_midair         BOOL            NOT NULL DEFAULT false
+    , is_throughsmoke   BOOL            NOT NULL DEFAULT false
+    , is_blinded        BOOL            NOT NULL DEFAULT false
     , PRIMARY KEY (death_id)
     , FOREIGN KEY (round_id) REFERENCES geek.match_round(round_id) ON DELETE CASCADE
     , FOREIGN KEY (geek_id) REFERENCES geek.geek(geek_id)
