@@ -10,9 +10,22 @@ class SeasonAdmin(admin.ModelAdmin):
 
     active.boolean = True
 
+class TeamGeekModelAdmin(admin.ModelAdmin):
+    list_display = ('geek', 'team', 'tier', 'event_date')
+    list_filter = ('team', 'geek')  # Using default filter options
+
+class TeamGeekInline(admin.TabularInline):
+    model = TeamGeek
+    extra = 1
+
+class TeamModelAdmin(admin.ModelAdmin):
+    list_display = ('team_id', 'season', 'name', 'description', 'captain', 'co_captain')
+    list_filter = ('season', 'captain')  # Using default filter options
+    inlines = [TeamGeekInline]
+
 # Register your models here.
 admin.site.register(Season)
 admin.site.register(TeamGeek)
-admin.site.register(Team)
+admin.site.register(Team, TeamModelAdmin)
 admin.site.register(Geek)
 admin.site.register(Maps)
